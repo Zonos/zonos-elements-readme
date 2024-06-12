@@ -20,9 +20,10 @@ export const productionCodeCheck = (path: string) => {
 
   const fullPathWithExt = `${path}/**/*.{ts*,js*}`;
   const globPaths = globSync(fullPathWithExt);
-  const hasNonDeclarationFiles = globPaths.filter(
-    (filePath) => !filePath.endsWith(".d.ts"),
-  );
+  const hasNonDeclarationFiles = globPaths
+    .filter((filePath) => !filePath.endsWith(".d.ts"))
+    // Take out the current working directory from the file path
+    .map((filePath) => filePath.replace(`${cwd()}/`, "./"));
 
   // Determine if there are files that are not declaration files, indicating the presence of production code
   return hasNonDeclarationFiles;

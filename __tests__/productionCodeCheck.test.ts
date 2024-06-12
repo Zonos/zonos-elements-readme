@@ -13,10 +13,10 @@ describe("Make sure there is no production code in this repository", () => {
     const hasProductionCode = productionCodeCheck(mockFolderPath);
     expect(hasProductionCode).toMatchInlineSnapshot(`
       [
-        "/Users/thienhuynh/zonos/zonos-elements-readme/__tests__/__mocks__/productionCodeCheck/mockTypescriptFile.ts",
-        "/Users/thienhuynh/zonos/zonos-elements-readme/__tests__/__mocks__/productionCodeCheck/mockTsxFile.tsx",
-        "/Users/thienhuynh/zonos/zonos-elements-readme/__tests__/__mocks__/productionCodeCheck/mockJsxFile.jsx",
-        "/Users/thienhuynh/zonos/zonos-elements-readme/__tests__/__mocks__/productionCodeCheck/mockJsFile.js",
+        "./__tests__/__mocks__/productionCodeCheck/mockTypescriptFile.ts",
+        "./__tests__/__mocks__/productionCodeCheck/mockTsxFile.tsx",
+        "./__tests__/__mocks__/productionCodeCheck/mockJsxFile.jsx",
+        "./__tests__/__mocks__/productionCodeCheck/mockJsFile.js",
       ]
     `);
   });
