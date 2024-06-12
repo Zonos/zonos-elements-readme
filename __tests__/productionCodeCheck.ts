@@ -1,29 +1,34 @@
 import { globSync } from "glob";
-import { existsSync, rmSync, writeFileSync } from "fs";
+import { rmSync, writeFileSync } from "fs";
 import { cwd } from "process";
 
 const redundantFilesToRemove = [
-  `${cwd()}/src/types/generated/graphql.customer.types.ts`,
-  `${cwd()}/src/types/generated/graphql.frontend.types.ts`,
+  `graphql.customer.types.ts`,
+  `graphql.frontend.types.ts`,
 ];
 
-const removeRedundantFiles = () => {
-  redundantFilesToRemove.forEach((file) => {
+const removeRedundantFiles = (path: string) => {
+  const filePathsToRemove = globSync(
+    redundantFilesToRemove.map((file) => `${path}/**/${file}`),
+  );
+  filePathsToRemove.forEach((file) => {
     rmSync(file, { force: true });
   });
 };
 
-const rewriteEnvironmentFile = () => {
+const rewriteEnvironmentFile = (path: string) => {
   // cleanup environment.d.ts
-  const environmentPath = `${cwd()}/src/environment.d.ts`;
+  const environmentPaths = globSync(`${path}/**/environment.d.ts`);
   // Only rewrite if the file exists
-  if (!existsSync(environmentPath)) {
+  if (!environmentPaths.length) {
     return;
   }
 
   // Rewrite the file to only export empty object
   const fileContent = `export type Env = {};`;
-  writeFileSync(environmentPath, fileContent);
+  environmentPaths.forEach((environmentPath) => {
+    writeFileSync(environmentPath, fileContent);
+  });
 };
 
 /**
@@ -33,10 +38,10 @@ const rewriteEnvironmentFile = () => {
  */
 export const productionCodeCheck = (path: string) => {
   // Delete .ts file in "generated" folder
-  removeRedundantFiles();
+  removeRedundantFiles(path);
 
   // Rewrite the file to only export empty object
-  rewriteEnvironmentFile();
+  rewriteEnvironmentFile(path);
 
   const fullPathWithExt = `${path}/**/*.{ts*,js*}`;
   const globPaths = globSync(fullPathWithExt);

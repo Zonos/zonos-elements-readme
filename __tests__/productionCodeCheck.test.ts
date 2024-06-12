@@ -3,8 +3,8 @@ import { readFileSync } from "fs";
 import { cwd } from "process";
 
 describe("Make sure there is no production code in this repository", () => {
-  test("Shoud not have js or ts files under `src` folder", () => {
-    const directoryPath = `${cwd()}/src`;
+  test("Shoud not have js or ts files under `dist` folder", () => {
+    const directoryPath = `${cwd()}/dist`;
     const hasProductionCode = productionCodeCheck(directoryPath);
     expect(hasProductionCode).toStrictEqual([]);
   });
@@ -23,7 +23,7 @@ describe("Make sure there is no production code in this repository", () => {
   });
 
   test("Make sure src/environment.ts not expose any type", () => {
-    const environmentPath = `${cwd()}/src/environment.d.ts`;
+    const environmentPath = `${cwd()}/dist/types/environment.d.ts`;
     // Make sure only export empty object if the environment file exist
     try {
       const fileContent = readFileSync(environmentPath, "utf-8");
