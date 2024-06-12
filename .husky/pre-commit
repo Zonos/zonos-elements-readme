@@ -1,0 +1,2 @@
+# Make sure the test is ran before commiting files
+pnpm tsc && pnpm test
