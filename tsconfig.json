@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "allowSyntheticDefaultImports": true,
+    "allowUnreachableCode": false,
+    "strict": true,
+    "strictNullChecks": true,
+    "noEmit": true,
+    "noImplicitAny": false,
+    "resolveJsonModule": true,
+    "forceConsistentCasingInFileNames": true,
+    "experimentalDecorators": true,
+    "lib": ["dom", "ES2017", "ES2015"],
+    "moduleResolution": "nodenext",
+    "module": "nodenext",
+    "types": ["vitest/globals"],
+    "typeRoots": ["node_modules"],
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "paths": {
+      "src/*": ["./src/*"],
+    },
+  },
+  "include": ["src/**/*", "__tests__/**/*"],
+  "exclude": ["node_modules"]
+}
