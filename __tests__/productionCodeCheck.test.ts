@@ -1,4 +1,5 @@
 import { productionCodeCheck } from "__tests__/productionCodeCheck";
+import { readFileSync } from "fs";
 import { cwd } from "process";
 
 describe("Make sure there is no production code in this repository", () => {
@@ -19,5 +20,16 @@ describe("Make sure there is no production code in this repository", () => {
         "./__tests__/__mocks__/productionCodeCheck/mockJsFile.js",
       ]
     `);
+  });
+
+  test("Make sure src/environment.ts not expose any type", () => {
+    const environmentPath = `${cwd()}/src/environment.d.ts`;
+    // Make sure only export empty object if the environment file exist
+    try {
+      const fileContent = readFileSync(environmentPath, "utf-8");
+      expect(fileContent).toMatchInlineSnapshot(`"export type Env = {};"`);
+    } catch (_err) {
+      // Do nothing
+    }
   });
 });

@@ -1,11 +1,30 @@
 import { globSync } from "glob";
-import { rmSync } from "fs";
+import { existsSync, rmSync, writeFileSync } from "fs";
 import { cwd } from "process";
 
 const redundantFilesToRemove = [
   `${cwd()}/src/types/generated/graphql.customer.types.ts`,
   `${cwd()}/src/types/generated/graphql.frontend.types.ts`,
 ];
+
+const removeRedundantFiles = () => {
+  redundantFilesToRemove.forEach((file) => {
+    rmSync(file, { force: true });
+  });
+};
+
+const rewriteEnvironmentFile = () => {
+  // cleanup environment.d.ts
+  const environmentPath = `${cwd()}/src/environment.d.ts`;
+  // Only rewrite if the file exists
+  if (!existsSync(environmentPath)) {
+    return;
+  }
+
+  // Rewrite the file to only export empty object
+  const fileContent = `export type Env = {};`;
+  writeFileSync(environmentPath, fileContent);
+};
 
 /**
  * Check if the given path has production code (non-declaration files)
@@ -14,9 +33,10 @@ const redundantFilesToRemove = [
  */
 export const productionCodeCheck = (path: string) => {
   // Delete .ts file in "generated" folder
-  redundantFilesToRemove.forEach((file) => {
-    rmSync(file, { force: true });
-  });
+  removeRedundantFiles();
+
+  // Rewrite the file to only export empty object
+  rewriteEnvironmentFile();
 
   const fullPathWithExt = `${path}/**/*.{ts*,js*}`;
   const globPaths = globSync(fullPathWithExt);
