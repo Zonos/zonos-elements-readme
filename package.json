@@ -4,7 +4,7 @@
   "description": "Documentation for integrating zonos-elements, no porduction code.",
   "types": "src/index.d.ts",
   "scripts": {
-    "tsc": "tsc",
+    "tsc": "tsc && echo 'Type checking completed'",
     "test": "vitest run",
     "prepare": "husky"
   },
