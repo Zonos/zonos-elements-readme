@@ -19,9 +19,9 @@
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "src/*": ["./src/*"],
+      "src/*": ["./dist/types/*"],
     },
   },
-  "include": ["src/**/*", "__tests__/**/*"],
+  "include": ["dist/types/**/*", "__tests__/**/*"],
   "exclude": ["node_modules"]
 }
