@@ -1,0 +1,22 @@
+import type { HelloCurrencyBehavior, HelloEstimateBehavior, HelloMobileLocation, HelloPeekMessageBehavior, HelloRestrictionBehavior, Mode } from "../generated/graphql.customer.types";
+export type HelloConfig = {
+    anchorElementSelector: string;
+    cartUrlPattern: string | null;
+    currencyBehavior: HelloCurrencyBehavior;
+    currencyElementSelector: string;
+    dutyTaxEstimationBehavior: HelloEstimateBehavior;
+    excludedUrlPatterns: Array<string>;
+    homepageUrlPattern: string | null;
+    mobileLocation: HelloMobileLocation;
+    mode: Mode;
+    organization: string;
+    peekMessageBehavior: HelloPeekMessageBehavior;
+    peekMessageDelay: number;
+    productAddToCartElementSelector: string | null;
+    productDescriptionElementSelector: string | null;
+    productDetailUrlPattern: string | null;
+    productListUrlPattern: string | null;
+    productPriceElementSelector: string | null;
+    productTitleElementSelector: string | null;
+    restrictionBehavior: HelloRestrictionBehavior;
+};
