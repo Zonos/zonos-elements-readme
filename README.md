@@ -22,7 +22,7 @@ This project offers web components designed primarily for Zonos Checkout, Zonos 
 
 # Prerequisites
 - Node.js (v18 or higher)
-- An API key for Zonos Checkout/Hello (please contact our support team [here](https://zonos.com/contact-sales) for more information)
+- An API key for Zonos Checkout/Hello (please contact our [support team](https://zonos.com/contact-support) for more information)
 
 # Installation
 There are two ways to initialize Zonos: via custom integration using a CDN or through npm installation.
@@ -32,8 +32,8 @@ There are two ways to initialize Zonos: via custom integration using a CDN or th
 ## Brief `Zonos.init` base configuration explanation:
 - `checkoutSettings.buildCartDetail`: This callback function retrieves cart item information from your web platform. It should return an array of cart item objects. For the expected type definition, please refer to the [`buildCartDetail`](./dist/types/types/checkout/CheckoutConfig.d.ts) and the [cart item](./dist/types/components/store/checkout/cart.d.ts) files.
 - `checkoutSettings.placeOrderButtonSelector`: This is used to find all matching selectors and attach an event to trigger the Checkout process. While you can configure this in our Zonos dashboard, it's recommended to set it here so that Zonos can disable your Checkout place order button while loading.
-- `zonosApiKey`: An API key for Zonos Checkout/Hello (please contact our [support team](https://zonos.com/contact-sales) for more information).
-- `storeId`: Store id that your checkout would associate with (please contact our [support team](https://zonos.com/contact-sales) for more information).
+- `zonosApiKey`: An API key for Zonos Checkout/Hello (please contact our [support team](https://zonos.com/contact-support) for more information).
+- `storeId`: Store id that your checkout would associate with (please contact our [support team](https://zonos.com/contact-support) for more information).
 
 ## CDN
 
