@@ -1,33 +1,30 @@
-# Zonos Component UI
-
-## Introduction
+# Zonos Component UI Introduction
 This project offers web components designed primarily for Zonos Checkout, Zonos Hello, and other Zonos products, with a focus on React and Next.js integration. Although not yet tested with other JavaScript libraries and frameworks, the implementation principles for React and Next.js can be adapted for use with other frameworks. For more information about Zonos products, please visit the official [Zonos website](https://zonos.com).
 
-## Table of content
-- [Zonos Component UI](#zonos-component-ui)
-  - [Introduction](#introduction)
-  - [Table of content](#table-of-content)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-    - [CDN](#cdn)
-      - [When to use:](#when-to-use)
-      - [Usage:](#usage)
-    - [Npm](#npm)
-      - [When to use:](#when-to-use-1)
-      - [Usage:](#usage-1)
-  - [API references](#api-references)
+# Table of content
+- [Zonos Component UI Introduction](#zonos-component-ui-introduction)
+- [Table of content](#table-of-content)
+- [Prerequisites](#prerequisites)
+- [Installation](#installation)
+  - [CDN](#cdn)
+    - [When to use:](#when-to-use)
+    - [Usage:](#usage)
+  - [Npm](#npm)
+    - [When to use:](#when-to-use-1)
+    - [Usage:](#usage-1)
+- [API references](#api-references)
 
 
-## Prerequisites
+# Prerequisites
 - Node.js (v18 or higher)
 - An API key for Zonos Checkout/Hello (please contact our support team [here](https://zonos.com/contact-sales) for more information)
 
-## Installation
+# Installation
 There are two ways to initialize Zonos: via custom integration using a CDN or through npm installation.
 
-### CDN
+## CDN
 
-#### When to use:
+### When to use:
 This is suitable for you if you:
 - Use any non-JavaScript frameworks (e.g., PHP, Java, C#).
 - Have a static site with pure HTML, CSS, and JavaScript.
@@ -35,7 +32,7 @@ This is suitable for you if you:
 - Prefer to use a CDN even if you are using a JavaScript framework (e.g., React, Vue, Next.js).
 - Want to quickly test how Zonos functions on your site (e.g., easily drop the script snippet into the Console tab in your browser's developer tools).
 
-#### Usage:
+### Usage:
 
 **Note**: All methods below are only using the base configuration to have the Checkout and Hello up and running. For a more secure way to build your cart, please check out our [docs](https://zonos.com/docs/global-ecommerce/integration/integrating-new-checkout/custom-integration#set-up-zonos-checkout) for more information.
 
@@ -211,11 +208,11 @@ This is suitable for you if you:
     import "@zonos/elements";
     ```
 
-### Npm
-#### When to use:
+## Npm
+### When to use:
 This method is ideal if you are using TypeScript with modern JavaScript frameworks, particularly React and Next.js. It provides strong typing for the window.Zonos.init function, making setup easier and enabling auto-completion in TypeScript-enabled environments.
 
-#### Usage:
+### Usage:
 - Install `@zonos/elements`.
   - With `pnpm`
     ```bash
@@ -282,6 +279,6 @@ This method is ideal if you are using TypeScript with modern JavaScript framewor
     }
     ```
 
-## API references
+# API references
 - [Zonos instance definition](./dist/types/scripts/_zonosBase.d.ts)
 - [Single file definition for Zonos instance](./dist/scripts/index.d.ts)
