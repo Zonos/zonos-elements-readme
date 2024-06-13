@@ -6,7 +6,7 @@ This project offers web components designed primarily for Zonos Checkout, Zonos 
 - [Table of content](#table-of-content)
 - [Prerequisites](#prerequisites)
 - [Installation](#installation)
-  - [Brief base `Zonos.init` configuration explanation:](#brief-base-zonosinit-configuration-explanation)
+  - [Brief `Zonos.init` base configuration explanation:](#brief-zonosinit-base-configuration-explanation)
   - [CDN](#cdn)
     - [CDN when to use:](#cdn-when-to-use)
     - [CDN usage:](#cdn-usage)
@@ -29,11 +29,11 @@ There are two ways to initialize Zonos: via custom integration using a CDN or th
 
 **Note**: All methods below are only using the base configuration to have the Checkout and Hello up and running. For a more secure way to build your cart, please check out our [docs](https://zonos.com/docs/global-ecommerce/integration/integrating-new-checkout/custom-integration#set-up-zonos-checkout) for more information.
 
-## Brief base `Zonos.init` configuration explanation:
+## Brief `Zonos.init` base configuration explanation:
 - `checkoutSettings.buildCartDetail`: This callback function retrieves cart item information from your web platform. It should return an array of cart item objects. For the expected type definition, please refer to the [`buildCartDetail`](./dist/types/types/checkout/CheckoutConfig.d.ts) and the [cart item](./dist/types/components/store/checkout/cart.d.ts) files.
 - `checkoutSettings.placeOrderButtonSelector`: This is used to find all matching selectors and attach an event to trigger the Checkout process. While you can configure this in our Zonos dashboard, it's recommended to set it here so that Zonos can disable your Checkout place order button while loading.
-- `zonosApiKey`: An API key for Zonos Checkout/Hello (please contact our support team [here](https://zonos.com/contact-sales) for more information).
-- `storeId`: Store id that your checkout would associate with (please contact our support team [here](https://zonos.com/contact-sales) for more information).
+- `zonosApiKey`: An API key for Zonos Checkout/Hello (please contact our [support team](https://zonos.com/contact-sales) for more information).
+- `storeId`: Store id that your checkout would associate with (please contact our [support team](https://zonos.com/contact-sales) for more information).
 
 ## CDN
 
@@ -101,7 +101,7 @@ This is suitable for you if you:
   <br>
 
 - For React, Next.js:
-  - Create a typescript file and import `@zonos/elements` to define types definition for `window` interface.
+  - Create a typescript file and import `@zonos/elements` to define types definition for `window` interface
     <details>
     <summary>Code example</summary>
 
@@ -153,7 +153,7 @@ This is suitable for you if you:
     </details>
     <br>
 
-  - Wrap `ZonosScriptContextProvider` into root of your `layout.tsx`. 
+  - Wrap `ZonosScriptContextProvider` into root of your `layout.tsx`
     <details>
     <summary>Code example</summary>
     
@@ -171,7 +171,7 @@ This is suitable for you if you:
     </details>
     <br>
 
-  - Create a hook named `useZonosScript.ts` to use the context easier.
+  - Create a hook named `useZonosScript.ts` to use the context easier
     <details>
     <summary>Code example</summary>
 
@@ -231,7 +231,7 @@ This is suitable for you if you:
     </details> 
     <br>
     
-  - Put component `ZonosLayoutSetup.tsx` right under `ZonosScriptContextProvider`.
+  - Put component `ZonosLayoutSetup.tsx` right under `ZonosScriptContextProvider`
     <details>
       <summary>Code example</summary>
 
@@ -266,82 +266,78 @@ This is suitable for you if you:
 This method is ideal if you are using TypeScript with modern JavaScript frameworks, particularly React and Next.js. It provides strong typing for the window.Zonos.init function, making setup easier and enabling auto-completion in TypeScript-enabled environments.
 
 ### Npm usage:
-- Install `@zonos/elements`.
-  - With `pnpm`
-    ```bash
-    pnpm add @zonos/elements
-    ```
-  - With `npm`
-    ```bash
-    npm install @zonos/elements
-    ```
-  - With `yarn`
-    ```bash
-    yarn add @zonos/elements
-    ```
-    <br>
-- React, Next.js:
-  - Create a component called `ZonosLayoutSetup.tsx`:
-    <details>
-      <summary>Code example</summary>
-      
-      ```typescript
-      'use client';
-      import { type ReactNode, useEffect } from 'react';
+Install `@zonos/elements`:
 
-      import { Zonos } from '@zonos/elements';
+| Package Manager | Command                       |
+|-----------------|-------------------------------|
+| pnpm            | `pnpm add @zonos/elements`    |
+| npm             | `npm install @zonos/elements` |
+| yarn            | `yarn add @zonos/elements`    |
 
-      import { useZonosScript } from 'src/utils/hooks/useZonosScript';
+<br>
 
-      export const ZonosLayoutSetup = ({ children }: { children: ReactNode }) => {
-        useEffect(() => {
-          // Initialize Zonos into `window` API.
-          window.Zonos = Zonos;
+React, Next.js:
+- Create a component called `ZonosLayoutSetup.tsx`
+  <details>
+    <summary>Code example</summary>
+    
+    ```typescript
+    'use client';
+    import { type ReactNode, useEffect } from 'react';
 
-          const getCartItems = async () => {
-            const yourServerUrl = "https://your-server.com/api/get-cart-items";
-            const response = await fetch(yourServerUrl);
-            const json = await response.json();
-            return json;
-          };
-          
+    import { Zonos } from '@zonos/elements';
 
-          // Initialize Zonos
-          void window.Zonos.init({
-            checkoutSettings: {
-              buildCartDetail: async () => {
-                const allItems = getCartItems();
-                return allItems;
-              },
-              placeOrderButtonSelector: '<%= placeOrderButtonSelector %>',
+    import { useZonosScript } from 'src/utils/hooks/useZonosScript';
+
+    export const ZonosLayoutSetup = ({ children }: { children: ReactNode }) => {
+      useEffect(() => {
+        // Initialize Zonos into `window` API.
+        window.Zonos = Zonos;
+
+        const getCartItems = async () => {
+          const yourServerUrl = "https://your-server.com/api/get-cart-items";
+          const response = await fetch(yourServerUrl);
+          const json = await response.json();
+          return json;
+        };
+        
+
+        // Initialize Zonos
+        void window.Zonos.init({
+          checkoutSettings: {
+            buildCartDetail: async () => {
+              const allItems = getCartItems();
+              return allItems;
             },
-            storeId: Number('<%= storeId %>'), // Contact support for this information.
-            zonosApiKey: '<%= credentialToken %>', // Contact support for this information
-          });
-        }, [scriptLoaded]);
+            placeOrderButtonSelector: '<%= placeOrderButtonSelector %>',
+          },
+          storeId: Number('<%= storeId %>'), // Contact support for this information.
+          zonosApiKey: '<%= credentialToken %>', // Contact support for this information
+        });
+      }, [scriptLoaded]);
 
-        return children;
-      };
-      ```
-    </details>
-    <br>
+      return children;
+    };
+    ```
+  </details>
+  <br>
 
-  - Put component `ZonosLayoutSetup.tsx` at top level of your `layout.tsx`.
-    <details>
-      <summary>Code example</summary>
+- Put component `ZonosLayoutSetup.tsx` at top level of your `layout.tsx`
+  <details>
+    <summary>Code example</summary>
 
-      ```typescript
-      export default function Layout({ children }:{ children: ReactNode}) {
-        return (
-          <ZonosLayoutSetup>
-            <main>
-              {children}
-            </main>
-          </ZonosLayoutSetup>
-        )
-      }
-      ```
-    </details>
+    ```typescript
+    export default function Layout({ children }:{ children: ReactNode}) {
+      return (
+        <ZonosLayoutSetup>
+          <main>
+            {children}
+          </main>
+        </ZonosLayoutSetup>
+      )
+    }
+    ```
+  </details>
 
 # API references
 ### [Zonos instance definition](./dist/types/scripts/_zonosBase.d.ts)
