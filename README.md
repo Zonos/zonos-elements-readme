@@ -9,7 +9,7 @@ This project offers web components designed primarily for Zonos Checkout, Zonos 
   - [Brief `Zonos.init` base configuration explanation:](#brief-zonosinit-base-configuration-explanation)
   - [CDN](#cdn)
     - [CDN when to use:](#cdn-when-to-use)
-    - [CDN usage:](#cdn-usage)
+    - [CDN usages:](#cdn-usages)
   - [Npm](#npm)
     - [Npm when to use:](#npm-when-to-use)
     - [Npm usage:](#npm-usage)
@@ -45,7 +45,7 @@ This is suitable for you if you:
 - Prefer to use a CDN even if you are using a JavaScript framework (e.g., React, Vue, Next.js).
 - Want to quickly test how Zonos functions on your site (e.g., easily drop the script snippet into the Console tab in your browser's developer tools).
 
-### CDN usage:
+### CDN usages:
 
 
 - For non-JavaScript frameworks:
