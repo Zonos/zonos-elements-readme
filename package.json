@@ -1,6 +1,6 @@
 {
   "name": "zonos-elements-readme",
-  "version": "1.3.18-alpha.3",
+  "version": "1.3.18-alpha.4",
   "description": "Documentation for integrating zonos-elements, no porduction code.",
   "types": "src/index.d.ts",
   "scripts": {
