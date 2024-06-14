@@ -6,6 +6,11 @@
   "scripts": {
     "tsc": "tsc && echo 'Type checking completed'",
     "test": "vitest run",
+    "push:tags": "git push --follow-tags",
+    "version:major": "pnpm version major -m 'Bump version %s' && pnpm push:tags",
+    "version:minor": "pnpm version minor -m 'Bump version %s' && pnpm push:tags",
+    "version:patch": "pnpm version patch -m 'Bump version %s' && pnpm push:tags",
+    "version:alpha": "pnpm version prerelease --preid=alpha -m 'Bump version %s' && pnpm push:tags",
     "prepare": "husky"
   },
   "devDependencies": {
