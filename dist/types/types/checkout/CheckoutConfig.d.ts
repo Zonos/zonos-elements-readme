@@ -46,7 +46,7 @@ export type CheckoutConfig = {
     successRedirectUrl: string;
     visibilityStatus: CheckoutVisibilityStatus;
     /**
-     * Cart info callback for checkout (optional if checkout is disabled)
+     * Cart info callback for checkout (optional)
      * @note will use temp cart data if available
      * User can dispatch an event 'zonos--init-cart-info' to update the cart
      * @example

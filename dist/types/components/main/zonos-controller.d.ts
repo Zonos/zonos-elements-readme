@@ -31,6 +31,11 @@ export declare class ZonosController {
      * Setup google font
      */
     setupGoogleFont(overrideFont?: string): Promise<void>;
+    handleLocationChange(): void;
+    /**
+     * Init history listener to know when the location changes to re-inject hello component
+     */
+    private initHistoryListener;
     componentWillLoad(): Promise<void>;
     /**
      * Show notification

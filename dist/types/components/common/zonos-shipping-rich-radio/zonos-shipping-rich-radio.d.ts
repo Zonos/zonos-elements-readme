@@ -2,6 +2,7 @@ import { type EventEmitter } from '../../../stencil-public-runtime';
 import type { ElementsUiStyle, ElementsUiTheme } from "../../../types/generated/graphql.customer.types";
 import type { Color } from "../../../types/styles/Color";
 export type ShippingRichRadioItem = {
+    amount: number;
     caption?: string;
     label: string;
     price: string;

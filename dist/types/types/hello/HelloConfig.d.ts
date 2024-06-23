@@ -2,6 +2,11 @@ import type { HelloCurrencyBehavior, HelloEstimateBehavior, HelloMobileLocation,
 export type HelloConfig = {
     anchorElementSelector: string;
     cartUrlPattern: string | null;
+    /**
+     * The behavior to use when determining the country to use for the user.
+     * @default 'URL_PARAM'
+     */
+    countryOverrideBehavior?: 'URL_PARAM' | 'SESSION';
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
     dutyTaxEstimationBehavior: HelloEstimateBehavior;
