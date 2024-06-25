@@ -1074,6 +1074,7 @@ type RestrictedItem = Items[number] & {
 };
 
 type ShippingRichRadioItem = {
+    amount: number;
     caption?: string;
     label: string;
     price: string;
@@ -3473,9 +3474,54 @@ declare module "@stencil/core" {
     }
 }
 
+type CalculateLandedCostRequest = {
+    billingAddress: {
+        addressLine1: string;
+        addressLine2?: string | undefined;
+        city: string;
+        country: string;
+        postalCode: string;
+        state: string;
+    };
+    billingContact: {
+        firstName: string;
+        lastName: string;
+        phone: string;
+    };
+    checkoutSessionId: string;
+    contact: {
+        email?: string;
+        firstName: string;
+        lastName: string;
+        phone: string;
+    };
+    items: CartItem[];
+    landedCostAdjustments?: {
+        amount: number;
+        type: LandedCostAdjustmentType;
+    }[];
+    metadata?: {
+        key: string;
+        value: string;
+    }[];
+    shippingAddress: {
+        addressLine1: string;
+        addressLine2?: string | undefined;
+        city: string;
+        country: string;
+        postalCode: string;
+        state: string;
+    };
+};
+
 type HelloConfig = {
     anchorElementSelector: string;
     cartUrlPattern: string | null;
+    /**
+     * The behavior to use when determining the country to use for the user.
+     * @default 'URL_PARAM'
+     */
+    countryOverrideBehavior?: 'URL_PARAM' | 'SESSION';
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
     dutyTaxEstimationBehavior: HelloEstimateBehavior;
@@ -3547,46 +3593,6 @@ type CartItem = {
     sku?: string;
 };
 
-type CalculateLandedCostRequest = {
-    billingAddress: {
-        addressLine1: string;
-        addressLine2?: string | undefined;
-        city: string;
-        country: string;
-        postalCode: string;
-        state: string;
-    };
-    billingContact: {
-        firstName: string;
-        lastName: string;
-        phone: string;
-    };
-    checkoutSessionId: string;
-    contact: {
-        email?: string;
-        firstName: string;
-        lastName: string;
-        phone: string;
-    };
-    items: CartItem[];
-    landedCostAdjustments?: {
-        amount: number;
-        type: LandedCostAdjustmentType;
-    }[];
-    metadata?: {
-        key: string;
-        value: string;
-    }[];
-    shippingAddress: {
-        addressLine1: string;
-        addressLine2?: string | undefined;
-        city: string;
-        country: string;
-        postalCode: string;
-        state: string;
-    };
-};
-
 type BuildLandedCostParams = {
     billingAddress: CalculateLandedCostRequest['billingAddress'];
     billingContact: CalculateLandedCostRequest['billingContact'];
@@ -3595,13 +3601,14 @@ type BuildLandedCostParams = {
     shippingAddress: CalculateLandedCostRequest['shippingAddress'];
     zonosApiRoute: string;
 };
-type BuildLandedCostResponse = Promise<(CalculateLandedCostMutation & {
+type BuildLandedCostResponse = (CalculateLandedCostMutation & {
     errors?: {
         message: string;
     }[];
-}) | null>;
+}) | null;
 
 type ZonosOrder = GetOrderQuery['order'];
+
 type CheckoutConfig = {
     /**
      * Validate address to allow specific character sets
@@ -3670,7 +3677,7 @@ type CheckoutConfig = {
      * Calculate landed cost callback for checkout (optional)
      * @note will use temp cart data if available
      */
-    buildLandedCost?: (params: BuildLandedCostParams) => BuildLandedCostResponse;
+    buildLandedCost?: (params: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
     /**
      * Callback trigger when the checkout is closed
      */

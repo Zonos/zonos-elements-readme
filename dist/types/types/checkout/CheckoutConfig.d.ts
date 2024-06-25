@@ -71,7 +71,7 @@ export type CheckoutConfig = {
      * Calculate landed cost callback for checkout (optional)
      * @note will use temp cart data if available
      */
-    buildLandedCost?: (params: BuildLandedCostParams) => BuildLandedCostResponse;
+    buildLandedCost?: (params: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
     /**
      * Callback trigger when the checkout is closed
      */

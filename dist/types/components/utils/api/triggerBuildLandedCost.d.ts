@@ -8,12 +8,12 @@ export type BuildLandedCostParams = {
     shippingAddress: CalculateLandedCostRequest['shippingAddress'];
     zonosApiRoute: string;
 };
-export type BuildLandedCostResponse = Promise<(CalculateLandedCostMutation & {
+export type BuildLandedCostResponse = (CalculateLandedCostMutation & {
     errors?: {
         message: string;
     }[];
-}) | null>;
-type BuildLandedCost = (props: BuildLandedCostParams) => BuildLandedCostResponse;
+}) | null;
+type BuildLandedCost = (props: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
 export declare const triggerBuildLandedCost: (buildLandedCost: BuildLandedCost) => Promise<CalculateLandedCostMutation & {
     errors?: {
         message: string;
