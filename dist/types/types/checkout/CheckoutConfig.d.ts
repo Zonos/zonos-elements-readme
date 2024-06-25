@@ -2,6 +2,7 @@ import type { CartItem } from "../../components/store/checkout/cart";
 import type { BuildLandedCostParams, BuildLandedCostResponse } from "../../components/utils/api/triggerBuildLandedCost";
 import type { AnalyticsProviderStatus, AnalyticsProviderType, CheckoutSubscriptionStatus, CheckoutSuccessBehavior, CheckoutVisibilityStatus, GetOrderQuery, NotificationActiveStatus } from "../generated/graphql.customer.types";
 export type ZonosOrder = GetOrderQuery['order'];
+export type { BuildLandedCostParams, BuildLandedCostResponse };
 export type CheckoutConfig = {
     /**
      * Validate address to allow specific character sets
