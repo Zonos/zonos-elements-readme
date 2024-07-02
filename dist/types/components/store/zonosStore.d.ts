@@ -24,6 +24,10 @@ export type ZonosConfig = {
     onCountryChange?: LoadZonosParamsConfig['onCountryChange'];
     organizationId: string;
     organizationName: string;
+    /**
+     * Currency format to be used in whole app
+     */
+    overrideCurrencyFormat?: LoadZonosParamsConfig['overrideCurrencyFormat'];
     sourceCurrency: string;
     storeId: number | null;
 };
@@ -36,7 +40,7 @@ type ZonosStore = ZonosConfig & {
      */
     zonosApiKey: string;
 };
-declare const zonosStore: ZonosStore;
+declare const zonosStoreDispose: () => void, zonosStore: ZonosStore;
 /**
  * Get theme from media query if theme is SYSTEM, otherwise return the theme
  */
@@ -49,4 +53,4 @@ declare const zonosStoreInitSetting: ({ overrideSettings, zonosSettings, }: {
     zonosSettings: ZonosSettingsQuery | null;
 }) => void;
 declare const zonosStoreFontFamily: () => string;
-export { getZonosStoreTheme, zonosStore, zonosStoreFontFamily, zonosStoreInitSetting, };
+export { getZonosStoreTheme, zonosStore, zonosStoreDispose, zonosStoreFontFamily, zonosStoreInitSetting, };

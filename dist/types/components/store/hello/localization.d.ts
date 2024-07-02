@@ -25,8 +25,8 @@ type ILocaleMessageForUse = {
     message?: string;
     pageName: Locale_PageName_Enum;
 };
-declare const localizationStoreOnUpdate: import("@stencil/store/dist/types").OnChangeHandler<LocalizationStore>, localizationStore: LocalizationStore;
+declare const localizationDispose: () => void, localizationStoreOnUpdate: import("@stencil/store/dist/types").OnChangeHandler<LocalizationStore>, localizationStore: LocalizationStore;
 declare const localizationStoreUpdateSelectedCountryCode: (newSelectedCountryCode: CountryCode | null) => void;
 declare const initLocalizationStore: () => Promise<void>;
 declare const localizationStoreUpdateSelectedLocale: (newSelectedLocale: Locale_ElementsSupportedLocationCode_Enum) => void;
-export { initLocalizationStore, localizationStore, localizationStoreOnUpdate, localizationStoreUpdateSelectedCountryCode, localizationStoreUpdateSelectedLocale, };
+export { initLocalizationStore, localizationDispose, localizationStore, localizationStoreOnUpdate, localizationStoreUpdateSelectedCountryCode, localizationStoreUpdateSelectedLocale, };

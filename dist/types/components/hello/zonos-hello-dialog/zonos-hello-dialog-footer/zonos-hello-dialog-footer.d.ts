@@ -1,5 +1,6 @@
 import type { AppearanceConfig } from "../../../../components";
 export declare class ZonosHelloDialogFooter {
+    ele: HTMLZonosHelloDialogFooterElement;
     /**
      * Appearance settings
      */

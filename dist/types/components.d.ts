@@ -883,10 +883,6 @@ export namespace Components {
     }
     interface ZonosText {
         /**
-          * The tag to use for the text
-         */
-        "content"?: string;
-        /**
           * The size of the text
          */
         "size"?: Size;
@@ -2281,10 +2277,6 @@ declare namespace LocalJSX {
         "spinnerColor"?: SpinnerColor;
     }
     interface ZonosText {
-        /**
-          * The tag to use for the text
-         */
-        "content"?: string;
         /**
           * The size of the text
          */

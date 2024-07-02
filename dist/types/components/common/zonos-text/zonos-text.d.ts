@@ -20,10 +20,6 @@ export declare class ZonosText {
      */
     weight?: FontWeight;
     /**
-     * The tag to use for the text
-     */
-    content?: string;
-    /**
      * Whether or not the component is ready
      */
     ready: boolean;

@@ -41,6 +41,26 @@ export type LoadZonosParamsConfig = {
     currencyConverter?: CurrencyConverter;
     helloSettings?: Partial<HelloConfig>;
     /**
+     * Hello and Checkout are using using the Intl.NumberFormat API to format the currency. You can either use the default currency display or customize it.
+     */
+    overrideCurrencyFormat?: {
+        /**
+         * `currencyDisplay` option in Intl.NumberFormat
+         * @ref https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#currencydisplay
+         * @default 'symbol'
+         *
+         * @note These options won't apply, and will use '{amount} {currencyCode}' if the browser is IE.
+         */
+        currencyDisplay?: 'symbol' | 'code' | 'name' | 'narrowSymbol';
+    }
+    /**
+     * Custom currency format function to be used in Hello and Checkout
+     */
+     | ((params: {
+        amount: number;
+        countryCode: CurrencyCode;
+    }) => string);
+    /**
      * Callback to be called when the country is changed
      */
     onCountryChange?: (props: {
@@ -114,7 +134,7 @@ export declare abstract class Zonos {
     static tempCartData: TempCart | null;
     static getCurrentTimestamp: () => number;
     private static zonosController;
-    static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
+    static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
     static displayCurrency: () => void;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;

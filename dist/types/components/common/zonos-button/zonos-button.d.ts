@@ -94,6 +94,7 @@ export declare class ZonosButton {
      */
     private handleSlotChange;
     private getColorVarProperty;
+    private getButtonStyle;
     componentWillLoad(): void;
     render(): any;
 }
