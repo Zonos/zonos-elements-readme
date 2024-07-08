@@ -33,7 +33,7 @@ export declare const languages: readonly [{
 }, {
     readonly code: "de";
     readonly label: "German";
-    readonly translatedLabel: "Deutsche";
+    readonly translatedLabel: "Deutsch";
 }, {
     readonly code: "ja";
     readonly label: "Japanese";
@@ -49,7 +49,7 @@ export declare const languages: readonly [{
 }, {
     readonly code: "tr";
     readonly label: "Turkish";
-    readonly translatedLabel: "Türk";
+    readonly translatedLabel: "Türkçe";
 }, {
     readonly code: "he";
     readonly label: "Hebrew";

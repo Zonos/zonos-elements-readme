@@ -1,1 +1,1 @@
-export declare const getCurrencyElements: (selector: string) => Element[] | null;
+export declare const getCurrencyElements: (selector: string) => HTMLElement[] | null;

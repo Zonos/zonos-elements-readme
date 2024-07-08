@@ -1,4 +1,4 @@
-import type { HelloCurrencyBehavior, HelloEstimateBehavior, HelloMobileLocation, HelloPeekMessageBehavior, HelloRestrictionBehavior, Mode } from "../generated/graphql.customer.types";
+import type { HelloCurrencyBehavior, HelloMobileLocation, HelloPeekMessageBehavior, HelloRestrictionBehavior, Mode } from "../generated/graphql.customer.types";
 export type HelloConfig = {
     anchorElementSelector: string;
     cartUrlPattern: string | null;
@@ -9,7 +9,6 @@ export type HelloConfig = {
     countryOverrideBehavior?: 'URL_PARAM' | 'SESSION';
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
-    dutyTaxEstimationBehavior: HelloEstimateBehavior;
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
     mobileLocation: HelloMobileLocation;
@@ -21,7 +20,6 @@ export type HelloConfig = {
     productDescriptionElementSelector: string | null;
     productDetailUrlPattern: string | null;
     productListUrlPattern: string | null;
-    productPriceElementSelector: string | null;
     productTitleElementSelector: string | null;
     restrictionBehavior: HelloRestrictionBehavior;
 };

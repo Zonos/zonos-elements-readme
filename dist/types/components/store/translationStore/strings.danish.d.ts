@@ -1,10 +1,4 @@
 export declare const stringsDanish: {
-    '${percentage} GST due on any order above ${threshold} along with an import entry transaction fee and MPI levy.': {
-        value: string;
-    };
-    '${percentage} GST due on any order above ${threshold}.': {
-        value: string;
-    };
     'Above de minimis threshold for': {
         value: string;
     };
@@ -131,7 +125,7 @@ export declare const stringsDanish: {
     'Order total': {
         value: string;
     };
-    'Orders to ${countryName} must be over ${threshold} to ship.': {
+    'Orders to [countryName] must be over [threshold] to ship.': {
         value: string;
     };
     Pay: {
@@ -239,7 +233,7 @@ export declare const stringsDanish: {
     "We've sent an email confirmation of the order details for your review. And our team is carefully preparing your order so it arrives on time.": {
         value: string;
     };
-    'Welcome to': {
+    'Welcome to [storeName]!': {
         value: string;
     };
     'Welcome!': {
@@ -255,6 +249,12 @@ export declare const stringsDanish: {
         value: string;
     };
     'Your payment went through successfully! Thank you for shopping with us! We hope you had an enjoyable experience and your support means the world to us.': {
+        value: string;
+    };
+    '[percentage] GST due on any order above [threshold] along with an import entry transaction fee and MPI levy.': {
+        value: string;
+    };
+    '[percentage] GST due on any order above [threshold].': {
         value: string;
     };
     'business days': {

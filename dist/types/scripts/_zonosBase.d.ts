@@ -5,8 +5,23 @@ import type { TempCart } from "../types/checkout/api/TempCart";
 import type { CheckoutConfig } from "../types/checkout/CheckoutConfig";
 import type { CountryCode, CurrencyCode } from "../types/generated/graphql.customer.types";
 import type { HelloConfig } from "../types/hello/HelloConfig";
+/**
+ * Currency converter function to be used in Hello and Checkout
+ * @note don't modify the element directly in this function, otherwise it might cause unexpected behavior like an infinite loop
+ */
 export type CurrencyConverter = (props: {
-    selector?: string;
+    /**
+     * Current currency code
+     */
+    currencyCode: CurrencyCode;
+    /**
+     * The original amount before conversion
+     */
+    originalAmount: number;
+    /**
+     * HTML element matching the selector specified in the helloSettings init
+     */
+    selector: HTMLElement;
     /**
      * Convert the amount to the target currency in Hello (no locale format)
      * @param convert amount
@@ -34,10 +49,14 @@ export type CurrencyConverter = (props: {
      * format(100) // return CA$100.00 when selected country in Hello is Canada
      */
     format: (amount: number) => string;
-}) => void;
+}) => string;
 export type LoadZonosParamsConfig = {
     appearance?: Partial<AppearanceConfig>;
     checkoutSettings?: Partial<CheckoutConfig>;
+    /**
+     * Currency converter function to be used in Hello and Checkout
+     * @note don't modify element directly in this function, otherwise it might cause unexpected behavior like an infinite loop
+     */
     currencyConverter?: CurrencyConverter;
     helloSettings?: Partial<HelloConfig>;
     /**

@@ -487,11 +487,6 @@ declare const helloCurrencyBehavior: {
     readonly Enabled: "ENABLED";
 };
 type HelloCurrencyBehavior = (typeof helloCurrencyBehavior)[keyof typeof helloCurrencyBehavior];
-declare const helloEstimateBehavior: {
-    readonly Disabled: "DISABLED";
-    readonly Enabled: "ENABLED";
-};
-type HelloEstimateBehavior = (typeof helloEstimateBehavior)[keyof typeof helloEstimateBehavior];
 declare const helloMobileLocation: {
     readonly BottomLeft: "BOTTOM_LEFT";
     readonly BottomRight: "BOTTOM_RIGHT";
@@ -1937,10 +1932,6 @@ declare namespace Components {
     }
     interface ZonosText {
         /**
-          * The tag to use for the text
-         */
-        "content"?: string;
-        /**
           * The size of the text
          */
         "size"?: Size;
@@ -3336,10 +3327,6 @@ declare namespace LocalJSX {
     }
     interface ZonosText {
         /**
-          * The tag to use for the text
-         */
-        "content"?: string;
-        /**
           * The size of the text
          */
         "size"?: Size;
@@ -3524,7 +3511,6 @@ type HelloConfig = {
     countryOverrideBehavior?: 'URL_PARAM' | 'SESSION';
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
-    dutyTaxEstimationBehavior: HelloEstimateBehavior;
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
     mobileLocation: HelloMobileLocation;
@@ -3536,7 +3522,6 @@ type HelloConfig = {
     productDescriptionElementSelector: string | null;
     productDetailUrlPattern: string | null;
     productListUrlPattern: string | null;
-    productPriceElementSelector: string | null;
     productTitleElementSelector: string | null;
     restrictionBehavior: HelloRestrictionBehavior;
 };
@@ -3609,6 +3594,10 @@ type BuildLandedCostResponse = (CalculateLandedCostMutation & {
 
 type ZonosOrder = GetOrderQuery['order'];
 
+type BuildCardDetailParams = {
+    countryCode: CountryCode;
+    currencyCode: CurrencyCode;
+};
 type CheckoutConfig = {
     /**
      * Validate address to allow specific character sets
@@ -3672,7 +3661,7 @@ type CheckoutConfig = {
      * - productId?: string;
      * - quantity: number;
      */
-    buildCartDetail?: () => Promise<CartItem[]>;
+    buildCartDetail?: (params: BuildCardDetailParams) => Promise<CartItem[]>;
     /**
      * Calculate landed cost callback for checkout (optional)
      * @note will use temp cart data if available
@@ -3782,8 +3771,23 @@ type TempCart = {
     vendorPassedCurrencyCode: string | null;
 };
 
+/**
+ * Currency converter function to be used in Hello and Checkout
+ * @note don't modify the element directly in this function, otherwise it might cause unexpected behavior like an infinite loop
+ */
 type CurrencyConverter = (props: {
-    selector?: string;
+    /**
+     * Current currency code
+     */
+    currencyCode: CurrencyCode;
+    /**
+     * The original amount before conversion
+     */
+    originalAmount: number;
+    /**
+     * HTML element matching the selector specified in the helloSettings init
+     */
+    selector: HTMLElement;
     /**
      * Convert the amount to the target currency in Hello (no locale format)
      * @param convert amount
@@ -3811,12 +3815,36 @@ type CurrencyConverter = (props: {
      * format(100) // return CA$100.00 when selected country in Hello is Canada
      */
     format: (amount: number) => string;
-}) => void;
+}) => string;
 type LoadZonosParamsConfig = {
     appearance?: Partial<AppearanceConfig>;
     checkoutSettings?: Partial<CheckoutConfig>;
+    /**
+     * Currency converter function to be used in Hello and Checkout
+     * @note don't modify element directly in this function, otherwise it might cause unexpected behavior like an infinite loop
+     */
     currencyConverter?: CurrencyConverter;
     helloSettings?: Partial<HelloConfig>;
+    /**
+     * Hello and Checkout are using using the Intl.NumberFormat API to format the currency. You can either use the default currency display or customize it.
+     */
+    overrideCurrencyFormat?: {
+        /**
+         * `currencyDisplay` option in Intl.NumberFormat
+         * @ref https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/NumberFormat/NumberFormat#currencydisplay
+         * @default 'symbol'
+         *
+         * @note These options won't apply, and will use '{amount} {currencyCode}' if the browser is IE.
+         */
+        currencyDisplay?: 'symbol' | 'code' | 'name' | 'narrowSymbol';
+    }
+    /**
+     * Custom currency format function to be used in Hello and Checkout
+     */
+     | ((params: {
+        amount: number;
+        countryCode: CurrencyCode;
+    }) => string);
     /**
      * Callback to be called when the country is changed
      */
@@ -3891,7 +3919,7 @@ declare abstract class Zonos {
     static tempCartData: TempCart | null;
     static getCurrentTimestamp: () => number;
     private static zonosController;
-    static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
+    static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
     static displayCurrency: () => void;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;
