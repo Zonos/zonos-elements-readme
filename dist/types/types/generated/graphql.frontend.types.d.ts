@@ -504,11 +504,17 @@ export declare const orderBy: {
 };
 export type Order_By = (typeof orderBy)[keyof typeof orderBy];
 export declare const promptBulkJobProjectLabelEnum: {
+    readonly AccountWebInlineTranslate: "account_web_inline_translate";
     readonly DashboardElementsCustomMessageTranslation: "dashboard_elements_custom_message_translation";
+    readonly DashboardWebDynamicTranslate: "dashboard_web_dynamic_translate";
+    readonly DashboardWebInlineTranslate: "dashboard_web_inline_translate";
     readonly DocsSeo: "docs_seo";
     readonly DocsTranslation: "docs_translation";
     readonly ElementsTranslation: "elements_translation";
     readonly ExploreSchemaValidation: "explore_schema_validation";
+    readonly ZonosComDynamicTranslate: "zonos_com_dynamic_translate";
+    readonly ZonosComInlineTranslate: "zonos_com_inline_translate";
+    readonly ZonosComMdxTranslate: "zonos_com_mdx_translate";
 };
 export type Prompt_BulkJobProjectLabel_Enum = (typeof promptBulkJobProjectLabelEnum)[keyof typeof promptBulkJobProjectLabelEnum];
 export declare const promptBulkJobStatusEnum: {
@@ -556,7 +562,7 @@ export type GetAudienceByAspectKeyQuery = {
 };
 export type LocaleCountryMessagesQuery = {
     locale_countryCodesPage: Array<{
-        countryCodes: Array<string>;
+        countryCodes: Array<string> | null;
         countryCodesPageMessageLinks: Array<{
             id: number;
             message: {

@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 import { type CartItem } from "../../store/checkout/cart";
 import { type StripeStoreContactOption } from "../../store/checkout/stripe";
@@ -60,6 +61,14 @@ export declare class ZonosCheckout {
      */
     confirmDialogOpen: boolean;
     /**
+     * Session timeout screen state
+     */
+    showSessionTimoutScreen: boolean;
+    /**
+     * Timeout alert message
+     */
+    checkoutTimeoutInterval: NodeJS.Timeout | null;
+    /**
      * Init cart info handler event
      */
     initCartInfoHandler(e: CustomEvent<CartItem[]>): Promise<void>;
@@ -75,6 +84,9 @@ export declare class ZonosCheckout {
     }): Promise<void>;
     private applyStripeTheme;
     private buildCartAndInit;
+    private clearCheckoutTimeoutInterval;
+    private startCheckoutTimeoutInterval;
+    private reloadCheckoutSession;
     private attachCheckout;
     appearanceSettingsOverrideChanged(): void;
     /**

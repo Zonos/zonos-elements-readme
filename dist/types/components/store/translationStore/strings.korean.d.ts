@@ -161,6 +161,9 @@ export declare const stringsKorean: {
     'Prepay duties and taxes at checkout': {
         value: string;
     };
+    Reload: {
+        value: string;
+    };
     'Restricted item': {
         value: string;
     };
@@ -177,6 +180,9 @@ export declare const stringsKorean: {
         value: string;
     };
     'Select a language': {
+        value: string;
+    };
+    'Session timed out': {
         value: string;
     };
     Shipping: {
@@ -246,6 +252,9 @@ export declare const stringsKorean: {
         value: string;
     };
     "You're all set!": {
+        value: string;
+    };
+    'Your checkout session has expired. Please reload the page to continue.': {
         value: string;
     };
     'Your payment went through successfully! Thank you for shopping with us! We hope you had an enjoyable experience and your support means the world to us.': {

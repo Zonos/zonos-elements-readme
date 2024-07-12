@@ -109,7 +109,6 @@ export interface Zonos {
      */
     debug?: boolean;
     doneInit: boolean;
-    internationalHideSelector: string;
     isBigCommerce: boolean;
     isNpm: boolean;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
@@ -146,7 +145,6 @@ export declare abstract class Zonos {
      * By default, the package will load from npm
      */
     static isNpm: boolean;
-    static internationalHideSelector: string;
     static zonosQaUrl: string | null;
     static version: string;
     static modeAlerted: boolean;

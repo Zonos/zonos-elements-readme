@@ -104,6 +104,10 @@ declare const cartStoreCheckItemRestrictions: (itemsWorkflow: ItemWorkflowInfo[]
             reason: string;
         };
         amount: number;
+        attributes: ({
+            key: string | null;
+            value: string | null;
+        } | null)[] | null;
         description: string | null;
         id: string;
         imageUrl: string | null;

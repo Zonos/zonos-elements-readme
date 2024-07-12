@@ -247,6 +247,27 @@ export declare const carrierApiSupportType: {
     readonly Unsupported: "UNSUPPORTED";
 };
 export type CarrierApiSupportType = (typeof carrierApiSupportType)[keyof typeof carrierApiSupportType];
+export declare const carrierBillingInvoiceFeeType: {
+    readonly RevShareAmount: "REV_SHARE_AMOUNT";
+    readonly RevSharePercent: "REV_SHARE_PERCENT";
+};
+export type CarrierBillingInvoiceFeeType = (typeof carrierBillingInvoiceFeeType)[keyof typeof carrierBillingInvoiceFeeType];
+export declare const carrierBillingInvoiceLineItemReferenceType: {
+    readonly AccountOrderNumber: "ACCOUNT_ORDER_NUMBER";
+    readonly ShipmentReferenceNumber: "SHIPMENT_REFERENCE_NUMBER";
+    readonly ZonosOrderId: "ZONOS_ORDER_ID";
+};
+export type CarrierBillingInvoiceLineItemReferenceType = (typeof carrierBillingInvoiceLineItemReferenceType)[keyof typeof carrierBillingInvoiceLineItemReferenceType];
+export declare const carrierBillingInvoiceStatus: {
+    readonly Draft: "DRAFT";
+    readonly Failed: "FAILED";
+    readonly Open: "OPEN";
+    readonly Paid: "PAID";
+    readonly Pending: "PENDING";
+    readonly Uncollectible: "UNCOLLECTIBLE";
+    readonly Voided: "VOIDED";
+};
+export type CarrierBillingInvoiceStatus = (typeof carrierBillingInvoiceStatus)[keyof typeof carrierBillingInvoiceStatus];
 export declare const carrierCode: {
     readonly Apc: "APC";
     readonly Dhl: "DHL";
@@ -301,6 +322,13 @@ export declare const catalogItemExportJobAction: {
     readonly None: "NONE";
 };
 export type CatalogItemExportJobAction = (typeof catalogItemExportJobAction)[keyof typeof catalogItemExportJobAction];
+export declare const catalogItemInclusivePriceStatus: {
+    readonly Active: "ACTIVE";
+    readonly Failed: "FAILED";
+    readonly Ignored: "IGNORED";
+    readonly Pending: "PENDING";
+};
+export type CatalogItemInclusivePriceStatus = (typeof catalogItemInclusivePriceStatus)[keyof typeof catalogItemInclusivePriceStatus];
 export declare const catalogItemSource: {
     readonly Classification: "CLASSIFICATION";
     readonly LegacyMigration: "LEGACY_MIGRATION";
@@ -403,6 +431,11 @@ export declare const collectUploadStatus: {
     readonly SucceededWithErrors: "SUCCEEDED_WITH_ERRORS";
 };
 export type CollectUploadStatus = (typeof collectUploadStatus)[keyof typeof collectUploadStatus];
+export declare const confidenceScoreDisplayStatus: {
+    readonly Disabled: "DISABLED";
+    readonly Enabled: "ENABLED";
+};
+export type ConfidenceScoreDisplayStatus = (typeof confidenceScoreDisplayStatus)[keyof typeof confidenceScoreDisplayStatus];
 export declare const connectTransferOriginType: {
     readonly Connect: "CONNECT";
     readonly Platform: "PLATFORM";
@@ -1298,6 +1331,10 @@ export declare const externalServiceTokenType: {
     readonly StripePublishableToken: "STRIPE_PUBLISHABLE_TOKEN";
 };
 export type ExternalServiceTokenType = (typeof externalServiceTokenType)[keyof typeof externalServiceTokenType];
+export type FailedSyncJobRecord = {
+    catalogItemInclusivePriceId: Scalars['ID']['input'];
+    errorMessage: Scalars['String']['input'];
+};
 export declare const fedExCategoryCode: {
     readonly Shipping: "SHIPPING";
 };
@@ -1388,6 +1425,7 @@ export declare const imageSlot: {
 };
 export type ImageSlot = (typeof imageSlot)[keyof typeof imageSlot];
 export declare const inclusivePriceCalculateJobStatus: {
+    readonly Cancelled: "CANCELLED";
     readonly Completed: "COMPLETED";
     readonly Failed: "FAILED";
     readonly InProgress: "IN_PROGRESS";
@@ -1409,6 +1447,7 @@ export type InclusivePriceCatalogValidationJobCompletionStatus = (typeof inclusi
 export declare const inclusivePriceCatalogValidationJobComplianceStatus: {
     readonly Compliant: "COMPLIANT";
     readonly NonCompliant: "NON_COMPLIANT";
+    readonly Pending: "PENDING";
 };
 export type InclusivePriceCatalogValidationJobComplianceStatus = (typeof inclusivePriceCatalogValidationJobComplianceStatus)[keyof typeof inclusivePriceCatalogValidationJobComplianceStatus];
 export declare const inclusivePriceHistoryCsvJobStatus: {
@@ -1440,6 +1479,13 @@ export declare const inclusivePriceStatus: {
     readonly Inactive: "INACTIVE";
 };
 export type InclusivePriceStatus = (typeof inclusivePriceStatus)[keyof typeof inclusivePriceStatus];
+export declare const inclusivePriceSyncJobStatus: {
+    readonly Completed: "COMPLETED";
+    readonly Failed: "FAILED";
+    readonly InProgress: "IN_PROGRESS";
+    readonly Initialized: "INITIALIZED";
+};
+export type InclusivePriceSyncJobStatus = (typeof inclusivePriceSyncJobStatus)[keyof typeof inclusivePriceSyncJobStatus];
 export declare const incotermCode: {
     readonly Cif: "CIF";
     readonly Custom: "CUSTOM";
@@ -1502,6 +1548,10 @@ export declare const invoiceLanguageCode: {
     readonly ZhTw: "ZH_TW";
 };
 export type InvoiceLanguageCode = (typeof invoiceLanguageCode)[keyof typeof invoiceLanguageCode];
+export declare const invoiceProcessor: {
+    readonly Stripe: "STRIPE";
+};
+export type InvoiceProcessor = (typeof invoiceProcessor)[keyof typeof invoiceProcessor];
 export declare const invoiceStatus: {
     readonly Received: "RECEIVED";
     readonly Reconciled: "RECONCILED";
@@ -1638,6 +1688,8 @@ export type LandedCostFeeType = (typeof landedCostFeeType)[keyof typeof landedCo
 export declare const landedCostGuaranteeCode: {
     readonly InclusivePrice: "INCLUSIVE_PRICE";
     readonly NotApplicable: "NOT_APPLICABLE";
+    readonly PostalDdp: "POSTAL_DDP";
+    readonly PostalDdpInclusivePrice: "POSTAL_DDP_INCLUSIVE_PRICE";
     readonly Zonos: "ZONOS";
 };
 export type LandedCostGuaranteeCode = (typeof landedCostGuaranteeCode)[keyof typeof landedCostGuaranteeCode];
@@ -1891,7 +1943,9 @@ export declare const orderStatus: {
     readonly Canceled: "CANCELED";
     readonly Completed: "COMPLETED";
     readonly FraudHold: "FRAUD_HOLD";
+    readonly InTransitToConsolidationCenter: "IN_TRANSIT_TO_CONSOLIDATION_CENTER";
     readonly Open: "OPEN";
+    readonly PartiallyShipped: "PARTIALLY_SHIPPED";
     readonly PaymentFailed: "PAYMENT_FAILED";
     readonly PaymentPending: "PAYMENT_PENDING";
 };
@@ -2385,6 +2439,8 @@ export declare const webhookStatus: {
 };
 export type WebhookStatus = (typeof webhookStatus)[keyof typeof webhookStatus];
 export declare const webhookType: {
+    readonly InclusivePriceSyncReady: "INCLUSIVE_PRICE_SYNC_READY";
+    readonly IpSettingStatusChanged: "IP_SETTING_STATUS_CHANGED";
     readonly OrderCanceled: "ORDER_CANCELED";
     readonly OrderCreated: "ORDER_CREATED";
     readonly OrderStatusChanged: "ORDER_STATUS_CHANGED";
@@ -2443,6 +2499,10 @@ export type CalculateLandedCostMutation = {
     }> | null;
     itemCreateWorkflow: Array<{
         amount: number;
+        attributes: Array<{
+            key: string | null;
+            value: string | null;
+        } | null> | null;
         description: string | null;
         id: string;
         imageUrl: string | null;
@@ -3174,7 +3234,7 @@ export type GetOrdersQuery = {
             hasNextPage: boolean;
             hasPreviousPage: boolean;
             startCursor: string | null;
-        } | null;
+        };
     } | null;
 };
 export type GetWebhooksQuery = {

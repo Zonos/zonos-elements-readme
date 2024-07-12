@@ -19,6 +19,7 @@ import { LoadZonosParamsConfig } from "./scripts/_zonosBase";
 import { NotificationInit } from "./components/common/zonos-notification/zonos-notification";
 import { RestrictedItem } from "./types/hello/RestrictedItem";
 import { AppearanceConfig as AppearanceConfig1 } from "./components.d";
+import { RestStateType } from "./components/utils/restStateType";
 import { ShippingRichRadioItem } from "./components/common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 import { SpinnerColor } from "./components/common/zonos-spinner/zonos-spinner";
 import { GridSpacing } from "./types/styles/GridSpacing";
@@ -36,6 +37,7 @@ export { LoadZonosParamsConfig } from "./scripts/_zonosBase";
 export { NotificationInit } from "./components/common/zonos-notification/zonos-notification";
 export { RestrictedItem } from "./types/hello/RestrictedItem";
 export { AppearanceConfig as AppearanceConfig1 } from "./components.d";
+export { RestStateType } from "./components/utils/restStateType";
 export { ShippingRichRadioItem } from "./components/common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 export { SpinnerColor } from "./components/common/zonos-spinner/zonos-spinner";
 export { GridSpacing } from "./types/styles/GridSpacing";
@@ -431,7 +433,7 @@ export namespace Components {
         /**
           * Cancel button text
          */
-        "dialogCancelBtnText": string;
+        "dialogCancelBtnText"?: string;
         /**
           * Confirm button text
          */
@@ -455,6 +457,11 @@ export namespace Components {
           * @default "Are you sure?"
          */
         "dialogTitle": string;
+        /**
+          * Type of dialog - "alert" - Only confirm button - "confirm" - Both Confirm and cancel buttons
+          * @default "confirm"
+         */
+        "dialogType": 'alert' | 'confirm';
         /**
           * Whether or not the dialog is open
          */
@@ -812,6 +819,20 @@ export namespace Components {
           * The title text for the authentication element
          */
         "titleText"?: string;
+    }
+    interface ZonosRestState {
+        /**
+          * The subtitle of the rest state
+         */
+        "restStateSubtitle": string;
+        /**
+          * The title of the rest state
+         */
+        "restStateTitle": string;
+        /**
+          * The type of rest state
+         */
+        "restStateType": RestStateType;
     }
     interface ZonosReview {
         /**
@@ -1330,6 +1351,12 @@ declare global {
         prototype: HTMLZonosPaymentElement;
         new (): HTMLZonosPaymentElement;
     };
+    interface HTMLZonosRestStateElement extends Components.ZonosRestState, HTMLStencilElement {
+    }
+    var HTMLZonosRestStateElement: {
+        prototype: HTMLZonosRestStateElement;
+        new (): HTMLZonosRestStateElement;
+    };
     interface HTMLZonosReviewElement extends Components.ZonosReview, HTMLStencilElement {
     }
     var HTMLZonosReviewElement: {
@@ -1438,6 +1465,7 @@ declare global {
         "zonos-logo": HTMLZonosLogoElement;
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
+        "zonos-rest-state": HTMLZonosRestStateElement;
         "zonos-review": HTMLZonosReviewElement;
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
         "zonos-shipping": HTMLZonosShippingElement;
@@ -1848,7 +1876,7 @@ declare namespace LocalJSX {
         /**
           * Cancel button text
          */
-        "dialogCancelBtnText": string;
+        "dialogCancelBtnText"?: string;
         /**
           * Confirm button text
          */
@@ -1861,7 +1889,7 @@ declare namespace LocalJSX {
         /**
           * Whether or not the dialog is open
          */
-        "dialogOpen"?: boolean;
+        "dialogOpen": boolean;
         /**
           * Dialog subtitle text
           * @default "" No subtitle
@@ -1872,6 +1900,11 @@ declare namespace LocalJSX {
           * @default "Are you sure?"
          */
         "dialogTitle"?: string;
+        /**
+          * Type of dialog - "alert" - Only confirm button - "confirm" - Both Confirm and cancel buttons
+          * @default "confirm"
+         */
+        "dialogType"?: 'alert' | 'confirm';
         /**
           * Whether or not the dialog is open
          */
@@ -2200,6 +2233,20 @@ declare namespace LocalJSX {
          */
         "titleText"?: string;
     }
+    interface ZonosRestState {
+        /**
+          * The subtitle of the rest state
+         */
+        "restStateSubtitle": string;
+        /**
+          * The title of the rest state
+         */
+        "restStateTitle": string;
+        /**
+          * The type of rest state
+         */
+        "restStateType": RestStateType;
+    }
     interface ZonosReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
@@ -2349,6 +2396,7 @@ declare namespace LocalJSX {
         "zonos-logo": ZonosLogo;
         "zonos-notification": ZonosNotification;
         "zonos-payment": ZonosPayment;
+        "zonos-rest-state": ZonosRestState;
         "zonos-review": ZonosReview;
         "zonos-select-dialog-header": ZonosSelectDialogHeader;
         "zonos-shipping": ZonosShipping;
@@ -2400,6 +2448,7 @@ declare module "@stencil/core" {
             "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
             "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
             "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
+            "zonos-rest-state": LocalJSX.ZonosRestState & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
             "zonos-review": LocalJSX.ZonosReview & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
             "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
             "zonos-shipping": LocalJSX.ZonosShipping & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;

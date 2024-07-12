@@ -27,7 +27,14 @@ export declare class ZonosConfirmDialog {
     /**
      * Cancel button text
      */
-    dialogCancelBtnText: string;
+    dialogCancelBtnText?: string;
+    /**
+     * Type of dialog
+     * - "alert" - Only confirm button
+     * - "confirm" - Both Confirm and cancel buttons
+     * @default "confirm"
+     */
+    dialogType: 'alert' | 'confirm';
     /**
      * Event to emit when the "Confirm" button is clicked
      */
