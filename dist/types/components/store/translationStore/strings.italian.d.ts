@@ -41,6 +41,9 @@ export declare const stringsItalian: {
     'Continue to shipping': {
         value: string;
     };
+    "Couldn't place order": {
+        value: string;
+    };
     Country: {
         value: string;
     };
@@ -170,6 +173,9 @@ export declare const stringsItalian: {
     'Restricted items found': {
         value: string;
     };
+    'Return to cart': {
+        value: string;
+    };
     'Search countries': {
         value: string;
     };
@@ -225,6 +231,9 @@ export declare const stringsItalian: {
         value: string;
     };
     'Translated address': {
+        value: string;
+    };
+    'Unable to check inventory. Please try again.': {
         value: string;
     };
     'Update address': {

@@ -564,6 +564,8 @@ type LandedCostAdjustmentType = (typeof landedCostAdjustmentType)[keyof typeof l
 declare const landedCostGuaranteeCode: {
     readonly InclusivePrice: "INCLUSIVE_PRICE";
     readonly NotApplicable: "NOT_APPLICABLE";
+    readonly PostalDdp: "POSTAL_DDP";
+    readonly PostalDdpInclusivePrice: "POSTAL_DDP_INCLUSIVE_PRICE";
     readonly Zonos: "ZONOS";
 };
 type LandedCostGuaranteeCode = (typeof landedCostGuaranteeCode)[keyof typeof landedCostGuaranteeCode];
@@ -581,7 +583,9 @@ declare const orderStatus: {
     readonly Canceled: "CANCELED";
     readonly Completed: "COMPLETED";
     readonly FraudHold: "FRAUD_HOLD";
+    readonly InTransitToConsolidationCenter: "IN_TRANSIT_TO_CONSOLIDATION_CENTER";
     readonly Open: "OPEN";
+    readonly PartiallyShipped: "PARTIALLY_SHIPPED";
     readonly PaymentFailed: "PAYMENT_FAILED";
     readonly PaymentPending: "PAYMENT_PENDING";
 };
@@ -657,6 +661,10 @@ type CalculateLandedCostMutation = {
     }> | null;
     itemCreateWorkflow: Array<{
         amount: number;
+        attributes: Array<{
+            key: string | null;
+            value: string | null;
+        } | null> | null;
         description: string | null;
         id: string;
         imageUrl: string | null;
@@ -1067,6 +1075,9 @@ type Items = CheckItemRestrictionsMutation['itemRestrictionApply']['items'];
 type RestrictedItem = Items[number] & {
     name?: string;
 };
+
+declare const restStateType: readonly ["Boxes", "Earth", "EmptyBox", "Lock", "PigBank", "Scribble", "Search", "Settings", "ShoppingCart", "SpilledCup", "Switch", "TaxId", "Truck", "Warning"];
+type RestStateType = (typeof restStateType)[number];
 
 type ShippingRichRadioItem = {
     amount: number;
@@ -1480,7 +1491,7 @@ declare namespace Components {
         /**
           * Cancel button text
          */
-        "dialogCancelBtnText": string;
+        "dialogCancelBtnText"?: string;
         /**
           * Confirm button text
          */
@@ -1496,14 +1507,19 @@ declare namespace Components {
         "dialogOpen": boolean;
         /**
           * Dialog subtitle text
-          * @default "" No subtitle
+          * @default null No subtitle
          */
-        "dialogSubtitle": string;
+        "dialogSubtitle": string | null;
         /**
           * Dialog title text
           * @default "Are you sure?"
          */
         "dialogTitle": string;
+        /**
+          * Type of dialog - "alert" - Only confirm button - "confirm" - Both Confirm and cancel buttons
+          * @default "confirm"
+         */
+        "dialogType": 'alert' | 'confirm';
         /**
           * Whether or not the dialog is open
          */
@@ -1861,6 +1877,20 @@ declare namespace Components {
           * The title text for the authentication element
          */
         "titleText"?: string;
+    }
+    interface ZonosRestState {
+        /**
+          * The subtitle of the rest state
+         */
+        "restStateSubtitle": string;
+        /**
+          * The title of the rest state
+         */
+        "restStateTitle": string;
+        /**
+          * The type of rest state
+         */
+        "restStateType": RestStateType;
     }
     interface ZonosReview {
         /**
@@ -2379,6 +2409,12 @@ declare global {
         prototype: HTMLZonosPaymentElement;
         new (): HTMLZonosPaymentElement;
     };
+    interface HTMLZonosRestStateElement extends Components.ZonosRestState, HTMLStencilElement {
+    }
+    var HTMLZonosRestStateElement: {
+        prototype: HTMLZonosRestStateElement;
+        new (): HTMLZonosRestStateElement;
+    };
     interface HTMLZonosReviewElement extends Components.ZonosReview, HTMLStencilElement {
     }
     var HTMLZonosReviewElement: {
@@ -2487,6 +2523,7 @@ declare global {
         "zonos-logo": HTMLZonosLogoElement;
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
+        "zonos-rest-state": HTMLZonosRestStateElement;
         "zonos-review": HTMLZonosReviewElement;
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
         "zonos-shipping": HTMLZonosShippingElement;
@@ -2897,7 +2934,7 @@ declare namespace LocalJSX {
         /**
           * Cancel button text
          */
-        "dialogCancelBtnText": string;
+        "dialogCancelBtnText"?: string;
         /**
           * Confirm button text
          */
@@ -2910,17 +2947,22 @@ declare namespace LocalJSX {
         /**
           * Whether or not the dialog is open
          */
-        "dialogOpen"?: boolean;
+        "dialogOpen": boolean;
         /**
           * Dialog subtitle text
-          * @default "" No subtitle
+          * @default null No subtitle
          */
-        "dialogSubtitle"?: string;
+        "dialogSubtitle"?: string | null;
         /**
           * Dialog title text
           * @default "Are you sure?"
          */
         "dialogTitle"?: string;
+        /**
+          * Type of dialog - "alert" - Only confirm button - "confirm" - Both Confirm and cancel buttons
+          * @default "confirm"
+         */
+        "dialogType"?: 'alert' | 'confirm';
         /**
           * Whether or not the dialog is open
          */
@@ -3249,6 +3291,20 @@ declare namespace LocalJSX {
          */
         "titleText"?: string;
     }
+    interface ZonosRestState {
+        /**
+          * The subtitle of the rest state
+         */
+        "restStateSubtitle": string;
+        /**
+          * The title of the rest state
+         */
+        "restStateTitle": string;
+        /**
+          * The type of rest state
+         */
+        "restStateType": RestStateType;
+    }
     interface ZonosReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
@@ -3398,6 +3454,7 @@ declare namespace LocalJSX {
         "zonos-logo": ZonosLogo;
         "zonos-notification": ZonosNotification;
         "zonos-payment": ZonosPayment;
+        "zonos-rest-state": ZonosRestState;
         "zonos-review": ZonosReview;
         "zonos-select-dialog-header": ZonosSelectDialogHeader;
         "zonos-shipping": ZonosShipping;
@@ -3449,6 +3506,7 @@ declare module "@stencil/core" {
             "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
             "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
             "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
+            "zonos-rest-state": LocalJSX.ZonosRestState & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
             "zonos-review": LocalJSX.ZonosReview & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
             "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
             "zonos-shipping": LocalJSX.ZonosShipping & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
@@ -3501,6 +3559,8 @@ type CalculateLandedCostRequest = {
     };
 };
 
+type CountryOverrideBehavior = 'URL_PARAM' | 'SESSION';
+type ShowForCountries = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
 type HelloConfig = {
     anchorElementSelector: string;
     cartUrlPattern: string | null;
@@ -3508,7 +3568,7 @@ type HelloConfig = {
      * The behavior to use when determining the country to use for the user.
      * @default 'URL_PARAM'
      */
-    countryOverrideBehavior?: 'URL_PARAM' | 'SESSION';
+    countryOverrideBehavior?: CountryOverrideBehavior;
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
     excludedUrlPatterns: Array<string>;
@@ -3524,6 +3584,11 @@ type HelloConfig = {
     productListUrlPattern: string | null;
     productTitleElementSelector: string | null;
     restrictionBehavior: HelloRestrictionBehavior;
+    /**
+     * The countries to show the widget for.
+     * @default ONLY_SHIPPABLE
+     */
+    showForCountries?: ShowForCountries;
 };
 
 type StripeStoreContactOption = {
@@ -3639,6 +3704,21 @@ type CheckoutConfig = {
      */
     subscriptionStatus: CheckoutSubscriptionStatus;
     successBehavior: CheckoutSuccessBehavior;
+    /**
+     * The success page action text for checkout.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageActionText?: string;
+    /**
+     * The success page subtitle text for checkout. Each item in the array will appear on a new line.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageSubtitleText?: string[];
+    /**
+     * The success page title text for checkout.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageTitleText?: string;
     successRedirectUrl: string;
     visibilityStatus: CheckoutVisibilityStatus;
     /**
@@ -3671,6 +3751,31 @@ type CheckoutConfig = {
      * Callback trigger when the checkout is closed
      */
     onClose?: () => void;
+    /**
+     * This callback is optional. If provided, it will be called right before the payment is processed.
+     * @param items - The cart items.
+     * @returns {string | null} - The error message to display to the user. If the message is empty or null, the payment will proceed.
+     * @example
+     * onInventoryCheck: async (items) => {
+     *   // Check if all items are available from the server.
+     *   const itemsInfo = await fetch('https://yourserver.com/api/get-available-items', {
+     *     method: 'POST',
+     *     body: JSON.stringify({ items }),
+     *   });
+     *   const items = await itemsInfo.json();
+     *   // Filter out unavailable items.
+     *   const unavailableItems = items.filter(item => !item.available);
+     *   if (unavailableItems.length) {
+     *     // Display an error message to the user.
+     *     return `The following items are not available: ${unavailableItems.map(item => item.name).join(', ')}`;
+     *   }
+     *   // Proceed with the payment if you return an empty string or null.
+     *   return '';
+     * }
+     */
+    onInventoryCheck?: (params: {
+        items: CartItem[];
+    }) => Promise<string | null>;
     /**
      * Callback trigger when payment succeeds
      */
@@ -3875,7 +3980,6 @@ interface Zonos {
      */
     debug?: boolean;
     doneInit: boolean;
-    internationalHideSelector: string;
     isBigCommerce: boolean;
     isNpm: boolean;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
@@ -3912,7 +4016,6 @@ declare abstract class Zonos {
      * By default, the package will load from npm
      */
     static isNpm: boolean;
-    static internationalHideSelector: string;
     static zonosQaUrl: string | null;
     static version: string;
     static modeAlerted: boolean;

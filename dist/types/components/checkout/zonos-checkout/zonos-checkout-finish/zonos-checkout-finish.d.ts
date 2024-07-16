@@ -28,10 +28,12 @@ export declare class ZonosCheckoutFinish {
     notificationType: 'success' | 'error';
     notificationTitle: string;
     notificationMessages: string[];
+    notificationActionText: string;
     order: ZonosOrder | null;
     private pullOrder;
     private handleSuccessBehavior;
     private getPullOrder;
+    private useOverrideSuccessNotification;
     private checkPaymentStatus;
     private closeClickHandler;
     componentDidLoad(): void;

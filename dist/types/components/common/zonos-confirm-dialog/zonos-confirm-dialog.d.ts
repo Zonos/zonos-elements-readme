@@ -13,9 +13,9 @@ export declare class ZonosConfirmDialog {
     dialogIntent: 'info' | 'danger' | 'warn';
     /**
      * Dialog subtitle text
-     * @default "" No subtitle
+     * @default null No subtitle
      */
-    dialogSubtitle: string;
+    dialogSubtitle: string | null;
     /**
      * Submit button main color
      */

@@ -69,6 +69,10 @@ export declare class ZonosCheckout {
      */
     checkoutTimeoutInterval: NodeJS.Timeout | null;
     /**
+     * Error message from onInventoryCheck callback
+     */
+    inventoryCheckErrorMessage: string | null;
+    /**
      * Init cart info handler event
      */
     initCartInfoHandler(e: CustomEvent<CartItem[]>): Promise<void>;
@@ -103,6 +107,12 @@ export declare class ZonosCheckout {
     setToFinishStep(forcePaymentStatus?: PaymentIntent['status']): Promise<void>;
     private handleCustomerInfoContinue;
     private handleShippingContinue;
+    private handleInventoryCheckDialogCancel;
+    private handleInventoryCheckDialogConfirm;
+    /**
+     * Handle inventory check and returns error message if the callback provided.
+     */
+    private handleInventoryCheck;
     private handleCheckoutPaymentContinue;
     private handleFinishClick;
     private getCurrentLocalePageEnum;

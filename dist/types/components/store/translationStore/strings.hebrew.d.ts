@@ -41,6 +41,9 @@ export declare const stringsHebrew: {
     'Continue to shipping': {
         value: string;
     };
+    "Couldn't place order": {
+        value: string;
+    };
     Country: {
         value: string;
     };
@@ -170,6 +173,9 @@ export declare const stringsHebrew: {
     'Restricted items found': {
         value: string;
     };
+    'Return to cart': {
+        value: string;
+    };
     'Search countries': {
         value: string;
     };
@@ -225,6 +231,9 @@ export declare const stringsHebrew: {
         value: string;
     };
     'Translated address': {
+        value: string;
+    };
+    'Unable to check inventory. Please try again.': {
         value: string;
     };
     'Update address': {

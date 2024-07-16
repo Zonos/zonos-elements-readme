@@ -449,9 +449,9 @@ export namespace Components {
         "dialogOpen": boolean;
         /**
           * Dialog subtitle text
-          * @default "" No subtitle
+          * @default null No subtitle
          */
-        "dialogSubtitle": string;
+        "dialogSubtitle": string | null;
         /**
           * Dialog title text
           * @default "Are you sure?"
@@ -1892,9 +1892,9 @@ declare namespace LocalJSX {
         "dialogOpen": boolean;
         /**
           * Dialog subtitle text
-          * @default "" No subtitle
+          * @default null No subtitle
          */
-        "dialogSubtitle"?: string;
+        "dialogSubtitle"?: string | null;
         /**
           * Dialog title text
           * @default "Are you sure?"

@@ -75,7 +75,7 @@ export declare class ZonosHello {
     openHelloDialog(value: boolean): Promise<void>;
     private shouldAnimateLeftDesktop;
     handleResize(): void;
-    private isShippableCountry;
+    private shouldRenderHello;
     handleAppearanceSettingsOverrideChange(): void;
     render(): any;
 }

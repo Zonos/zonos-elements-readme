@@ -48,6 +48,21 @@ export type CheckoutConfig = {
      */
     subscriptionStatus: CheckoutSubscriptionStatus;
     successBehavior: CheckoutSuccessBehavior;
+    /**
+     * The success page action text for checkout.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageActionText?: string;
+    /**
+     * The success page subtitle text for checkout. Each item in the array will appear on a new line.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageSubtitleText?: string[];
+    /**
+     * The success page title text for checkout.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageTitleText?: string;
     successRedirectUrl: string;
     visibilityStatus: CheckoutVisibilityStatus;
     /**
@@ -80,6 +95,31 @@ export type CheckoutConfig = {
      * Callback trigger when the checkout is closed
      */
     onClose?: () => void;
+    /**
+     * This callback is optional. If provided, it will be called right before the payment is processed.
+     * @param items - The cart items.
+     * @returns {string | null} - The error message to display to the user. If the message is empty or null, the payment will proceed.
+     * @example
+     * onInventoryCheck: async (items) => {
+     *   // Check if all items are available from the server.
+     *   const itemsInfo = await fetch('https://yourserver.com/api/get-available-items', {
+     *     method: 'POST',
+     *     body: JSON.stringify({ items }),
+     *   });
+     *   const items = await itemsInfo.json();
+     *   // Filter out unavailable items.
+     *   const unavailableItems = items.filter(item => !item.available);
+     *   if (unavailableItems.length) {
+     *     // Display an error message to the user.
+     *     return `The following items are not available: ${unavailableItems.map(item => item.name).join(', ')}`;
+     *   }
+     *   // Proceed with the payment if you return an empty string or null.
+     *   return '';
+     * }
+     */
+    onInventoryCheck?: (params: {
+        items: CartItem[];
+    }) => Promise<string | null>;
     /**
      * Callback trigger when payment succeeds
      */
