@@ -100,8 +100,8 @@ export type CheckoutConfig = {
      * @param items - The cart items.
      * @returns {string | null} - The error message to display to the user. If the message is empty or null, the payment will proceed.
      * @example
-     * onInventoryCheck: async (items) => {
-     *   // Check if all items are available from the server.
+     * onInventoryCheck: async ({ items }) => {
+     *   // Check if all items are available from the server. If the fetch is throwing an error, we will show a generic error message "Unable to check inventory. Please try again.".
      *   const itemsInfo = await fetch('https://yourserver.com/api/get-available-items', {
      *     method: 'POST',
      *     body: JSON.stringify({ items }),
