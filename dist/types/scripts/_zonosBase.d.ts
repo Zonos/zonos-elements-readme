@@ -158,7 +158,6 @@ export declare abstract class Zonos {
     static updateOrganizationName: (organizationName: string) => void;
     private static disablePlaceOrderButtons;
     private static injectController;
-    private static injectSentryScript;
     private static injectScript;
     /**
      * We now support loading Zonos via npm. For clients using npm, `zonosBase` will always load from the server side. Therefore, the `zonosLoadUrl` defined earlier won't work since it lacks access to client-side APIs such as `window` and `document`.

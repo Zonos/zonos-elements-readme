@@ -62,6 +62,9 @@ export declare const stringsDanish: {
     "Don't close": {
         value: string;
     };
+    'Duties & taxes in Australia, VAT or GST is [percentage] and is due on all orders': {
+        value: string;
+    };
     'Duties and taxes will be applied to items and shipping.': {
         value: string;
     };
@@ -102,6 +105,9 @@ export declare const stringsDanish: {
         value: string;
     };
     'Last name': {
+        value: string;
+    };
+    'Learn more.': {
         value: string;
     };
     'Missing required fields. Make sure all fields are completed.': {
@@ -206,7 +212,10 @@ export declare const stringsDanish: {
     'Something went wrong.': {
         value: string;
     };
-    Spend: {
+    'Spend [threshold] duty free': {
+        value: string;
+    };
+    'Spend [threshold] tax free': {
         value: string;
     };
     State: {
@@ -219,6 +228,9 @@ export declare const stringsDanish: {
         value: string;
     };
     'The following items are unable to be shipped to your country and are not included in your cart total.': {
+        value: string;
+    };
+    'The low-value GST law passed July 1st, 2018 applies to this retailer.': {
         value: string;
     };
     "There's been an error creating your checkout session. Please reload and try again or contact support if the error persists": {
@@ -281,13 +293,7 @@ export declare const stringsDanish: {
     'click to learn more': {
         value: string;
     };
-    'duty free': {
-        value: string;
-    };
     'restricted items': {
-        value: string;
-    };
-    'tax free': {
         value: string;
     };
 };

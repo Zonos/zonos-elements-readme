@@ -3756,8 +3756,8 @@ type CheckoutConfig = {
      * @param items - The cart items.
      * @returns {string | null} - The error message to display to the user. If the message is empty or null, the payment will proceed.
      * @example
-     * onInventoryCheck: async (items) => {
-     *   // Check if all items are available from the server.
+     * onInventoryCheck: async ({ items }) => {
+     *   // Check if all items are available from the server. If the fetch is throwing an error, we will show a generic error message "Unable to check inventory. Please try again.".
      *   const itemsInfo = await fetch('https://yourserver.com/api/get-available-items', {
      *     method: 'POST',
      *     body: JSON.stringify({ items }),
@@ -4029,7 +4029,6 @@ declare abstract class Zonos {
     static updateOrganizationName: (organizationName: string) => void;
     private static disablePlaceOrderButtons;
     private static injectController;
-    private static injectSentryScript;
     private static injectScript;
     /**
      * We now support loading Zonos via npm. For clients using npm, `zonosBase` will always load from the server side. Therefore, the `zonosLoadUrl` defined earlier won't work since it lacks access to client-side APIs such as `window` and `document`.

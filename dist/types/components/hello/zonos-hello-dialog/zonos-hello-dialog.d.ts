@@ -45,6 +45,14 @@ export declare class ZonosHelloDialog {
     private setShowLanguageSelect;
     globalClickHandler(e: MouseEvent): void;
     isOpenHandler(isOpen: boolean): void;
+    /**
+     * Store has tax id setup in Zonos settings
+     */
+    private hasTaxId;
+    /**
+     * Some countries don't have threshold. So we need to show generic message for them
+     */
+    private isNoThresholdCountry;
     private getDutyMessage;
     private getTaxMessage;
     private getUkDutyTaxMessage;
