@@ -3589,6 +3589,15 @@ type HelloConfig = {
      * @default ONLY_SHIPPABLE
      */
     showForCountries?: ShowForCountries;
+    /**
+     * Callback function to run after the Hello widget has been initialized. This should be triggered only once when hello is attached to the DOM.
+     * **Note**: If hello is detached from the DOM and reattached, this callback will be called again.
+     * @param params - The parameters containing the country code and currency code that hello is initialized with.
+     */
+    onInitSucess?: (params: {
+        countryCode: CountryCode;
+        currencyCode: CurrencyCode;
+    }) => Promise<void>;
 };
 
 type StripeStoreContactOption = {

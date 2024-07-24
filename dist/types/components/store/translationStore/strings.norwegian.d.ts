@@ -260,7 +260,7 @@ export declare const stringsNorwegian: {
     "We've sent an email confirmation of the order details for your review. And our team is carefully preparing your order so it arrives on time.": {
         value: string;
     };
-    'Welcome to [storeName]!': {
+    'Welcome to [storeName]': {
         value: string;
     };
     'Welcome!': {

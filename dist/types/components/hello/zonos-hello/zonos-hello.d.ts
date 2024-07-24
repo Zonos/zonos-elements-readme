@@ -35,6 +35,10 @@ export declare class ZonosHello {
      * This array will hold all products currently on the page
      */
     productsOnPage: Product[];
+    /**
+     * Hello widget is rendered on the screen, this should only triggered once
+     */
+    isHelloWidgetRendered: boolean;
     private getHelloPeekMessage;
     private enableShowPeekMessage;
     private getNewItemRestrictions;
@@ -76,6 +80,10 @@ export declare class ZonosHello {
     private shouldAnimateLeftDesktop;
     handleResize(): void;
     private shouldRenderHello;
+    /**
+     * This method will handle the Hello widget initialized state, should only trigger once
+     */
+    private handleHelloWidgetInitializedState;
     handleAppearanceSettingsOverrideChange(): void;
     render(): any;
 }
