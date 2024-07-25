@@ -3594,7 +3594,7 @@ type HelloConfig = {
      * **Note**: If hello is detached from the DOM and reattached, this callback will be called again.
      * @param params - The parameters containing the country code and currency code that hello is initialized with.
      */
-    onInitSucess?: (params: {
+    onInitSuccess?: (params: {
         countryCode: CountryCode;
         currencyCode: CurrencyCode;
     }) => Promise<void>;
