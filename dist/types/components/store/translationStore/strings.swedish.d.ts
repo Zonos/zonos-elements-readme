@@ -26,10 +26,16 @@ export declare const stringsSwedish: {
     Cancel: {
         value: string;
     };
+    'Card number copied to clipboard': {
+        value: string;
+    };
     'Cart subtotal': {
         value: string;
     };
     City: {
+        value: string;
+    };
+    'Click to copy the card number. Use any future expiration date and three number CVC.': {
         value: string;
     };
     Close: {
@@ -86,6 +92,9 @@ export declare const stringsSwedish: {
     'Expected delivery': {
         value: string;
     };
+    Failure: {
+        value: string;
+    };
     'First name': {
         value: string;
     };
@@ -137,7 +146,10 @@ export declare const stringsSwedish: {
     'Orders to [countryName] must be over [threshold] to ship.': {
         value: string;
     };
-    Pay: {
+    'Pay [orderTotal]': {
+        value: string;
+    };
+    'Pay [organizationName]': {
         value: string;
     };
     Payment: {
@@ -224,7 +236,16 @@ export declare const stringsSwedish: {
     'State/Province': {
         value: string;
     };
+    Success: {
+        value: string;
+    };
     'Taxes will apply to all orders': {
+        value: string;
+    };
+    'Test cards': {
+        value: string;
+    };
+    'Test mode': {
         value: string;
     };
     'The following items are unable to be shipped to your country and are not included in your cart total.': {

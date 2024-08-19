@@ -49,7 +49,7 @@ export declare class ZonosAddressUpdateDialog {
     /**
      * Close dialog button click
      */
-    closeDialog: EventEmitter<void>;
+    closeUpdateDialog: EventEmitter<void>;
     /**
      * Event to emit when the continue button is clicked
      */
@@ -72,7 +72,7 @@ export declare class ZonosAddressUpdateDialog {
     /**
      * handler for close button click
      */
-    private closeDialogHandler;
+    private closeUpdateDialogHandler;
     /**
      * Extract value from translated object
      */

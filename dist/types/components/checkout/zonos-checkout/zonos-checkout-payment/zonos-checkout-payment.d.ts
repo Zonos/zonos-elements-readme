@@ -30,5 +30,6 @@ export declare class ZonosCheckoutPayment {
      * handler for continue button click
      */
     private continueClickHandler;
+    private copyCardToClipboard;
     render(): any;
 }

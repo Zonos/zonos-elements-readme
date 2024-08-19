@@ -42,6 +42,10 @@ export declare class ZonosController {
      */
     showNotification(notification: NotificationInit): Promise<void>;
     /**
+     * Reset the Checkout session id and client secret (required for dashboard store switching)
+     */
+    reset(): Promise<void>;
+    /**
      * Override the setting
      * @param config config that need to override the default setting
      */

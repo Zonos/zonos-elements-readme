@@ -119,6 +119,7 @@ export declare class ZonosCheckout {
     handleWindowResize(): void;
     handleMobileChange(): void;
     handleAppearanceSettingsOverrideChange(): void;
+    handleAddressChange(): void;
     componentWillLoad(): void;
     disconnectedCallback(): void;
     render(): any;

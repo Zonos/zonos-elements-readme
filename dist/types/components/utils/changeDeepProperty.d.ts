@@ -37,7 +37,7 @@ import type { IDeepKeyof, IDeepPropertyType } from "../../types/utils/deep/IDeep
       },
     };
  */
-export declare const changeDeepProperty: <T extends Record<string, unknown>, P extends IDeepKeyof<T, Depth>, Depth extends 0 | 1 | 2 | 3 | 4 | 8 | 7 | 5 | 6 | 9 = 4>({ obj, propertyPath, value, }: {
+export declare const changeDeepProperty: <T extends Record<string, unknown>, P extends IDeepKeyof<T, Depth>, Depth extends 0 | 1 | 2 | 3 | 5 | 8 | 4 | 6 | 7 | 9 = 4>({ obj, propertyPath, value, }: {
     obj: T;
     propertyPath: P;
     value: IDeepPropertyType<T, P, Depth>;

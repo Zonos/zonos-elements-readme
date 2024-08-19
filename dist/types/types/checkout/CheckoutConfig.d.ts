@@ -17,6 +17,11 @@ export type CheckoutConfig = {
         status: AnalyticsProviderStatus;
         type: AnalyticsProviderType;
     }>;
+    /**
+     * @default false - when false, we disable the place order button until the script is loaded
+     * @note if set to true, we will not enable or disable the place order button
+     */
+    disablePlaceOrderButtonActivation?: boolean;
     orderNotifications: {
         abandonedCart: {
             delay: number;

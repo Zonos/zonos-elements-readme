@@ -1,10 +1,12 @@
 import type { Stripe } from '@stripe/stripe-js';
 import type { AppearanceConfig } from "../components/store/zonosStore";
+import { type InjectScriptType } from "./_getNextFallbackUrl";
 import type { NotificationInit } from "../types/index";
 import type { TempCart } from "../types/checkout/api/TempCart";
 import type { CheckoutConfig } from "../types/checkout/CheckoutConfig";
 import type { CountryCode, CurrencyCode } from "../types/generated/graphql.customer.types";
 import type { HelloConfig } from "../types/hello/HelloConfig";
+export declare const MAIN_LOAD_CDN_TYPE: InjectScriptType;
 /**
  * Currency converter function to be used in Hello and Checkout
  * @note don't modify the element directly in this function, otherwise it might cause unexpected behavior like an infinite loop

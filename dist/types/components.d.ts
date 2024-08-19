@@ -11,6 +11,7 @@ import { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-addr
 import { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
 import { BannerIntent } from "./components/common/zonos-banner/zonos-banner";
 import { CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.customer.types";
+import { Color as Color1 } from "./types/index";
 import { FontWeight, Size, Type } from "./types/styles/Text";
 import { AppearanceConfig } from "./components/store/zonosStore";
 import { StripeStoreContactOption } from "./components/store/checkout/stripe";
@@ -29,6 +30,7 @@ export { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-addr
 export { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
 export { BannerIntent } from "./components/common/zonos-banner/zonos-banner";
 export { CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.customer.types";
+export { Color as Color1 } from "./types/index";
 export { FontWeight, Size, Type } from "./types/styles/Text";
 export { AppearanceConfig } from "./components/store/zonosStore";
 export { StripeStoreContactOption } from "./components/store/checkout/stripe";
@@ -124,10 +126,10 @@ export namespace Components {
     }
     interface ZonosBadge {
         /**
-          * The size of the badge
+          * The color of the badge
           * @default 24
          */
-        "badgeColor": ColorPrefix;
+        "badgeColor": ColorPrefix | 'transparent';
         /**
           * Whether or not the badge is bold
           * @default false
@@ -166,7 +168,7 @@ export namespace Components {
     }
     interface ZonosButton {
         /**
-          * The color of the button text and svg **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
+          * The color of the button **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
@@ -196,6 +198,11 @@ export namespace Components {
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
          */
         "isDisabled": boolean;
+        /**
+          * The content alignment within the button
+          * @default 'center'
+         */
+        "justifyContent": 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
          */
@@ -244,6 +251,15 @@ export namespace Components {
           * The actions to display in the header of the card
          */
         "actions"?: HTMLElement;
+        /**
+          * The background color of the card
+         */
+        "backgroundColor"?: Color;
+        /**
+          * The border radius of the card
+          * @default 6
+         */
+        "borderRadius"?: number;
         /**
           * The actions to display in the footer of the card
          */
@@ -498,6 +514,10 @@ export namespace Components {
           * Override country code for storybook
          */
         "overrideCountry": (countryCode: CountryCode) => Promise<void>;
+        /**
+          * Reset the Checkout session id and client secret (required for dashboard store switching)
+         */
+        "reset": () => Promise<void>;
         /**
           * Setup google font
          */
@@ -1036,7 +1056,7 @@ declare global {
         new (): HTMLZonosAddressFormElement;
     };
     interface HTMLZonosAddressUpdateDialogElementEventMap {
-        "closeDialog": void;
+        "closeUpdateDialog": void;
         "continueClicked": SubmitEventData;
     }
     interface HTMLZonosAddressUpdateDialogElement extends Components.ZonosAddressUpdateDialog, HTMLStencilElement {
@@ -1547,7 +1567,7 @@ declare namespace LocalJSX {
         /**
           * Close dialog button click
          */
-        "onCloseDialog"?: (event: ZonosAddressUpdateDialogCustomEvent<void>) => void;
+        "onCloseUpdateDialog"?: (event: ZonosAddressUpdateDialogCustomEvent<void>) => void;
         /**
           * Event to emit when the continue button is clicked
          */
@@ -1575,10 +1595,10 @@ declare namespace LocalJSX {
     }
     interface ZonosBadge {
         /**
-          * The size of the badge
+          * The color of the badge
           * @default 24
          */
-        "badgeColor"?: ColorPrefix;
+        "badgeColor"?: ColorPrefix | 'transparent';
         /**
           * Whether or not the badge is bold
           * @default false
@@ -1617,7 +1637,7 @@ declare namespace LocalJSX {
     }
     interface ZonosButton {
         /**
-          * The color of the button text and svg **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
+          * The color of the button **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
@@ -1647,6 +1667,11 @@ declare namespace LocalJSX {
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
          */
         "isDisabled"?: boolean;
+        /**
+          * The content alignment within the button
+          * @default 'center'
+         */
+        "justifyContent"?: 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
          */
@@ -1695,6 +1720,15 @@ declare namespace LocalJSX {
           * The actions to display in the header of the card
          */
         "actions"?: HTMLElement;
+        /**
+          * The background color of the card
+         */
+        "backgroundColor"?: Color;
+        /**
+          * The border radius of the card
+          * @default 6
+         */
+        "borderRadius"?: number;
         /**
           * The actions to display in the footer of the card
          */

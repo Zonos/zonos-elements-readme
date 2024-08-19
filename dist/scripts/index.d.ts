@@ -871,6 +871,7 @@ declare const envClientSchema: z.ZodObject<{
     NEXT_PUBLIC_ZONOS_JS_DELIVR_CDN_URL: z.ZodString;
     NEXT_PUBLIC_ZONOS_PACKAGE_VERSION: z.ZodString;
     NEXT_PUBLIC_ZONOS_ROUTE_URL: z.ZodString;
+    NEXT_PUBLIC_ZONOS_UNPKG_CDN_URL: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     NEXT_PUBLIC_FLAG_URL: string;
     NEXT_PUBLIC_ZONOS_API_KEY: string;
@@ -878,6 +879,7 @@ declare const envClientSchema: z.ZodObject<{
     NEXT_PUBLIC_ZONOS_JS_DELIVR_CDN_URL: string;
     NEXT_PUBLIC_ZONOS_PACKAGE_VERSION: string;
     NEXT_PUBLIC_ZONOS_ROUTE_URL: string;
+    NEXT_PUBLIC_ZONOS_UNPKG_CDN_URL: string;
 }, {
     NEXT_PUBLIC_FLAG_URL: string;
     NEXT_PUBLIC_ZONOS_API_KEY: string;
@@ -885,6 +887,7 @@ declare const envClientSchema: z.ZodObject<{
     NEXT_PUBLIC_ZONOS_JS_DELIVR_CDN_URL: string;
     NEXT_PUBLIC_ZONOS_PACKAGE_VERSION: string;
     NEXT_PUBLIC_ZONOS_ROUTE_URL: string;
+    NEXT_PUBLIC_ZONOS_UNPKG_CDN_URL: string;
 }>;
 interface Env extends z.infer<typeof envClientSchema> {
 }
@@ -1182,10 +1185,10 @@ declare namespace Components {
     }
     interface ZonosBadge {
         /**
-          * The size of the badge
+          * The color of the badge
           * @default 24
          */
-        "badgeColor": ColorPrefix;
+        "badgeColor": ColorPrefix | 'transparent';
         /**
           * Whether or not the badge is bold
           * @default false
@@ -1224,7 +1227,7 @@ declare namespace Components {
     }
     interface ZonosButton {
         /**
-          * The color of the button text and svg **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
+          * The color of the button **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
@@ -1254,6 +1257,11 @@ declare namespace Components {
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
          */
         "isDisabled": boolean;
+        /**
+          * The content alignment within the button
+          * @default 'center'
+         */
+        "justifyContent": 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
          */
@@ -1302,6 +1310,15 @@ declare namespace Components {
           * The actions to display in the header of the card
          */
         "actions"?: HTMLElement;
+        /**
+          * The background color of the card
+         */
+        "backgroundColor"?: Color;
+        /**
+          * The border radius of the card
+          * @default 6
+         */
+        "borderRadius"?: number;
         /**
           * The actions to display in the footer of the card
          */
@@ -1556,6 +1573,10 @@ declare namespace Components {
           * Override country code for storybook
          */
         "overrideCountry": (countryCode: CountryCode) => Promise<void>;
+        /**
+          * Reset the Checkout session id and client secret (required for dashboard store switching)
+         */
+        "reset": () => Promise<void>;
         /**
           * Setup google font
          */
@@ -2094,7 +2115,7 @@ declare global {
         new (): HTMLZonosAddressFormElement;
     };
     interface HTMLZonosAddressUpdateDialogElementEventMap {
-        "closeDialog": void;
+        "closeUpdateDialog": void;
         "continueClicked": SubmitEventData;
     }
     interface HTMLZonosAddressUpdateDialogElement extends Components.ZonosAddressUpdateDialog, HTMLStencilElement {
@@ -2605,7 +2626,7 @@ declare namespace LocalJSX {
         /**
           * Close dialog button click
          */
-        "onCloseDialog"?: (event: ZonosAddressUpdateDialogCustomEvent<void>) => void;
+        "onCloseUpdateDialog"?: (event: ZonosAddressUpdateDialogCustomEvent<void>) => void;
         /**
           * Event to emit when the continue button is clicked
          */
@@ -2633,10 +2654,10 @@ declare namespace LocalJSX {
     }
     interface ZonosBadge {
         /**
-          * The size of the badge
+          * The color of the badge
           * @default 24
          */
-        "badgeColor"?: ColorPrefix;
+        "badgeColor"?: ColorPrefix | 'transparent';
         /**
           * Whether or not the badge is bold
           * @default false
@@ -2675,7 +2696,7 @@ declare namespace LocalJSX {
     }
     interface ZonosButton {
         /**
-          * The color of the button text and svg **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
+          * The color of the button **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
@@ -2705,6 +2726,11 @@ declare namespace LocalJSX {
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
          */
         "isDisabled"?: boolean;
+        /**
+          * The content alignment within the button
+          * @default 'center'
+         */
+        "justifyContent"?: 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
          */
@@ -2753,6 +2779,15 @@ declare namespace LocalJSX {
           * The actions to display in the header of the card
          */
         "actions"?: HTMLElement;
+        /**
+          * The background color of the card
+         */
+        "backgroundColor"?: Color;
+        /**
+          * The border radius of the card
+          * @default 6
+         */
+        "borderRadius"?: number;
         /**
           * The actions to display in the footer of the card
          */
@@ -3682,6 +3717,11 @@ type CheckoutConfig = {
         status: AnalyticsProviderStatus;
         type: AnalyticsProviderType;
     }>;
+    /**
+     * @default false - when false, we disable the place order button until the script is loaded
+     * @note if set to true, we will not enable or disable the place order button
+     */
+    disablePlaceOrderButtonActivation?: boolean;
     orderNotifications: {
         abandonedCart: {
             delay: number;

@@ -6,10 +6,10 @@ export declare class ZonosBadge {
      */
     bold: boolean;
     /**
-     * The size of the badge
+     * The color of the badge
      * @default 24
      */
-    badgeColor: ColorPrefix;
+    badgeColor: ColorPrefix | 'transparent';
     /**
      * The icon element to display
      * @default null

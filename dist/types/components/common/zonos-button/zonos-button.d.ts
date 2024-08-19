@@ -9,7 +9,7 @@ export declare class ZonosButton {
         _placeholder?: never;
     });
     /**
-     * The color of the button text and svg
+     * The color of the button
      * **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
      */
     backgroundColor?: Color | (string & {
@@ -72,6 +72,11 @@ export declare class ZonosButton {
      * Whether or not the button is loading
      */
     loading: boolean;
+    /**
+     * The content alignment within the button
+     * @default 'center'
+     */
+    justifyContent: 'center' | 'flex-end' | 'flex-start';
     /**
      * The theme of the button
      */

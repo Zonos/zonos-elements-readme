@@ -1,8 +1,18 @@
+import type { Color } from "../../../types/index";
 export declare class ZonosCard {
     /**
      * The actions to display in the header of the card
      */
     actions?: HTMLElement;
+    /**
+     * The background color of the card
+     */
+    backgroundColor?: Color;
+    /**
+     * The border radius of the card
+     * @default 6
+     */
+    borderRadius?: number;
     /**
      * The actions to display in the footer of the card
      */

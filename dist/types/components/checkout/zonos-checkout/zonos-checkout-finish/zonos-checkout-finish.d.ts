@@ -31,6 +31,7 @@ export declare class ZonosCheckoutFinish {
     notificationActionText: string;
     order: ZonosOrder | null;
     private pullOrder;
+    private redirectToUrl;
     private handleSuccessBehavior;
     private getPullOrder;
     private useOverrideSuccessNotification;
