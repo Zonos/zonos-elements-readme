@@ -1,6 +1,7 @@
 import type { CountryCode, CurrencyCode, HelloCurrencyBehavior, HelloMobileLocation, HelloPeekMessageBehavior, HelloRestrictionBehavior, Mode } from "../generated/graphql.customer.types";
 export type CountryOverrideBehavior = 'URL_PARAM' | 'SESSION';
 export type ShowForCountries = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
+export type ShowCountryList = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
 export type HelloConfig = {
     anchorElementSelector: string;
     cartUrlPattern: string | null;
@@ -24,6 +25,11 @@ export type HelloConfig = {
     productListUrlPattern: string | null;
     productTitleElementSelector: string | null;
     restrictionBehavior: HelloRestrictionBehavior;
+    /**
+     * The countries to include in the country list dropdown of the Hello widget.
+     * @default ONLY_SHIPPABLE
+     */
+    showCountryList?: ShowCountryList;
     /**
      * The countries to show the widget for.
      * @default ONLY_SHIPPABLE

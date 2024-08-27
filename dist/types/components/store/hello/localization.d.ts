@@ -13,6 +13,8 @@ type LocalizationStore = {
     customMessages: ILocaleMessageForUse[];
     exchangeRate: ExchangeRateForUse | null;
     exchangeRateTimeout?: NodeJS.Timeout;
+    hasInclusivePrices: boolean;
+    helloCountryList: ICountryJson | null;
     isShippableCountry: boolean;
     localizationLoaded: boolean;
     selectedCountryCode: CountryCode | null;

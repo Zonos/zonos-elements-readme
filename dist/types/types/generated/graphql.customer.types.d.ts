@@ -324,6 +324,7 @@ export declare const catalogItemExportJobAction: {
 export type CatalogItemExportJobAction = (typeof catalogItemExportJobAction)[keyof typeof catalogItemExportJobAction];
 export declare const catalogItemInclusivePriceStatus: {
     readonly Active: "ACTIVE";
+    readonly Archived: "ARCHIVED";
     readonly Failed: "FAILED";
     readonly Ignored: "IGNORED";
     readonly Pending: "PENDING";
@@ -335,6 +336,11 @@ export declare const catalogItemSource: {
     readonly UserProvided: "USER_PROVIDED";
 };
 export type CatalogItemSource = (typeof catalogItemSource)[keyof typeof catalogItemSource];
+export declare const catalogItemUpdateMethod: {
+    readonly All: "ALL";
+    readonly NonNull: "NON_NULL";
+};
+export type CatalogItemUpdateMethod = (typeof catalogItemUpdateMethod)[keyof typeof catalogItemUpdateMethod];
 export declare const catalogSettingMigrationAction: {
     readonly Evaluate: "EVALUATE";
     readonly Migrate: "MIGRATE";
@@ -375,6 +381,12 @@ export declare const classificationBulkJobStatus: {
     readonly Processing: "PROCESSING";
 };
 export type ClassificationBulkJobStatus = (typeof classificationBulkJobStatus)[keyof typeof classificationBulkJobStatus];
+export declare const classificationCalculateOrigin: {
+    readonly All: "ALL";
+    readonly Bulk: "BULK";
+    readonly Single: "SINGLE";
+};
+export type ClassificationCalculateOrigin = (typeof classificationCalculateOrigin)[keyof typeof classificationCalculateOrigin];
 export declare const classificationCalculateSource: {
     readonly External: "EXTERNAL";
     readonly Internal: "INTERNAL";
@@ -1276,6 +1288,7 @@ export type EmailTemplateStatus = (typeof emailTemplateStatus)[keyof typeof emai
 export declare const emailTemplateType: {
     readonly AbandonedCart: "ABANDONED_CART";
     readonly CatalogExport: "CATALOG_EXPORT";
+    readonly ClassificationExport: "CLASSIFICATION_EXPORT";
     readonly ManualClassificationExport: "MANUAL_CLASSIFICATION_EXPORT";
     readonly OrderCanceled: "ORDER_CANCELED";
     readonly OrderConfirmation: "ORDER_CONFIRMATION";
@@ -1340,6 +1353,7 @@ export declare const fedExCategoryCode: {
 };
 export type FedExCategoryCode = (typeof fedExCategoryCode)[keyof typeof fedExCategoryCode];
 export declare const fulfillmentCenterType: {
+    readonly ConsolidationCenter: "CONSOLIDATION_CENTER";
     readonly Primary: "PRIMARY";
     readonly Standard: "STANDARD";
 };
@@ -1393,6 +1407,13 @@ export declare const hsCodeProvidedTreatment: {
     readonly ValidateOnly: "VALIDATE_ONLY";
 };
 export type HsCodeProvidedTreatment = (typeof hsCodeProvidedTreatment)[keyof typeof hsCodeProvidedTreatment];
+export declare const hsCodeSource: {
+    readonly Classify: "CLASSIFY";
+    readonly Fallback: "FALLBACK";
+    readonly Hybrid: "HYBRID";
+    readonly UserProvided: "USER_PROVIDED";
+};
+export type HsCodeSource = (typeof hsCodeSource)[keyof typeof hsCodeSource];
 export declare const hsCodeType: {
     readonly Chapter: "CHAPTER";
     readonly Export: "EXPORT";
@@ -1427,16 +1448,11 @@ export type ImageSlot = (typeof imageSlot)[keyof typeof imageSlot];
 export declare const inclusivePriceCalculateJobStatus: {
     readonly Cancelled: "CANCELLED";
     readonly Completed: "COMPLETED";
+    readonly CompletedWithErrors: "COMPLETED_WITH_ERRORS";
     readonly Failed: "FAILED";
     readonly InProgress: "IN_PROGRESS";
 };
 export type InclusivePriceCalculateJobStatus = (typeof inclusivePriceCalculateJobStatus)[keyof typeof inclusivePriceCalculateJobStatus];
-export declare const inclusivePriceCalculateJobType: {
-    readonly All: "ALL";
-    readonly CatalogItem: "CATALOG_ITEM";
-    readonly Country: "COUNTRY";
-};
-export type InclusivePriceCalculateJobType = (typeof inclusivePriceCalculateJobType)[keyof typeof inclusivePriceCalculateJobType];
 export declare const inclusivePriceCatalogValidationJobCompletionStatus: {
     readonly Archived: "ARCHIVED";
     readonly Completed: "COMPLETED";
@@ -1451,11 +1467,10 @@ export declare const inclusivePriceCatalogValidationJobComplianceStatus: {
 };
 export type InclusivePriceCatalogValidationJobComplianceStatus = (typeof inclusivePriceCatalogValidationJobComplianceStatus)[keyof typeof inclusivePriceCatalogValidationJobComplianceStatus];
 export declare const inclusivePriceHistoryCsvJobStatus: {
+    readonly Completed: "COMPLETED";
     readonly Error: "ERROR";
-    readonly Processed: "PROCESSED";
-    readonly ReadyForProcessing: "READY_FOR_PROCESSING";
-    readonly ReadyForUpload: "READY_FOR_UPLOAD";
-    readonly Uploading: "UPLOADING";
+    readonly Initialized: "INITIALIZED";
+    readonly Processing: "PROCESSING";
 };
 export type InclusivePriceHistoryCsvJobStatus = (typeof inclusivePriceHistoryCsvJobStatus)[keyof typeof inclusivePriceHistoryCsvJobStatus];
 export declare const inclusivePriceHistorySource: {
@@ -1470,6 +1485,7 @@ export declare const inclusivePriceSettingAdjustmentStatus: {
 };
 export type InclusivePriceSettingAdjustmentStatus = (typeof inclusivePriceSettingAdjustmentStatus)[keyof typeof inclusivePriceSettingAdjustmentStatus];
 export declare const inclusivePriceSettingStatus: {
+    readonly Archived: "ARCHIVED";
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
 };
@@ -1480,7 +1496,9 @@ export declare const inclusivePriceStatus: {
 };
 export type InclusivePriceStatus = (typeof inclusivePriceStatus)[keyof typeof inclusivePriceStatus];
 export declare const inclusivePriceSyncJobStatus: {
+    readonly Cancelled: "CANCELLED";
     readonly Completed: "COMPLETED";
+    readonly CompletedWithErrors: "COMPLETED_WITH_ERRORS";
     readonly Failed: "FAILED";
     readonly InProgress: "IN_PROGRESS";
     readonly Initialized: "INITIALIZED";
@@ -1609,7 +1627,11 @@ export type ItemUnitOfMeasure = (typeof itemUnitOfMeasure)[keyof typeof itemUnit
 export declare const itemValueSource: {
     readonly ApiRequest: "API_REQUEST";
     readonly Catalog: "CATALOG";
+    readonly Classify: "CLASSIFY";
+    readonly Fallback: "FALLBACK";
+    readonly Hybrid: "HYBRID";
     readonly OrganizationSetting: "ORGANIZATION_SETTING";
+    readonly UserProvided: "USER_PROVIDED";
 };
 export type ItemValueSource = (typeof itemValueSource)[keyof typeof itemValueSource];
 export declare const labelAmountType: {
@@ -1933,6 +1955,14 @@ export declare const orderCompleteBillingMethod: {
     readonly Legacy: "LEGACY";
 };
 export type OrderCompleteBillingMethod = (typeof orderCompleteBillingMethod)[keyof typeof orderCompleteBillingMethod];
+export declare const orderNoteType: {
+    readonly Comment: "COMMENT";
+    readonly NotificationSent: "NOTIFICATION_SENT";
+    readonly OrderChange: "ORDER_CHANGE";
+    readonly Shipment: "SHIPMENT";
+    readonly Status: "STATUS";
+};
+export type OrderNoteType = (typeof orderNoteType)[keyof typeof orderNoteType];
 export declare const orderRefundSubtotalType: {
     readonly DutyTaxFee: "DUTY_TAX_FEE";
     readonly Item: "ITEM";
@@ -2062,6 +2092,11 @@ export declare const pddpStatus: {
     readonly Disabled: "DISABLED";
 };
 export type PddpStatus = (typeof pddpStatus)[keyof typeof pddpStatus];
+export declare const pddpType: {
+    readonly CanadaPost: "CANADA_POST";
+    readonly Ipc: "IPC";
+};
+export type PddpType = (typeof pddpType)[keyof typeof pddpType];
 export declare const pickupBuildingType: {
     readonly Apartment: "APARTMENT";
     readonly Building: "BUILDING";
@@ -2123,6 +2158,13 @@ export declare const roundingType: {
     readonly None: "NONE";
 };
 export type RoundingType = (typeof roundingType)[keyof typeof roundingType];
+export declare const searchIndex: {
+    readonly Catalog: "CATALOG";
+    readonly Orders: "ORDERS";
+    readonly Quotes: "QUOTES";
+    readonly Shipments: "SHIPMENTS";
+};
+export type SearchIndex = (typeof searchIndex)[keyof typeof searchIndex];
 export declare const serviceLevelAvailability: {
     readonly Contracted: "CONTRACTED";
     readonly Disabled: "DISABLED";
@@ -2169,6 +2211,11 @@ export declare const shipmentRatingBatteryPackingType: {
     readonly BatteryPackagedWithEquipment: "BATTERY_PACKAGED_WITH_EQUIPMENT";
 };
 export type ShipmentRatingBatteryPackingType = (typeof shipmentRatingBatteryPackingType)[keyof typeof shipmentRatingBatteryPackingType];
+export declare const shipmentRatingRateType: {
+    readonly LabelEnabled: "LABEL_ENABLED";
+    readonly Zone: "ZONE";
+};
+export type ShipmentRatingRateType = (typeof shipmentRatingRateType)[keyof typeof shipmentRatingRateType];
 export declare const shipmentRatingSignatureOptionType: {
     readonly Adult: "ADULT";
     readonly Default: "DEFAULT";
@@ -2206,6 +2253,10 @@ export declare const shipmentSpecialService: {
 export type ShipmentSpecialService = (typeof shipmentSpecialService)[keyof typeof shipmentSpecialService];
 export declare const shipmentStatusType: {
     readonly Created: "CREATED";
+    readonly Delivered: "DELIVERED";
+    readonly DeliveredToConsolidationCenter: "DELIVERED_TO_CONSOLIDATION_CENTER";
+    readonly InTransit: "IN_TRANSIT";
+    readonly InTransitToConsolidationCenter: "IN_TRANSIT_TO_CONSOLIDATION_CENTER";
     readonly Voided: "VOIDED";
 };
 export type ShipmentStatusType = (typeof shipmentStatusType)[keyof typeof shipmentStatusType];
@@ -2337,8 +2388,16 @@ export declare const taxMethodType: {
     readonly Consignment: "CONSIGNMENT";
     readonly Default: "DEFAULT";
     readonly Domestic: "DOMESTIC";
+    readonly SellerOfRecord: "SELLER_OF_RECORD";
 };
 export type TaxMethodType = (typeof taxMethodType)[keyof typeof taxMethodType];
+export declare const thirdPartyAccountType: {
+    readonly Dhl: "DHL";
+    readonly Fedex: "FEDEX";
+    readonly Ups: "UPS";
+    readonly Usps: "USPS";
+};
+export type ThirdPartyAccountType = (typeof thirdPartyAccountType)[keyof typeof thirdPartyAccountType];
 export declare const tokenTypeCategory: {
     readonly Auxiliary: "AUXILIARY";
     readonly Functional: "FUNCTIONAL";
@@ -2444,6 +2503,7 @@ export declare const webhookType: {
     readonly OrderCanceled: "ORDER_CANCELED";
     readonly OrderCreated: "ORDER_CREATED";
     readonly OrderStatusChanged: "ORDER_STATUS_CHANGED";
+    readonly OrderUpdated: "ORDER_UPDATED";
     readonly ShipmentCanceled: "SHIPMENT_CANCELED";
     readonly ShipmentCreated: "SHIPMENT_CREATED";
 };
@@ -2656,8 +2716,8 @@ export type FulfillmentCenterQuery = {
                 propertyType: PropertyType | null;
             } | null;
         };
-        type: FulfillmentCenterType | null;
-    } | null> | null;
+        type: FulfillmentCenterType;
+    }> | null;
 };
 export type CheckItemRestrictionsMutation = {
     itemRestrictionApply: {
@@ -2805,6 +2865,16 @@ export type GetCheckoutSessionQuery = {
             id: string;
         } | null;
     };
+};
+export type GetInclusivePriceSettingEnabledByCountryQuery = {
+    inclusivePriceSettings: {
+        edges: Array<{
+            node: {
+                id: string;
+                status: InclusivePriceSettingStatus;
+            };
+        }>;
+    } | null;
 };
 export type ShippingZonesQuery = {
     shippingZones: Array<{
@@ -3329,6 +3399,9 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     getCheckoutSession(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCheckoutSessionQuery>;
+    getInclusivePriceSettingEnabledByCountry(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetInclusivePriceSettingEnabledByCountryQuery>;
     getOrder(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetOrderQuery>;

@@ -49,6 +49,7 @@ export declare class ZonosHelloDialog {
      * Store has tax id setup in Zonos settings
      */
     private hasTaxId;
+    private hasInclusivePrices;
     /**
      * Some countries don't have threshold. So we need to show generic message for them
      */

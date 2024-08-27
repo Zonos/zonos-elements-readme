@@ -80,6 +80,8 @@ export declare const errorProjectNameEnum: {
 };
 export declare const featureAspectKeyEnum: {
     readonly Checkout_2_0: "checkout_2_0";
+    readonly ClassifyBulk: "classify_bulk";
+    readonly ClassifyBulkExportViewConfidenceScore: "classify_bulk_export_view_confidence_score";
     readonly ClassifySingleRequest: "classify_single_request";
     readonly ComConsolidation: "com_consolidation";
     readonly DashboardCheckout_2Settings: "dashboard_checkout_2_settings";
@@ -103,6 +105,8 @@ export type Feature_AspectKey_Enum = (typeof featureAspectKeyEnum)[keyof typeof 
 export declare const featureAudienceNameEnum: {
     readonly AccountsReceivable: "accounts_receivable";
     readonly CheckoutSales: "checkout_sales";
+    readonly ClassifyBulkMerchant: "classify_bulk_merchant";
+    readonly ClassifyBulkMerchantExportConfidenceScore: "classify_bulk_merchant_export_confidence_score";
     readonly CustomerSuccess: "customer_success";
     readonly DashboardLabelBetaMerchant: "dashboard_label_beta_merchant";
     readonly Designer: "designer";
@@ -562,7 +566,7 @@ export type GetAudienceByAspectKeyQuery = {
 };
 export type LocaleCountryMessagesQuery = {
     locale_countryCodesPage: Array<{
-        countryCodes: Array<string> | null;
+        countryCodes: Array<string>;
         countryCodesPageMessageLinks: Array<{
             id: number;
             message: {

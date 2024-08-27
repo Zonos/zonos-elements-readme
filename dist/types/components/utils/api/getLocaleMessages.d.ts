@@ -4,7 +4,7 @@ export declare const getLocaleMessages: ({ countryCode, localeTo, storeId, }: {
     localeTo?: string;
     storeId: number;
 }) => Promise<{
-    countryCodes: string[] | null;
+    countryCodes: string[];
     countryCodesPageMessageLinks: {
         id: number;
         message: {

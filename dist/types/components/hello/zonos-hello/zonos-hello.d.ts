@@ -39,6 +39,10 @@ export declare class ZonosHello {
      * Hello widget is rendered on the screen, this should only triggered once
      */
     isHelloWidgetRendered: boolean;
+    /**
+     * Get the country list the hello widget's country select is using
+     */
+    getCountryList(): Promise<import("../../../types/ICountryJson").ICountryJson | null>;
     private getHelloPeekMessage;
     private enableShowPeekMessage;
     private getNewItemRestrictions;

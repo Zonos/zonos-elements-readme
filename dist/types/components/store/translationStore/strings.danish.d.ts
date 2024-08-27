@@ -68,13 +68,13 @@ export declare const stringsDanish: {
     "Don't close": {
         value: string;
     };
-    'Duties & taxes in Australia, VAT or GST is [percentage] and is due on all orders': {
+    'Duties & taxes in Australia, VAT or GST is [percentage] and is due on all orders.': {
         value: string;
     };
     'Duties and taxes will be applied to items and shipping.': {
         value: string;
     };
-    'Duties will apply to all orders': {
+    'Duties will apply to all orders.': {
         value: string;
     };
     'Duties, taxes, and fees': {
@@ -182,6 +182,9 @@ export declare const stringsDanish: {
     'Prepay duties and taxes at checkout': {
         value: string;
     };
+    'Product prices already include duties, taxes, and fees. No additional duties or taxes will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
     Reload: {
         value: string;
     };
@@ -224,10 +227,10 @@ export declare const stringsDanish: {
     'Something went wrong.': {
         value: string;
     };
-    'Spend [threshold] duty free': {
+    'Spend [threshold] duty free.': {
         value: string;
     };
-    'Spend [threshold] tax free': {
+    'Spend [threshold] tax free.': {
         value: string;
     };
     State: {
@@ -239,7 +242,7 @@ export declare const stringsDanish: {
     Success: {
         value: string;
     };
-    'Taxes will apply to all orders': {
+    'Taxes will apply to all orders.': {
         value: string;
     };
     'Test cards': {

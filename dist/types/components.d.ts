@@ -679,6 +679,10 @@ export namespace Components {
          */
         "format": (value: number) => Promise<string>;
         /**
+          * Get the country list the hello widget's country select is using
+         */
+        "getCountryList": () => Promise<import("/Users/thienhuynh/zonos/zonos-elements/src/types/ICountryJson").ICountryJson | null>;
+        /**
           * Force mobile styling instead of media query and use the passed location value
           * @default false
          */
