@@ -18,6 +18,7 @@ import { StripeStoreContactOption } from "./components/store/checkout/stripe";
 import { TabItem, TabItems } from "./components/store/checkout/cart";
 import { LoadZonosParamsConfig } from "./scripts/_zonosBase";
 import { NotificationInit } from "./components/common/zonos-notification/zonos-notification";
+import { ICountryJson } from "./types/ICountryJson";
 import { RestrictedItem } from "./types/hello/RestrictedItem";
 import { AppearanceConfig as AppearanceConfig1 } from "./components.d";
 import { RestStateType } from "./components/utils/restStateType";
@@ -37,6 +38,7 @@ export { StripeStoreContactOption } from "./components/store/checkout/stripe";
 export { TabItem, TabItems } from "./components/store/checkout/cart";
 export { LoadZonosParamsConfig } from "./scripts/_zonosBase";
 export { NotificationInit } from "./components/common/zonos-notification/zonos-notification";
+export { ICountryJson } from "./types/ICountryJson";
 export { RestrictedItem } from "./types/hello/RestrictedItem";
 export { AppearanceConfig as AppearanceConfig1 } from "./components.d";
 export { RestStateType } from "./components/utils/restStateType";
@@ -391,10 +393,6 @@ export namespace Components {
          */
         "continueLoading": boolean;
         /**
-          * Error occurred during payment
-         */
-        "paymentError": boolean;
-        /**
           * Submit button main color
          */
         "submitBtnColor"?: string;
@@ -681,7 +679,7 @@ export namespace Components {
         /**
           * Get the country list the hello widget's country select is using
          */
-        "getCountryList": () => Promise<import("/Users/thienhuynh/zonos/zonos-elements/src/types/ICountryJson").ICountryJson | null>;
+        "getCountryList": () => Promise<ICountryJson | null>;
         /**
           * Force mobile styling instead of media query and use the passed location value
           * @default false
@@ -844,6 +842,8 @@ export namespace Components {
          */
         "titleText"?: string;
     }
+    interface ZonosPaypalPayment {
+    }
     interface ZonosRestState {
         /**
           * The subtitle of the rest state
@@ -961,6 +961,36 @@ export namespace Components {
          */
         "spacing": GridSpacing;
     }
+    /**
+     * The idea is from
+     * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+     * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+     */
+    interface ZonosVirtualScroll {
+        /**
+          * Height that is used as a fallback if height is not provided
+         */
+        "fallbackItemHeight": number;
+        /**
+          * Heights list of each item
+         */
+        "itemHeights": number[];
+        /**
+          * Width of each item
+         */
+        "itemWidth"?: number;
+        /**
+          * Render item
+         */
+        "renderItem": (
+    itemIndex: number,
+  ) =>
+    | HTMLElement
+    | Promise<HTMLElement>
+    | HTMLElement[]
+    | Promise<HTMLElement[]>
+    | Promise<HTMLElement>[];
+    }
 }
 export interface ZonosAddressCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1009,6 +1039,10 @@ export interface ZonosHelloDialogCustomEvent<T> extends CustomEvent<T> {
 export interface ZonosInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosInputElement;
+}
+export interface ZonosPaypalPaymentCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosPaypalPaymentElement;
 }
 export interface ZonosShippingCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1167,6 +1201,8 @@ declare global {
     };
     interface HTMLZonosCheckoutPaymentElementEventMap {
         "continueClicked": void;
+        "paypalSessionFailed": void;
+        "paypalSessionDone": string;
     }
     interface HTMLZonosCheckoutPaymentElement extends Components.ZonosCheckoutPayment, HTMLStencilElement {
         addEventListener<K extends keyof HTMLZonosCheckoutPaymentElementEventMap>(type: K, listener: (this: HTMLZonosCheckoutPaymentElement, ev: ZonosCheckoutPaymentCustomEvent<HTMLZonosCheckoutPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1219,6 +1255,7 @@ declare global {
         new (): HTMLZonosConfirmDialogElement;
     };
     interface HTMLZonosControllerElementEventMap {
+        "paypalInitEvent": { paypalClientId: string };
         "stripeInitEvent": { publishableKey: string };
     }
     interface HTMLZonosControllerElement extends Components.ZonosController, HTMLStencilElement {
@@ -1375,6 +1412,24 @@ declare global {
         prototype: HTMLZonosPaymentElement;
         new (): HTMLZonosPaymentElement;
     };
+    interface HTMLZonosPaypalPaymentElementEventMap {
+        "paypalSessionDone": { orderId: string };
+        "paypalSessionFail": void;
+    }
+    interface HTMLZonosPaypalPaymentElement extends Components.ZonosPaypalPayment, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosPaypalPaymentElementEventMap>(type: K, listener: (this: HTMLZonosPaypalPaymentElement, ev: ZonosPaypalPaymentCustomEvent<HTMLZonosPaypalPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosPaypalPaymentElementEventMap>(type: K, listener: (this: HTMLZonosPaypalPaymentElement, ev: ZonosPaypalPaymentCustomEvent<HTMLZonosPaypalPaymentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosPaypalPaymentElement: {
+        prototype: HTMLZonosPaypalPaymentElement;
+        new (): HTMLZonosPaypalPaymentElement;
+    };
     interface HTMLZonosRestStateElement extends Components.ZonosRestState, HTMLStencilElement {
     }
     var HTMLZonosRestStateElement: {
@@ -1451,6 +1506,17 @@ declare global {
         prototype: HTMLZonosVStackElement;
         new (): HTMLZonosVStackElement;
     };
+    /**
+     * The idea is from
+     * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+     * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+     */
+    interface HTMLZonosVirtualScrollElement extends Components.ZonosVirtualScroll, HTMLStencilElement {
+    }
+    var HTMLZonosVirtualScrollElement: {
+        prototype: HTMLZonosVirtualScrollElement;
+        new (): HTMLZonosVirtualScrollElement;
+    };
     interface HTMLElementTagNameMap {
         "zonos-address": HTMLZonosAddressElement;
         "zonos-address-display": HTMLZonosAddressDisplayElement;
@@ -1489,6 +1555,7 @@ declare global {
         "zonos-logo": HTMLZonosLogoElement;
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
+        "zonos-paypal-payment": HTMLZonosPaypalPaymentElement;
         "zonos-rest-state": HTMLZonosRestStateElement;
         "zonos-review": HTMLZonosReviewElement;
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
@@ -1498,6 +1565,7 @@ declare global {
         "zonos-text": HTMLZonosTextElement;
         "zonos-tooltip": HTMLZonosTooltipElement;
         "zonos-v-stack": HTMLZonosVStackElement;
+        "zonos-virtual-scroll": HTMLZonosVirtualScrollElement;
     }
 }
 declare namespace LocalJSX {
@@ -1864,9 +1932,13 @@ declare namespace LocalJSX {
          */
         "onContinueClicked"?: (event: ZonosCheckoutPaymentCustomEvent<void>) => void;
         /**
-          * Error occurred during payment
+          * Event to emit when the paypal session is done
          */
-        "paymentError"?: boolean;
+        "onPaypalSessionDone"?: (event: ZonosCheckoutPaymentCustomEvent<string>) => void;
+        /**
+          * Event to emit when the paypal session failed
+         */
+        "onPaypalSessionFailed"?: (event: ZonosCheckoutPaymentCustomEvent<void>) => void;
         /**
           * Submit button main color
          */
@@ -1970,6 +2042,10 @@ declare namespace LocalJSX {
           * The zonos config object
          */
         "config": LoadZonosParamsConfig;
+        /**
+          * Event emitted to initialize paypal
+         */
+        "onPaypalInitEvent"?: (event: ZonosControllerCustomEvent<{ paypalClientId: string }>) => void;
         /**
           * Event emitted when stripe is initialized
          */
@@ -2271,6 +2347,16 @@ declare namespace LocalJSX {
          */
         "titleText"?: string;
     }
+    interface ZonosPaypalPayment {
+        /**
+          * Event to emit when the paypal session is done
+         */
+        "onPaypalSessionDone"?: (event: ZonosPaypalPaymentCustomEvent<{ orderId: string }>) => void;
+        /**
+          * Event to emit when the paypal session is failed
+         */
+        "onPaypalSessionFail"?: (event: ZonosPaypalPaymentCustomEvent<void>) => void;
+    }
     interface ZonosRestState {
         /**
           * The subtitle of the rest state
@@ -2396,6 +2482,36 @@ declare namespace LocalJSX {
          */
         "spacing"?: GridSpacing;
     }
+    /**
+     * The idea is from
+     * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+     * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+     */
+    interface ZonosVirtualScroll {
+        /**
+          * Height that is used as a fallback if height is not provided
+         */
+        "fallbackItemHeight": number;
+        /**
+          * Heights list of each item
+         */
+        "itemHeights": number[];
+        /**
+          * Width of each item
+         */
+        "itemWidth"?: number;
+        /**
+          * Render item
+         */
+        "renderItem": (
+    itemIndex: number,
+  ) =>
+    | HTMLElement
+    | Promise<HTMLElement>
+    | HTMLElement[]
+    | Promise<HTMLElement[]>
+    | Promise<HTMLElement>[];
+    }
     interface IntrinsicElements {
         "zonos-address": ZonosAddress;
         "zonos-address-display": ZonosAddressDisplay;
@@ -2434,6 +2550,7 @@ declare namespace LocalJSX {
         "zonos-logo": ZonosLogo;
         "zonos-notification": ZonosNotification;
         "zonos-payment": ZonosPayment;
+        "zonos-paypal-payment": ZonosPaypalPayment;
         "zonos-rest-state": ZonosRestState;
         "zonos-review": ZonosReview;
         "zonos-select-dialog-header": ZonosSelectDialogHeader;
@@ -2443,6 +2560,7 @@ declare namespace LocalJSX {
         "zonos-text": ZonosText;
         "zonos-tooltip": ZonosTooltip;
         "zonos-v-stack": ZonosVStack;
+        "zonos-virtual-scroll": ZonosVirtualScroll;
     }
 }
 export { LocalJSX as JSX };
@@ -2486,6 +2604,7 @@ declare module "@stencil/core" {
             "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
             "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
             "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
+            "zonos-paypal-payment": LocalJSX.ZonosPaypalPayment & JSXBase.HTMLAttributes<HTMLZonosPaypalPaymentElement>;
             "zonos-rest-state": LocalJSX.ZonosRestState & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
             "zonos-review": LocalJSX.ZonosReview & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
             "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
@@ -2495,6 +2614,12 @@ declare module "@stencil/core" {
             "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
             "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
             "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
+            /**
+             * The idea is from
+             * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+             * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+             */
+            "zonos-virtual-scroll": LocalJSX.ZonosVirtualScroll & JSXBase.HTMLAttributes<HTMLZonosVirtualScrollElement>;
         }
     }
 }

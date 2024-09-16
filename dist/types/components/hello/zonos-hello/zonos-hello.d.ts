@@ -2,6 +2,7 @@ import { type AppearanceConfig } from "../../store/zonosStore";
 import type { HelloMobileLocation } from "../../../types/generated/graphql.customer.types";
 import type { Product } from "../../../types/hello/Product";
 import type { RestrictedItem } from "../../../types/hello/RestrictedItem";
+import type { ICountryJson } from "../../../types/ICountryJson";
 export declare class ZonosHello {
     private helloRef?;
     /**
@@ -40,9 +41,13 @@ export declare class ZonosHello {
      */
     isHelloWidgetRendered: boolean;
     /**
+     * Determine if the window is mobile
+     */
+    isMobile: boolean;
+    /**
      * Get the country list the hello widget's country select is using
      */
-    getCountryList(): Promise<import("../../../types/ICountryJson").ICountryJson | null>;
+    getCountryList(): Promise<ICountryJson | null>;
     private getHelloPeekMessage;
     private enableShowPeekMessage;
     private getNewItemRestrictions;
@@ -81,6 +86,9 @@ export declare class ZonosHello {
      * @returns void
      */
     openHelloDialog(value: boolean): Promise<void>;
+    /**
+     * Determine if the peek message should animate from left or not
+     */
     private shouldAnimateLeftDesktop;
     handleResize(): void;
     private shouldRenderHello;
@@ -88,6 +96,8 @@ export declare class ZonosHello {
      * This method will handle the Hello widget initialized state, should only trigger once
      */
     private handleHelloWidgetInitializedState;
+    private getHelloLocation;
     handleAppearanceSettingsOverrideChange(): void;
+    componentDidLoad(): void;
     render(): any;
 }

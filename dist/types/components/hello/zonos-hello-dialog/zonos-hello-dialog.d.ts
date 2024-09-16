@@ -59,6 +59,7 @@ export declare class ZonosHelloDialog {
     private getUkDutyTaxMessage;
     private getAustraliaDutyTaxMessage;
     private getNewZealandDutyTaxMessge;
+    private getInclusivePriceMessage;
     /**
      * Get additional duty tax message if selected country has tax id
      */

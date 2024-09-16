@@ -551,19 +551,6 @@ export type UpdateCacheStoreVersionMutation = {
         }>;
     } | null;
 };
-export type GetAudienceByAspectKeyQuery = {
-    feature_audienceAspectLink: Array<{
-        audience: {
-            entityLinks: Array<{
-                entity: {
-                    email: string | null;
-                    storeId: number | null;
-                };
-            }>;
-            name: Feature_AudienceName_Enum;
-        };
-    }>;
-};
 export type LocaleCountryMessagesQuery = {
     locale_countryCodesPage: Array<{
         countryCodes: Array<string>;
@@ -614,6 +601,19 @@ export type CreateScriptLoadEventMutation = {
             id: number;
         }>;
     } | null;
+};
+export type GetAudienceByAspectKeyQuery = {
+    feature_audienceAspectLink: Array<{
+        audience: {
+            entityLinks: Array<{
+                entity: {
+                    email: string | null;
+                    storeId: number | null;
+                };
+            }>;
+            name: Feature_AudienceName_Enum;
+        };
+    }>;
 };
 export type AllSettingsQuery = {
     bigcommerce_settings: Array<{

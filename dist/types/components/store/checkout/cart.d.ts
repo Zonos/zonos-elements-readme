@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { stripeStoreUpdateCheckoutSession } from "./stripe";
 import type { CalculateLandedCostMutation, CheckoutPresentmentFragment, CurrencyCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.customer.types";
 type Step = 'customer-info' | 'shipping' | 'payment' | 'finish' | 'error';
@@ -51,6 +52,11 @@ type CartItemToUse = CartItem & {
 };
 type CartStore = {
     checkoutSessionId: string | null;
+    /**
+     * Checkout session timeout
+     */
+    checkoutSessionTimeoutShow: boolean;
+    checkoutTimeoutInterval: NodeJS.Timeout | null;
     currency: CurrencyCode;
     dutiesTaxFees: number;
     error: {
@@ -64,6 +70,10 @@ type CartStore = {
         targetCurrencyCode: CurrencyCode;
         type: string;
     } | null;
+    /**
+     * Inventory check error message. When this error message is not null, we will show the inventory check error modal
+     */
+    inventoryCheckErrorMessage: string | null;
     isSelectedShippingAboveDeminimis: boolean;
     isSelectedShippingGuarantee: boolean;
     items: CartItemToUse[];
@@ -144,8 +154,16 @@ type CartStoreRecalculateTotalParams = Omit<Parameters<typeof stripeStoreUpdateC
 declare const cartStoreHasOneEligibleItem: () => boolean;
 declare const cartStoreReCalculateTotal: ({ currency, itemsAmount, landedCostId, }: CartStoreRecalculateTotalParams) => Promise<boolean>;
 declare const cartStoreUpdateSelectedShippingOption: (selectedShippingOption: ShipmentRatingFragment) => Promise<boolean>;
+declare const cartStoreStartCheckoutInterval: ({ isPreview, sessionTimeout, }: {
+    isPreview: boolean;
+    /**
+     * Checkout session timeout in milliseconds
+     */
+    sessionTimeout: number;
+}) => void;
+declare const cartStoreClearCheckoutInterval: () => void;
 declare const cartStoreResetCartItems: () => void;
 declare const cartStoreUpdateItems: (cartItems: CartItem[]) => Promise<void>;
 declare const cartStoreNextStep: () => void;
 declare const cartStoreResetTabItems: () => void;
-export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreNextStep, cartStoreReCalculateTotal, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateToErrorState, };
+export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreClearCheckoutInterval, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreNextStep, cartStoreReCalculateTotal, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreStartCheckoutInterval, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateToErrorState, };

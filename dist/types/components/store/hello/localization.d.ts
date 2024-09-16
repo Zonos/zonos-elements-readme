@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { type CountryLandedCost } from "../../utils/api/getCountryLandedCost";
 import { type TargetFormat } from "../../utils/api/getExchangeRate";
-import type { CountryCode, CurrencyCode } from "../../../types/generated/graphql.customer.types";
+import type { CountryCode, CurrencyCode, InclusivePriceSettingFieldsFragment } from "../../../types/generated/graphql.customer.types";
 import type { Locale_ElementsSupportedLocationCode_Enum, Locale_PageName_Enum } from "../../../types/generated/graphql.frontend.types";
 import type { ICountryJson } from "../../../types/ICountryJson";
 export type ExchangeRateForUse = {
@@ -13,8 +13,8 @@ type LocalizationStore = {
     customMessages: ILocaleMessageForUse[];
     exchangeRate: ExchangeRateForUse | null;
     exchangeRateTimeout?: NodeJS.Timeout;
-    hasInclusivePrices: boolean;
     helloCountryList: ICountryJson | null;
+    inclusivePricing: InclusivePriceSettingFieldsFragment | null;
     isShippableCountry: boolean;
     localizationLoaded: boolean;
     selectedCountryCode: CountryCode | null;

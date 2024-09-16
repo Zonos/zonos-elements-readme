@@ -8,6 +8,9 @@ devDependencies:
   '@eslint/js':
     specifier: ^9.4.0
     version: 9.4.0
+  '@paypal/paypal-js':
+    specifier: ^8.1.2
+    version: 8.1.2
   '@sentry/browser':
     specifier: ^7.111.0
     version: 7.117.0
@@ -394,6 +397,12 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
+    dev: true
+
+  /@paypal/paypal-js@8.1.2:
+    resolution: {integrity: sha512-EKshGSWRxLWU1NyPB9P1TiOkPajVmpTo5I9HuZKoSv8y2uk0XIskXqMkAJ/Y9qAg9iJyP102Jb/atX63tTy24w==}
+    dependencies:
+      promise-polyfill: 8.3.0
     dev: true
 
   /@pkgjs/parseargs@0.11.0:
@@ -1787,6 +1796,10 @@ packages:
       '@jest/schemas': 29.6.3
       ansi-styles: 5.2.0
       react-is: 18.3.1
+    dev: true
+
+  /promise-polyfill@8.3.0:
+    resolution: {integrity: sha512-H5oELycFml5yto/atYqmjyigJoAo3+OXwolYiH7OfQuYlAqhxNvTfiNMbV9hsC6Yp83yE5r2KTVmtrG6R9i6Pg==}
     dev: true
 
   /punycode@2.3.1:

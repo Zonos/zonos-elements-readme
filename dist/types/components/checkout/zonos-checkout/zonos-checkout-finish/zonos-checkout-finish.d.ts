@@ -35,7 +35,8 @@ export declare class ZonosCheckoutFinish {
     private handleSuccessBehavior;
     private getPullOrder;
     private useOverrideSuccessNotification;
-    private checkPaymentStatus;
+    private checkStripePaymentStatus;
+    private checkPaypalPaymentStatus;
     private closeClickHandler;
     componentDidLoad(): void;
     render(): any;

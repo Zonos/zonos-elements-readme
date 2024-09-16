@@ -1,3 +1,4 @@
+import { PayPalNamespace } from '@paypal/paypal-js';
 import { StripeConstructor, StripeAddressElementChangeEvent, ContactOption, PaymentIntent, Stripe } from '@stripe/stripe-js';
 import { BrowserOptions } from '@sentry/browser';
 import { z } from 'zod';
@@ -482,6 +483,20 @@ declare const exchangeRateType: {
     readonly MidMarket: "MID_MARKET";
 };
 type ExchangeRateType = (typeof exchangeRateType)[keyof typeof exchangeRateType];
+declare const externalPaymentMethodStatus: {
+    readonly Disabled: "DISABLED";
+    readonly Enabled: "ENABLED";
+};
+type ExternalPaymentMethodStatus = (typeof externalPaymentMethodStatus)[keyof typeof externalPaymentMethodStatus];
+declare const externalPaymentMethodType: {
+    readonly Paypal: "PAYPAL";
+};
+type ExternalPaymentMethodType = (typeof externalPaymentMethodType)[keyof typeof externalPaymentMethodType];
+declare const externalServiceTokenType: {
+    readonly PaypalClientId: "PAYPAL_CLIENT_ID";
+    readonly StripePublishableToken: "STRIPE_PUBLISHABLE_TOKEN";
+};
+type ExternalServiceTokenType = (typeof externalServiceTokenType)[keyof typeof externalServiceTokenType];
 declare const helloCurrencyBehavior: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -607,6 +622,12 @@ declare const partyType: {
     readonly Payor: "PAYOR";
 };
 type PartyType = (typeof partyType)[keyof typeof partyType];
+declare const paypalMockResponse: {
+    readonly InstrumentDeclined: "INSTRUMENT_DECLINED";
+    readonly InternalServerError: "INTERNAL_SERVER_ERROR";
+    readonly TransactionRefused: "TRANSACTION_REFUSED";
+};
+type PaypalMockResponse = (typeof paypalMockResponse)[keyof typeof paypalMockResponse];
 declare const restrictedItemAction: {
     readonly Block: "BLOCK";
     readonly BlockAll: "BLOCK_ALL";
@@ -683,7 +704,7 @@ type CalculateLandedCostMutation = {
                 amount: number;
             } | null;
             type: LandedCostAdjustmentType | null;
-        } | null> | null;
+        }> | null;
         deMinimis: Array<{
             formula: string;
             method: IncotermCode;
@@ -796,7 +817,7 @@ type GetOrderQuery = {
                     amount: number;
                     name: string | null;
                 } | null;
-            } | null> | null;
+            }> | null;
             duties: Array<{
                 exchangeRate: {
                     rate: number;
@@ -866,24 +887,33 @@ type CustomEventMap = {
 
 declare const envClientSchema: z.ZodObject<{
     NEXT_PUBLIC_FLAG_URL: z.ZodString;
+    NEXT_PUBLIC_RELEASE_DATE: z.ZodString;
     NEXT_PUBLIC_ZONOS_API_KEY: z.ZodString;
+    NEXT_PUBLIC_ZONOS_CDNJS_CDN_URL: z.ZodString;
     NEXT_PUBLIC_ZONOS_CDN_URL: z.ZodString;
+    NEXT_PUBLIC_ZONOS_CLOUDFLARE_URL: z.ZodString;
     NEXT_PUBLIC_ZONOS_JS_DELIVR_CDN_URL: z.ZodString;
     NEXT_PUBLIC_ZONOS_PACKAGE_VERSION: z.ZodString;
     NEXT_PUBLIC_ZONOS_ROUTE_URL: z.ZodString;
     NEXT_PUBLIC_ZONOS_UNPKG_CDN_URL: z.ZodString;
 }, "strip", z.ZodTypeAny, {
     NEXT_PUBLIC_FLAG_URL: string;
+    NEXT_PUBLIC_RELEASE_DATE: string;
     NEXT_PUBLIC_ZONOS_API_KEY: string;
+    NEXT_PUBLIC_ZONOS_CDNJS_CDN_URL: string;
     NEXT_PUBLIC_ZONOS_CDN_URL: string;
+    NEXT_PUBLIC_ZONOS_CLOUDFLARE_URL: string;
     NEXT_PUBLIC_ZONOS_JS_DELIVR_CDN_URL: string;
     NEXT_PUBLIC_ZONOS_PACKAGE_VERSION: string;
     NEXT_PUBLIC_ZONOS_ROUTE_URL: string;
     NEXT_PUBLIC_ZONOS_UNPKG_CDN_URL: string;
 }, {
     NEXT_PUBLIC_FLAG_URL: string;
+    NEXT_PUBLIC_RELEASE_DATE: string;
     NEXT_PUBLIC_ZONOS_API_KEY: string;
+    NEXT_PUBLIC_ZONOS_CDNJS_CDN_URL: string;
     NEXT_PUBLIC_ZONOS_CDN_URL: string;
+    NEXT_PUBLIC_ZONOS_CLOUDFLARE_URL: string;
     NEXT_PUBLIC_ZONOS_JS_DELIVR_CDN_URL: string;
     NEXT_PUBLIC_ZONOS_PACKAGE_VERSION: string;
     NEXT_PUBLIC_ZONOS_ROUTE_URL: string;
@@ -1072,6 +1102,41 @@ type NotificationInit = {
      * @default 'success'
      */
     type?: 'error' | 'success' | 'warning';
+};
+
+declare const localeElementsSupportedLocationCodeEnum: {
+    readonly Ar: "ar";
+    readonly Da: "da";
+    readonly De: "de";
+    readonly En: "en";
+    readonly Es: "es";
+    readonly Fr: "fr";
+    readonly He: "he";
+    readonly Id: "id";
+    readonly It: "it";
+    readonly Ja: "ja";
+    readonly Ko: "ko";
+    readonly Nl: "nl";
+    readonly No: "no";
+    readonly Pl: "pl";
+    readonly Pt: "pt";
+    readonly Ru: "ru";
+    readonly Sv: "sv";
+    readonly Tr: "tr";
+    readonly Vi: "vi";
+    readonly Zh: "zh";
+};
+type Locale_ElementsSupportedLocationCode_Enum = (typeof localeElementsSupportedLocationCodeEnum)[keyof typeof localeElementsSupportedLocationCodeEnum];
+
+type ICountry = {
+    bigcommerceDisplayName?: string;
+    code: CountryCode;
+    currencyCode: string;
+    displayName: string;
+    languageCode: Locale_ElementsSupportedLocationCode_Enum;
+};
+type ICountryJson = {
+    [countryCode: string]: ICountry;
 };
 
 type Items = CheckItemRestrictionsMutation['itemRestrictionApply']['items'];
@@ -1450,10 +1515,6 @@ declare namespace Components {
          */
         "continueLoading": boolean;
         /**
-          * Error occurred during payment
-         */
-        "paymentError": boolean;
-        /**
           * Submit button main color
          */
         "submitBtnColor"?: string;
@@ -1738,6 +1799,10 @@ declare namespace Components {
          */
         "format": (value: number) => Promise<string>;
         /**
+          * Get the country list the hello widget's country select is using
+         */
+        "getCountryList": () => Promise<ICountryJson | null>;
+        /**
           * Force mobile styling instead of media query and use the passed location value
           * @default false
          */
@@ -1899,6 +1964,8 @@ declare namespace Components {
          */
         "titleText"?: string;
     }
+    interface ZonosPaypalPayment {
+    }
     interface ZonosRestState {
         /**
           * The subtitle of the rest state
@@ -2016,6 +2083,36 @@ declare namespace Components {
          */
         "spacing": GridSpacing;
     }
+    /**
+     * The idea is from
+     * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+     * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+     */
+    interface ZonosVirtualScroll {
+        /**
+          * Height that is used as a fallback if height is not provided
+         */
+        "fallbackItemHeight": number;
+        /**
+          * Heights list of each item
+         */
+        "itemHeights": number[];
+        /**
+          * Width of each item
+         */
+        "itemWidth"?: number;
+        /**
+          * Render item
+         */
+        "renderItem": (
+    itemIndex: number,
+  ) =>
+    | HTMLElement
+    | Promise<HTMLElement>
+    | HTMLElement[]
+    | Promise<HTMLElement[]>
+    | Promise<HTMLElement>[];
+    }
 }
 interface ZonosAddressCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -2064,6 +2161,10 @@ interface ZonosHelloDialogCustomEvent<T> extends CustomEvent<T> {
 interface ZonosInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosInputElement;
+}
+interface ZonosPaypalPaymentCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosPaypalPaymentElement;
 }
 interface ZonosShippingCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -2222,6 +2323,8 @@ declare global {
     };
     interface HTMLZonosCheckoutPaymentElementEventMap {
         "continueClicked": void;
+        "paypalSessionFailed": void;
+        "paypalSessionDone": string;
     }
     interface HTMLZonosCheckoutPaymentElement extends Components.ZonosCheckoutPayment, HTMLStencilElement {
         addEventListener<K extends keyof HTMLZonosCheckoutPaymentElementEventMap>(type: K, listener: (this: HTMLZonosCheckoutPaymentElement, ev: ZonosCheckoutPaymentCustomEvent<HTMLZonosCheckoutPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -2274,6 +2377,7 @@ declare global {
         new (): HTMLZonosConfirmDialogElement;
     };
     interface HTMLZonosControllerElementEventMap {
+        "paypalInitEvent": { paypalClientId: string };
         "stripeInitEvent": { publishableKey: string };
     }
     interface HTMLZonosControllerElement extends Components.ZonosController, HTMLStencilElement {
@@ -2430,6 +2534,24 @@ declare global {
         prototype: HTMLZonosPaymentElement;
         new (): HTMLZonosPaymentElement;
     };
+    interface HTMLZonosPaypalPaymentElementEventMap {
+        "paypalSessionDone": { orderId: string };
+        "paypalSessionFail": void;
+    }
+    interface HTMLZonosPaypalPaymentElement extends Components.ZonosPaypalPayment, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosPaypalPaymentElementEventMap>(type: K, listener: (this: HTMLZonosPaypalPaymentElement, ev: ZonosPaypalPaymentCustomEvent<HTMLZonosPaypalPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosPaypalPaymentElementEventMap>(type: K, listener: (this: HTMLZonosPaypalPaymentElement, ev: ZonosPaypalPaymentCustomEvent<HTMLZonosPaypalPaymentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosPaypalPaymentElement: {
+        prototype: HTMLZonosPaypalPaymentElement;
+        new (): HTMLZonosPaypalPaymentElement;
+    };
     interface HTMLZonosRestStateElement extends Components.ZonosRestState, HTMLStencilElement {
     }
     var HTMLZonosRestStateElement: {
@@ -2506,6 +2628,17 @@ declare global {
         prototype: HTMLZonosVStackElement;
         new (): HTMLZonosVStackElement;
     };
+    /**
+     * The idea is from
+     * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+     * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+     */
+    interface HTMLZonosVirtualScrollElement extends Components.ZonosVirtualScroll, HTMLStencilElement {
+    }
+    var HTMLZonosVirtualScrollElement: {
+        prototype: HTMLZonosVirtualScrollElement;
+        new (): HTMLZonosVirtualScrollElement;
+    };
     interface HTMLElementTagNameMap {
         "zonos-address": HTMLZonosAddressElement;
         "zonos-address-display": HTMLZonosAddressDisplayElement;
@@ -2544,6 +2677,7 @@ declare global {
         "zonos-logo": HTMLZonosLogoElement;
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
+        "zonos-paypal-payment": HTMLZonosPaypalPaymentElement;
         "zonos-rest-state": HTMLZonosRestStateElement;
         "zonos-review": HTMLZonosReviewElement;
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
@@ -2553,6 +2687,7 @@ declare global {
         "zonos-text": HTMLZonosTextElement;
         "zonos-tooltip": HTMLZonosTooltipElement;
         "zonos-v-stack": HTMLZonosVStackElement;
+        "zonos-virtual-scroll": HTMLZonosVirtualScrollElement;
     }
 }
 declare namespace LocalJSX {
@@ -2919,9 +3054,13 @@ declare namespace LocalJSX {
          */
         "onContinueClicked"?: (event: ZonosCheckoutPaymentCustomEvent<void>) => void;
         /**
-          * Error occurred during payment
+          * Event to emit when the paypal session is done
          */
-        "paymentError"?: boolean;
+        "onPaypalSessionDone"?: (event: ZonosCheckoutPaymentCustomEvent<string>) => void;
+        /**
+          * Event to emit when the paypal session failed
+         */
+        "onPaypalSessionFailed"?: (event: ZonosCheckoutPaymentCustomEvent<void>) => void;
         /**
           * Submit button main color
          */
@@ -3025,6 +3164,10 @@ declare namespace LocalJSX {
           * The zonos config object
          */
         "config": LoadZonosParamsConfig;
+        /**
+          * Event emitted to initialize paypal
+         */
+        "onPaypalInitEvent"?: (event: ZonosControllerCustomEvent<{ paypalClientId: string }>) => void;
         /**
           * Event emitted when stripe is initialized
          */
@@ -3326,6 +3469,16 @@ declare namespace LocalJSX {
          */
         "titleText"?: string;
     }
+    interface ZonosPaypalPayment {
+        /**
+          * Event to emit when the paypal session is done
+         */
+        "onPaypalSessionDone"?: (event: ZonosPaypalPaymentCustomEvent<{ orderId: string }>) => void;
+        /**
+          * Event to emit when the paypal session is failed
+         */
+        "onPaypalSessionFail"?: (event: ZonosPaypalPaymentCustomEvent<void>) => void;
+    }
     interface ZonosRestState {
         /**
           * The subtitle of the rest state
@@ -3451,6 +3604,36 @@ declare namespace LocalJSX {
          */
         "spacing"?: GridSpacing;
     }
+    /**
+     * The idea is from
+     * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+     * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+     */
+    interface ZonosVirtualScroll {
+        /**
+          * Height that is used as a fallback if height is not provided
+         */
+        "fallbackItemHeight": number;
+        /**
+          * Heights list of each item
+         */
+        "itemHeights": number[];
+        /**
+          * Width of each item
+         */
+        "itemWidth"?: number;
+        /**
+          * Render item
+         */
+        "renderItem": (
+    itemIndex: number,
+  ) =>
+    | HTMLElement
+    | Promise<HTMLElement>
+    | HTMLElement[]
+    | Promise<HTMLElement[]>
+    | Promise<HTMLElement>[];
+    }
     interface IntrinsicElements {
         "zonos-address": ZonosAddress;
         "zonos-address-display": ZonosAddressDisplay;
@@ -3489,6 +3672,7 @@ declare namespace LocalJSX {
         "zonos-logo": ZonosLogo;
         "zonos-notification": ZonosNotification;
         "zonos-payment": ZonosPayment;
+        "zonos-paypal-payment": ZonosPaypalPayment;
         "zonos-rest-state": ZonosRestState;
         "zonos-review": ZonosReview;
         "zonos-select-dialog-header": ZonosSelectDialogHeader;
@@ -3498,6 +3682,7 @@ declare namespace LocalJSX {
         "zonos-text": ZonosText;
         "zonos-tooltip": ZonosTooltip;
         "zonos-v-stack": ZonosVStack;
+        "zonos-virtual-scroll": ZonosVirtualScroll;
     }
 }
 
@@ -3541,6 +3726,7 @@ declare module "@stencil/core" {
             "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
             "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
             "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
+            "zonos-paypal-payment": LocalJSX.ZonosPaypalPayment & JSXBase.HTMLAttributes<HTMLZonosPaypalPaymentElement>;
             "zonos-rest-state": LocalJSX.ZonosRestState & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
             "zonos-review": LocalJSX.ZonosReview & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
             "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
@@ -3550,6 +3736,12 @@ declare module "@stencil/core" {
             "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
             "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
             "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
+            /**
+             * The idea is from
+             * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
+             * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
+             */
+            "zonos-virtual-scroll": LocalJSX.ZonosVirtualScroll & JSXBase.HTMLAttributes<HTMLZonosVirtualScrollElement>;
         }
     }
 }
@@ -3596,6 +3788,7 @@ type CalculateLandedCostRequest = {
 
 type CountryOverrideBehavior = 'URL_PARAM' | 'SESSION';
 type ShowForCountries = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
+type ShowCountryList = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
 type HelloConfig = {
     anchorElementSelector: string;
     cartUrlPattern: string | null;
@@ -3606,9 +3799,10 @@ type HelloConfig = {
     countryOverrideBehavior?: CountryOverrideBehavior;
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
+    desktopLocation?: HelloMobileLocation | null;
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
-    mobileLocation: HelloMobileLocation;
+    mobileLocation: HelloMobileLocation | null;
     mode: Mode;
     organization: string;
     peekMessageBehavior: HelloPeekMessageBehavior;
@@ -3620,10 +3814,16 @@ type HelloConfig = {
     productTitleElementSelector: string | null;
     restrictionBehavior: HelloRestrictionBehavior;
     /**
+     * The countries to include in the country list dropdown of the Hello widget.
+     * @default ONLY_SHIPPABLE
+     */
+    showCountryList?: ShowCountryList;
+    /**
      * The countries to show the widget for.
      * @default ONLY_SHIPPABLE
      */
     showForCountries?: ShowForCountries;
+    visibilityStatus?: 'ENABLED' | 'DISABLED';
     /**
      * Callback function to run after the Hello widget has been initialized. This should be triggered only once when hello is attached to the DOM.
      * **Note**: If hello is detached from the DOM and reattached, this callback will be called again.
@@ -3722,6 +3922,19 @@ type CheckoutConfig = {
      * @note if set to true, we will not enable or disable the place order button
      */
     disablePlaceOrderButtonActivation?: boolean;
+    externalPaymentMethods: Array<{
+        status: ExternalPaymentMethodStatus;
+        type: ExternalPaymentMethodType;
+    }> | null;
+    externalServiceTokens: {
+        token: string;
+        type: ExternalServiceTokenType;
+    }[];
+    /**
+     * Test mode for checkout (sandbox or production)
+     * @default TEST
+     */
+    mode: Mode;
     orderNotifications: {
         abandonedCart: {
             delay: number;
@@ -3970,6 +4183,12 @@ type CurrencyConverter = (props: {
      */
     format: (amount: number) => string;
 }) => string;
+/**
+ * This function will use the `Intl.NumberFormat` API to format the number with native decimal and thousand separators
+ */
+type NumberFormat = (props: {
+    amount: number;
+}) => string;
 type LoadZonosParamsConfig = {
     appearance?: Partial<AppearanceConfig>;
     checkoutSettings?: Partial<CheckoutConfig>;
@@ -3980,7 +4199,63 @@ type LoadZonosParamsConfig = {
     currencyConverter?: CurrencyConverter;
     helloSettings?: Partial<HelloConfig>;
     /**
-     * Hello and Checkout are using using the Intl.NumberFormat API to format the currency. You can either use the default currency display or customize it.
+     * Hello and Checkout are using the Intl.NumberFormat API to format the currency. You can either use the default currency display or customize it.
+     *
+     * ### There are 3 options to customize the currency format:
+     * @option1 Simple currency display change
+     * @example
+     * Price: "1200.99"
+     * End result: "$1,200.99"
+     *
+     * Zonos.init({
+     *   overrideCurrencyFormat: {
+     *     currencyDisplay: 'symbol'
+     *   }
+     * });
+     * ------
+     * @option2 Customize currency format (use `convert` and `format` in `currencyConverter`)
+     * @note This function would override the default behavior of `format`, and `convertAndFormat` function inside of `CurrencyConverter`
+     * @note You can combine this function with `currencyConverter` to customize the currency format
+     * @example
+     * Price:  "1200.99"
+     * End result: "USD - 1,200.99"
+     *
+     * Zonos.init({
+     *   // `format` function in `currencyConverter` will trigger this function instead.
+     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
+     *     return `- ${numberFormat({ amount })}`;
+     *   }
+     *   currencyConverter: ({ convert, currencyCode, originalAmount, selector }) => {
+     *      const convertedAmount = convert(originalAmount);
+     *      // `format` function will call `overrideCurrencyFormat` function instead and it will just format the converted amount
+     *      const formattedAmount = `${currencyCode} ${format(convertedAmount)}`;
+     *      selector.innerText = formattedAmount;
+     *
+     *      revealPrice();
+     *      return formattedAmount;
+     *    },
+     * });
+     *
+     * ------
+     * @option3 Customize currency format (use `convertAndFormat`)
+     * @example
+     * Price: "1200.99"
+     * End result: "USD - 1,200.99"
+     *
+     * Zonos.init({
+     *   // `format` function in `currencyConverter` will trigger this function instead.
+     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
+     *     return `${currencyCode} - ${numberFormat({ amount })}`;
+     *   }
+     *   currencyConverter: ({ convertAndFormat, originalAmount, selector }) => {
+     *      // `convertAndFormat` function calls `format` under the hood, so it will also call `overrideCurrencyFormat` function
+     *      const convertedAndFormatedAmount = convertAndFormat(originalAmount);
+     *      selector.innerText = convertedAndFormatedAmount;
+     *
+     *      revealPrice();
+     *      return formattedAmount;
+     *    },
+     * });
      */
     overrideCurrencyFormat?: {
         /**
@@ -3993,11 +4268,23 @@ type LoadZonosParamsConfig = {
         currencyDisplay?: 'symbol' | 'code' | 'name' | 'narrowSymbol';
     }
     /**
-     * Custom currency format function to be used in Hello and Checkout
+     * Custom currency format function to be used in Hello and Checkout.
+     * @note This function would override the default behavior of `format` function inside of `CurrencyConverter`
+     * @note You can combine this function with `currencyConverter` to customize the currency format
      */
      | ((params: {
+        /**
+         * Amount to be formatted
+         */
         amount: number;
-        countryCode: CurrencyCode;
+        /**
+         * Current selected currency code
+         */
+        currencyCode: CurrencyCode;
+        /**
+         * This function will use the `Intl.NumberFormat` API to format the number with native decimal and thousand separators
+         */
+        numberFormat: NumberFormat;
     }) => string);
     /**
      * Callback to be called when the country is changed
@@ -4024,6 +4311,10 @@ type LoadZonosParams = LoadZonosParamsConfig & {
 };
 interface Zonos {
     /**
+     * Mock error response for Paypal. Mainly used for testing purposes
+     */
+    _paypalMockResponse: PaypalMockResponse | null;
+    /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
      */
@@ -4033,6 +4324,11 @@ interface Zonos {
     isNpm: boolean;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
     modeAlerted: boolean;
+    paypal: PayPalNamespace | null;
+    /**
+     * Version release timestamp
+     */
+    releaseDate: string;
     storeId: number;
     /** Stripe instance */
     stripe: Stripe;
@@ -4060,7 +4356,9 @@ declare abstract class Zonos {
     static doneInit: boolean;
     static debug: boolean;
     static zonosConversionTest: boolean;
+    static _paypalMockResponse: PaypalMockResponse | null;
     static isBigCommerce: boolean;
+    static releaseDate: string;
     /**
      * By default, the package will load from npm
      */
@@ -4069,6 +4367,7 @@ declare abstract class Zonos {
     static version: string;
     static modeAlerted: boolean;
     static tempCartData: TempCart | null;
+    static paypal: PayPalNamespace | null;
     static getCurrentTimestamp: () => number;
     private static zonosController;
     static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;

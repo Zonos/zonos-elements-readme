@@ -30,6 +30,10 @@ export type ZonosConfig = {
     overrideCurrencyFormat?: LoadZonosParamsConfig['overrideCurrencyFormat'];
     sourceCurrency: string;
     storeId: number | null;
+    /**
+     * This is to determine if the request is sending to the zonos production or dev API enviroment
+     */
+    zonosMode: 'production' | 'test' | null;
 };
 type ZonosStore = ZonosConfig & {
     loadedConfig: boolean;

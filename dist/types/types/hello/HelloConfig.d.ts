@@ -12,9 +12,10 @@ export type HelloConfig = {
     countryOverrideBehavior?: CountryOverrideBehavior;
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
+    desktopLocation?: HelloMobileLocation | null;
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
-    mobileLocation: HelloMobileLocation;
+    mobileLocation: HelloMobileLocation | null;
     mode: Mode;
     organization: string;
     peekMessageBehavior: HelloPeekMessageBehavior;
@@ -35,6 +36,7 @@ export type HelloConfig = {
      * @default ONLY_SHIPPABLE
      */
     showForCountries?: ShowForCountries;
+    visibilityStatus?: 'ENABLED' | 'DISABLED';
     /**
      * Callback function to run after the Hello widget has been initialized. This should be triggered only once when hello is attached to the DOM.
      * **Note**: If hello is detached from the DOM and reattached, this callback will be called again.

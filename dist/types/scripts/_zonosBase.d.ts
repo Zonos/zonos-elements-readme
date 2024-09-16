@@ -1,10 +1,11 @@
+import type { PayPalNamespace } from '@paypal/paypal-js';
 import type { Stripe } from '@stripe/stripe-js';
 import type { AppearanceConfig } from "../components/store/zonosStore";
 import { type InjectScriptType } from "./_getNextFallbackUrl";
 import type { NotificationInit } from "../types/index";
 import type { TempCart } from "../types/checkout/api/TempCart";
 import type { CheckoutConfig } from "../types/checkout/CheckoutConfig";
-import type { CountryCode, CurrencyCode } from "../types/generated/graphql.customer.types";
+import type { CountryCode, CurrencyCode, PaypalMockResponse } from "../types/generated/graphql.customer.types";
 import type { HelloConfig } from "../types/hello/HelloConfig";
 export declare const MAIN_LOAD_CDN_TYPE: InjectScriptType;
 /**
@@ -52,6 +53,12 @@ export type CurrencyConverter = (props: {
      */
     format: (amount: number) => string;
 }) => string;
+/**
+ * This function will use the `Intl.NumberFormat` API to format the number with native decimal and thousand separators
+ */
+export type NumberFormat = (props: {
+    amount: number;
+}) => string;
 export type LoadZonosParamsConfig = {
     appearance?: Partial<AppearanceConfig>;
     checkoutSettings?: Partial<CheckoutConfig>;
@@ -62,7 +69,63 @@ export type LoadZonosParamsConfig = {
     currencyConverter?: CurrencyConverter;
     helloSettings?: Partial<HelloConfig>;
     /**
-     * Hello and Checkout are using using the Intl.NumberFormat API to format the currency. You can either use the default currency display or customize it.
+     * Hello and Checkout are using the Intl.NumberFormat API to format the currency. You can either use the default currency display or customize it.
+     *
+     * ### There are 3 options to customize the currency format:
+     * @option1 Simple currency display change
+     * @example
+     * Price: "1200.99"
+     * End result: "$1,200.99"
+     *
+     * Zonos.init({
+     *   overrideCurrencyFormat: {
+     *     currencyDisplay: 'symbol'
+     *   }
+     * });
+     * ------
+     * @option2 Customize currency format (use `convert` and `format` in `currencyConverter`)
+     * @note This function would override the default behavior of `format`, and `convertAndFormat` function inside of `CurrencyConverter`
+     * @note You can combine this function with `currencyConverter` to customize the currency format
+     * @example
+     * Price:  "1200.99"
+     * End result: "USD - 1,200.99"
+     *
+     * Zonos.init({
+     *   // `format` function in `currencyConverter` will trigger this function instead.
+     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
+     *     return `- ${numberFormat({ amount })}`;
+     *   }
+     *   currencyConverter: ({ convert, currencyCode, originalAmount, selector }) => {
+     *      const convertedAmount = convert(originalAmount);
+     *      // `format` function will call `overrideCurrencyFormat` function instead and it will just format the converted amount
+     *      const formattedAmount = `${currencyCode} ${format(convertedAmount)}`;
+     *      selector.innerText = formattedAmount;
+     *
+     *      revealPrice();
+     *      return formattedAmount;
+     *    },
+     * });
+     *
+     * ------
+     * @option3 Customize currency format (use `convertAndFormat`)
+     * @example
+     * Price: "1200.99"
+     * End result: "USD - 1,200.99"
+     *
+     * Zonos.init({
+     *   // `format` function in `currencyConverter` will trigger this function instead.
+     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
+     *     return `${currencyCode} - ${numberFormat({ amount })}`;
+     *   }
+     *   currencyConverter: ({ convertAndFormat, originalAmount, selector }) => {
+     *      // `convertAndFormat` function calls `format` under the hood, so it will also call `overrideCurrencyFormat` function
+     *      const convertedAndFormatedAmount = convertAndFormat(originalAmount);
+     *      selector.innerText = convertedAndFormatedAmount;
+     *
+     *      revealPrice();
+     *      return formattedAmount;
+     *    },
+     * });
      */
     overrideCurrencyFormat?: {
         /**
@@ -75,11 +138,23 @@ export type LoadZonosParamsConfig = {
         currencyDisplay?: 'symbol' | 'code' | 'name' | 'narrowSymbol';
     }
     /**
-     * Custom currency format function to be used in Hello and Checkout
+     * Custom currency format function to be used in Hello and Checkout.
+     * @note This function would override the default behavior of `format` function inside of `CurrencyConverter`
+     * @note You can combine this function with `currencyConverter` to customize the currency format
      */
      | ((params: {
+        /**
+         * Amount to be formatted
+         */
         amount: number;
-        countryCode: CurrencyCode;
+        /**
+         * Current selected currency code
+         */
+        currencyCode: CurrencyCode;
+        /**
+         * This function will use the `Intl.NumberFormat` API to format the number with native decimal and thousand separators
+         */
+        numberFormat: NumberFormat;
     }) => string);
     /**
      * Callback to be called when the country is changed
@@ -106,6 +181,10 @@ export type LoadZonosParams = LoadZonosParamsConfig & {
 };
 export interface Zonos {
     /**
+     * Mock error response for Paypal. Mainly used for testing purposes
+     */
+    _paypalMockResponse: PaypalMockResponse | null;
+    /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
      */
@@ -115,6 +194,11 @@ export interface Zonos {
     isNpm: boolean;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
     modeAlerted: boolean;
+    paypal: PayPalNamespace | null;
+    /**
+     * Version release timestamp
+     */
+    releaseDate: string;
     storeId: number;
     /** Stripe instance */
     stripe: Stripe;
@@ -142,7 +226,9 @@ export declare abstract class Zonos {
     static doneInit: boolean;
     static debug: boolean;
     static zonosConversionTest: boolean;
+    static _paypalMockResponse: PaypalMockResponse | null;
     static isBigCommerce: boolean;
+    static releaseDate: string;
     /**
      * By default, the package will load from npm
      */
@@ -151,6 +237,7 @@ export declare abstract class Zonos {
     static version: string;
     static modeAlerted: boolean;
     static tempCartData: TempCart | null;
+    static paypal: PayPalNamespace | null;
     static getCurrentTimestamp: () => number;
     private static zonosController;
     static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;

@@ -11,6 +11,9 @@ export declare const stringsArabic: {
     'Address line 2': {
         value: string;
     };
+    'An unexpected error occurred when processing PayPal order.': {
+        value: string;
+    };
     'Are you sure?': {
         value: string;
     };
@@ -92,6 +95,9 @@ export declare const stringsArabic: {
     'Expected delivery': {
         value: string;
     };
+    'Failed to create PayPal order. Please try again, or consider using an alternative method.': {
+        value: string;
+    };
     Failure: {
         value: string;
     };
@@ -123,6 +129,9 @@ export declare const stringsArabic: {
         value: string;
     };
     Name: {
+        value: string;
+    };
+    'No countries found': {
         value: string;
     };
     'No shipping method selected': {
@@ -182,7 +191,25 @@ export declare const stringsArabic: {
     'Prepay duties and taxes at checkout': {
         value: string;
     };
-    'Product prices already include duties, taxes, and fees. No additional duties or taxes will be added at checkout, with rare exceptions.': {
+    'Product prices already include duties and fees. No additional duties or fees will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
+    'Product prices already include duties and taxes. No additional duties or taxes will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
+    'Product prices already include duties, taxes, and fees. No additional duties, taxes, or fees will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
+    'Product prices already include duties. No additional duties will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
+    'Product prices already include fees. No additional fees will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
+    'Product prices already include taxes and fees. No additional taxes or fees will be added at checkout, with rare exceptions.': {
+        value: string;
+    };
+    'Product prices already include taxes. No additional taxes will be added at checkout, with rare exceptions.': {
         value: string;
     };
     Reload: {
@@ -315,6 +342,9 @@ export declare const stringsArabic: {
         value: string;
     };
     'click to learn more': {
+        value: string;
+    };
+    or: {
         value: string;
     };
     'restricted items': {

@@ -18,6 +18,7 @@ export type StripeStoreContactOption = {
 type StripeStore = {
     clientSecret: string | null;
     fetchingLandedCostAbordController: AbortController | null;
+    hasPaymentError: boolean;
     isFetchingLandedCost: boolean;
     isFetchingSession: boolean;
     stripe: Stripe | null;
@@ -70,6 +71,14 @@ declare const initStripeElements: (props?: {
 }) => Promise<void>;
 declare const stripeStoreReset: () => void;
 declare const stripeStorePrefetchLandedCost: () => Promise<void>;
+declare const stripeStoreMessageBasedOnStatus: (status?: PaymentIntent['status']) => {
+    isError: boolean;
+    messages: string[];
+};
+/**
+ * Handle inventory check and returns error message if the callback provided.
+ */
+declare const stripeStoreHandleInventoryCheck: () => Promise<string | null>;
 declare const stripeStoreRetrievePayment: ({ clientSecret: _clientSecret, storybookForceStatus, }: {
     clientSecret: string | null;
     storybookForceStatus?: PaymentIntent['status'];
@@ -128,4 +137,4 @@ declare const stripeStoreTranslateAddressToLatin: ({ addressInvalidCharactersLis
     addressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
     billingAddressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
 }) => Promise<void>;
-export { initStripeElements, stripeStore, stripeStoreCleanupDomesticShippingSession, stripeStoreConfirmPayment, stripeStoreGetDomesticShippingSession, stripeStoreInitCheckoutSession, stripeStorePrefetchLandedCost, stripeStoreReset, stripeStoreRetrievePayment, stripeStoreSaveDomesticShippingSession, stripeStoreTranslateAddressToLatin, stripeStoreUpdateCheckoutSession, };
+export { initStripeElements, stripeStore, stripeStoreCleanupDomesticShippingSession, stripeStoreConfirmPayment, stripeStoreGetDomesticShippingSession, stripeStoreHandleInventoryCheck, stripeStoreInitCheckoutSession, stripeStoreMessageBasedOnStatus, stripeStorePrefetchLandedCost, stripeStoreReset, stripeStoreRetrievePayment, stripeStoreSaveDomesticShippingSession, stripeStoreTranslateAddressToLatin, stripeStoreUpdateCheckoutSession, };

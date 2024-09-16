@@ -1,6 +1,6 @@
 import type { CartItem } from "../../components/store/checkout/cart";
 import type { BuildLandedCostParams, BuildLandedCostResponse } from "../../components/utils/api/triggerBuildLandedCost";
-import type { AnalyticsProviderStatus, AnalyticsProviderType, CheckoutSubscriptionStatus, CheckoutSuccessBehavior, CheckoutVisibilityStatus, CountryCode, CurrencyCode, GetOrderQuery, NotificationActiveStatus } from "../generated/graphql.customer.types";
+import type { AnalyticsProviderStatus, AnalyticsProviderType, CheckoutSubscriptionStatus, CheckoutSuccessBehavior, CheckoutVisibilityStatus, CountryCode, CurrencyCode, ExternalPaymentMethodStatus, ExternalPaymentMethodType, ExternalServiceTokenType, GetOrderQuery, Mode, NotificationActiveStatus } from "../generated/graphql.customer.types";
 export type ZonosOrder = GetOrderQuery['order'];
 export type { BuildLandedCostParams, BuildLandedCostResponse };
 export type BuildCardDetailParams = {
@@ -22,6 +22,19 @@ export type CheckoutConfig = {
      * @note if set to true, we will not enable or disable the place order button
      */
     disablePlaceOrderButtonActivation?: boolean;
+    externalPaymentMethods: Array<{
+        status: ExternalPaymentMethodStatus;
+        type: ExternalPaymentMethodType;
+    }> | null;
+    externalServiceTokens: {
+        token: string;
+        type: ExternalServiceTokenType;
+    }[];
+    /**
+     * Test mode for checkout (sandbox or production)
+     * @default TEST
+     */
+    mode: Mode;
     orderNotifications: {
         abandonedCart: {
             delay: number;

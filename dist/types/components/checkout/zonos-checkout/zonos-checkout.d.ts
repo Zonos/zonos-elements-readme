@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 import { type CartItem } from "../../store/checkout/cart";
 import { type StripeStoreContactOption } from "../../store/checkout/stripe";
@@ -40,10 +39,6 @@ export declare class ZonosCheckout {
      * Whether or not the submit button is loading in `step` component
      */
     submitLoading: boolean;
-    /**
-     * Error when submitting payment
-     */
-    paymentError: boolean;
     collapseReviewMobile: boolean;
     /**
      * Determine if we should skip and not hijack the Checkout button click event
@@ -60,14 +55,6 @@ export declare class ZonosCheckout {
      * Confirm dialog open state
      */
     confirmDialogOpen: boolean;
-    /**
-     * Session timeout screen state
-     */
-    showSessionTimoutScreen: boolean;
-    /**
-     * Timeout alert message
-     */
-    checkoutTimeoutInterval: NodeJS.Timeout | null;
     /**
      * Error message from onInventoryCheck callback
      */
@@ -88,8 +75,6 @@ export declare class ZonosCheckout {
     }): Promise<void>;
     private applyStripeTheme;
     private buildCartAndInit;
-    private clearCheckoutTimeoutInterval;
-    private startCheckoutTimeoutInterval;
     private reloadCheckoutSession;
     private attachCheckout;
     appearanceSettingsOverrideChanged(): void;
@@ -109,11 +94,7 @@ export declare class ZonosCheckout {
     private handleShippingContinue;
     private handleInventoryCheckDialogCancel;
     private handleInventoryCheckDialogConfirm;
-    /**
-     * Handle inventory check and returns error message if the callback provided.
-     */
-    private handleInventoryCheck;
-    private handleCheckoutPaymentContinue;
+    private handleStripePaymentContinue;
     private handleFinishClick;
     private getCurrentLocalePageEnum;
     handleWindowResize(): void;

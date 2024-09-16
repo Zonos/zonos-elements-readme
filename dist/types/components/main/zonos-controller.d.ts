@@ -14,6 +14,12 @@ export declare class ZonosController {
      */
     zonosApiKey: string;
     /**
+     * Event emitted to initialize paypal
+     */
+    paypalInitEvent?: EventEmitter<{
+        paypalClientId: string;
+    }>;
+    /**
      * Event emitted when stripe is initialized
      */
     stripeInitEvent?: EventEmitter<{
