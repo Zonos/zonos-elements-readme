@@ -139,6 +139,51 @@ export type LoadZonosParamsConfig = {
      * Custom currency format function to be used in Hello and Checkout.
      * @note This function would override the default behavior of `format` function inside of `CurrencyConverter`
      * @note You can combine this function with `currencyConverter` to customize the currency format
+     * 
+     * ------
+     * @option1 Customize currency format (use `convert` and `format` in `currencyConverter`)
+     * @note This function would override the default behavior of `format`, and `convertAndFormat` function inside of `CurrencyConverter`
+     * @note You can combine this function with `currencyConverter` to customize the currency format
+     * @example
+     * Price:  "1200.99"
+     * End result: "USD - 1,200.99"
+     *
+     * Zonos.init({
+     *   // `format` function in `currencyConverter` will trigger this function instead.
+     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
+     *     return `- ${numberFormat({ amount })}`;
+     *   }
+     *   currencyConverter: ({ convert, currencyCode, originalAmount, selector }) => {
+     *      const convertedAmount = convert(originalAmount);
+     *      // `format` function will call `overrideCurrencyFormat` function instead and it will just format the converted amount
+     *      const formattedAmount = `${currencyCode} ${format(convertedAmount)}`;
+     *      selector.innerText = formattedAmount;
+     *
+     *      revealPrice();
+     *      return formattedAmount;
+     *    },
+     * });
+     *
+     * ------
+     * @option2 Customize currency format (use `convertAndFormat`)
+     * @example
+     * Price: "1200.99"
+     * End result: "USD - 1,200.99"
+     *
+     * Zonos.init({
+     *   // `format` function in `currencyConverter` will trigger this function instead.
+     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
+     *     return `${currencyCode} - ${numberFormat({ amount })}`;
+     *   }
+     *   currencyConverter: ({ convertAndFormat, originalAmount, selector }) => {
+     *      // `convertAndFormat` function calls `format` under the hood, so it will also call `overrideCurrencyFormat` function
+     *      const convertedAndFormatedAmount = convertAndFormat(originalAmount);
+     *      selector.innerText = convertedAndFormatedAmount;
+     *
+     *      revealPrice();
+     *      return formattedAmount;
+     *    },
+     * });
      */
      | ((params: {
         /**
