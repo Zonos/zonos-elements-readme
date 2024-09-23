@@ -1,6 +1,8 @@
 import type { CartItem } from "../../components/store/checkout/cart";
 import type { BuildLandedCostParams, BuildLandedCostResponse } from "../../components/utils/api/triggerBuildLandedCost";
 import type { AnalyticsProviderStatus, AnalyticsProviderType, CheckoutSubscriptionStatus, CheckoutSuccessBehavior, CheckoutVisibilityStatus, CountryCode, CurrencyCode, ExternalPaymentMethodStatus, ExternalPaymentMethodType, ExternalServiceTokenType, GetOrderQuery, Mode, NotificationActiveStatus } from "../generated/graphql.customer.types";
+export declare const checkoutHiddenBtnSelector = "zonos--checkout-hidden-button";
+export declare const domesticRedirectedBtnSelector = "zonos--domestic-redirected-checkout-button";
 export type ZonosOrder = GetOrderQuery['order'];
 export type { BuildLandedCostParams, BuildLandedCostResponse };
 export type BuildCardDetailParams = {
@@ -84,8 +86,11 @@ export type CheckoutConfig = {
     successRedirectUrl: string;
     visibilityStatus: CheckoutVisibilityStatus;
     /**
-     * Cart info callback for checkout (optional)
-     * @note will use temp cart data if available
+     * Cart info callback for checkout (optional),
+     * @deprecated
+     * @note
+     * This function is deprecated in favor of new API `createCartId`
+     * @note will attempt to use cart data if available
      * User can dispatch an event 'zonos--init-cart-info' to update the cart
      * @example
      * const initEvent = new CustomEvent<CartItem[]>('zonos--init-cart-info', {
@@ -106,9 +111,19 @@ export type CheckoutConfig = {
     buildCartDetail?: (params: BuildCardDetailParams) => Promise<CartItem[]>;
     /**
      * Calculate landed cost callback for checkout (optional)
-     * @note will use temp cart data if available
+     * @deprecated
+     * @note
+     * This function is deprecated in favor of new API `createCartId`
+     * @note will attempt to use cart data if available
      */
     buildLandedCost?: (params: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
+    /**
+     * Callback that returns the cart id from `cartCreate` mutation.
+     * @note
+     * The mutation `cartCreate` is preferred to be called in the server side
+     * @returns string - Cart ID
+     */
+    createCartId?: () => Promise<string> | string;
     /**
      * Callback trigger when the checkout is closed
      */

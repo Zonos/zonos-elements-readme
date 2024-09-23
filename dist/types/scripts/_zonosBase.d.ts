@@ -1,13 +1,11 @@
 import type { PayPalNamespace } from '@paypal/paypal-js';
 import type { Stripe } from '@stripe/stripe-js';
 import type { AppearanceConfig } from "../components/store/zonosStore";
-import { type InjectScriptType } from "./_getNextFallbackUrl";
 import type { NotificationInit } from "../types/index";
-import type { TempCart } from "../types/checkout/api/TempCart";
-import type { CheckoutConfig } from "../types/checkout/CheckoutConfig";
+import type { NormalizedTempCart } from "../types/checkout/api/NormalizedTempCart";
+import { type CheckoutConfig } from "../types/checkout/CheckoutConfig";
 import type { CountryCode, CurrencyCode, PaypalMockResponse } from "../types/generated/graphql.customer.types";
 import type { HelloConfig } from "../types/hello/HelloConfig";
-export declare const MAIN_LOAD_CDN_TYPE: InjectScriptType;
 /**
  * Currency converter function to be used in Hello and Checkout
  * @note don't modify the element directly in this function, otherwise it might cause unexpected behavior like an infinite loop
@@ -173,17 +171,17 @@ export type LoadZonosParamsConfig = {
 export type LoadZonosParams = LoadZonosParamsConfig & {
     storeId: number;
     /**
-     * Temporary cart UUID to be used for legacy zonos checkout. If this is provided, no need to configure `buildCartDetail`, `buildLandedCost` callback, zonosApiKey or storeId
-     * @note This would be deprecated in the future when we fully migrate to new zonos checkout
+     * If cart id is provided in the url with query param zCartUUID, you don't need to provide zonosApiKey
      */
-    tempCartUUID?: string;
-    zonosApiKey: string;
+    zonosApiKey?: string;
 };
 export interface Zonos {
     /**
      * Mock error response for Paypal. Mainly used for testing purposes
      */
     _paypalMockResponse: PaypalMockResponse | null;
+    cartData: NormalizedTempCart | null;
+    cartId: string | null;
     /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
@@ -191,6 +189,10 @@ export interface Zonos {
     debug?: boolean;
     doneInit: boolean;
     isBigCommerce: boolean;
+    /**
+     * This will be set to true when it's called form legacy checkout
+     */
+    isLegacyCheckout: boolean;
     isNpm: boolean;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
     modeAlerted: boolean;
@@ -202,9 +204,8 @@ export interface Zonos {
     storeId: number;
     /** Stripe instance */
     stripe: Stripe;
-    tempCartData: TempCart | null;
     version: string;
-    zonosApiKey: string;
+    zonosApiKey?: string;
     /**
      * Flag to send tracking event to api for conversion testing, since we don't send tracking event to api when in debug/development mode
      */
@@ -220,7 +221,7 @@ export interface Zonos {
     updateOrganizationName: (organizationName: string) => void;
 }
 export declare abstract class Zonos {
-    static zonosApiKey: string;
+    static zonosApiKey?: string;
     static stripe: Stripe;
     static storeId: number;
     static doneInit: boolean;
@@ -229,6 +230,7 @@ export declare abstract class Zonos {
     static _paypalMockResponse: PaypalMockResponse | null;
     static isBigCommerce: boolean;
     static releaseDate: string;
+    static isLegacyCheckout: boolean;
     /**
      * By default, the package will load from npm
      */
@@ -236,9 +238,10 @@ export declare abstract class Zonos {
     static zonosQaUrl: string | null;
     static version: string;
     static modeAlerted: boolean;
-    static tempCartData: TempCart | null;
+    static cartData: NormalizedTempCart | null;
     static paypal: PayPalNamespace | null;
     static getCurrentTimestamp: () => number;
+    static cartId: string | null;
     private static zonosController;
     static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
     static displayCurrency: () => void;

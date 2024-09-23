@@ -14,6 +14,12 @@ declare const analyticsProviderType: {
     readonly GoogleAnalytics: "GOOGLE_ANALYTICS";
 };
 type AnalyticsProviderType = (typeof analyticsProviderType)[keyof typeof analyticsProviderType];
+declare const cartAdjustmentType: {
+    readonly CartTotal: "CART_TOTAL";
+    readonly Item: "ITEM";
+    readonly Shipping: "SHIPPING";
+};
+type CartAdjustmentType = (typeof cartAdjustmentType)[keyof typeof cartAdjustmentType];
 declare const checkoutSubscriptionStatus: {
     readonly Active: "ACTIVE";
     readonly Inactive: "INACTIVE";
@@ -662,7 +668,9 @@ type CalculateLandedCostMutation = {
         landedCost: {
             id: string;
         } | null;
+        landedCostId: string;
         subtotals: {
+            adjustments: number;
             duties: number;
             exchangeRate: {
                 id: string;
@@ -698,6 +706,9 @@ type CalculateLandedCostMutation = {
         sku: string | null;
     }>;
     landedCostCalculateWorkflow: Array<{
+        amountSubtotals: {
+            discounts: number | null;
+        } | null;
         appliedAdjustments: Array<{
             amount: number;
             item: {
@@ -708,8 +719,8 @@ type CalculateLandedCostMutation = {
         deMinimis: Array<{
             formula: string;
             method: IncotermCode;
-            note: string;
             threshold: DeMinimisThreshold;
+            note: string;
             type: DeMinimisType;
         }>;
         duties: Array<{
@@ -725,8 +736,8 @@ type CalculateLandedCostMutation = {
         method: IncotermCode;
         shipmentRating: {
             amount: number;
-            displayName: string;
             currencyCode: CurrencyCode;
+            displayName: string;
             id: string;
             maxTransitAt: string | null;
             minTransitAt: string | null;
@@ -3770,6 +3781,8 @@ type CalculateLandedCostRequest = {
     items: CartItem[];
     landedCostAdjustments?: {
         amount: number;
+        productId: string | null;
+        sku: string | null;
         type: LandedCostAdjustmentType;
     }[];
     metadata?: {
@@ -3984,8 +3997,11 @@ type CheckoutConfig = {
     successRedirectUrl: string;
     visibilityStatus: CheckoutVisibilityStatus;
     /**
-     * Cart info callback for checkout (optional)
-     * @note will use temp cart data if available
+     * Cart info callback for checkout (optional),
+     * @deprecated
+     * @note
+     * This function is deprecated in favor of new API `createCartId`
+     * @note will attempt to use cart data if available
      * User can dispatch an event 'zonos--init-cart-info' to update the cart
      * @example
      * const initEvent = new CustomEvent<CartItem[]>('zonos--init-cart-info', {
@@ -4006,9 +4022,19 @@ type CheckoutConfig = {
     buildCartDetail?: (params: BuildCardDetailParams) => Promise<CartItem[]>;
     /**
      * Calculate landed cost callback for checkout (optional)
-     * @note will use temp cart data if available
+     * @deprecated
+     * @note
+     * This function is deprecated in favor of new API `createCartId`
+     * @note will attempt to use cart data if available
      */
     buildLandedCost?: (params: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
+    /**
+     * Callback that returns the cart id from `cartCreate` mutation.
+     * @note
+     * The mutation `cartCreate` is preferred to be called in the server side
+     * @returns string - Cart ID
+     */
+    createCartId?: () => Promise<string> | string;
     /**
      * Callback trigger when the checkout is closed
      */
@@ -4057,85 +4083,41 @@ type AppearanceConfig = {
     zonosAttribution: ZonosAttribution | null;
 };
 
-type TempCartItem = {
-    additionalCharge: boolean;
-    boxNumber: number | null;
-    countryOfOrigin: string | null;
+type NormalizedTempCartItem = {
+    amount: number;
+    attributes: {
+        key: string;
+        value: string;
+    }[];
+    countryOfOrigin: CountryCode | null;
+    currencyCode: CurrencyCode;
     description: string | null;
-    discount: boolean;
-    foreignUnitPrice: number | null;
-    giftCard: boolean;
-    height: number | null;
-    id: number | null;
-    imageURL: string | null;
-    itemBrand: string | null;
-    itemCategory: string | null;
-    itemColor: string | null;
-    itemCustomization: string | null;
-    itemDescriptionDetailed: string | null;
-    itemDescriptionLong: string | null;
-    itemDiscountAmount: number | null;
-    itemDoSell: boolean;
-    itemFabricContent: string | null;
-    itemForwarded: boolean;
-    itemHSCode: string | null;
-    itemLtlClass: string | null;
-    itemMaterial: string | null;
-    itemPickingLocation: string | null;
-    itemShipFromLocation: string | null;
-    itemShippingAmount: number | null;
-    itemSize: string | null;
-    itemURL: string | null;
-    itemUnitPriceHide: boolean;
-    length: number | null;
-    nonShippable: boolean;
+    id: string;
+    imageUrl: string | null;
+    itemType: ItemType | null;
+    measurements: {
+        type: ItemMeasurementType;
+        unitOfMeasure: ItemUnitOfMeasure;
+        value: number;
+    }[];
+    name: string | null;
     productId: string | null;
-    quantity: number | null;
+    quantity: number;
     sku: string | null;
-    status: string | null;
-    unitPrice: number | null;
-    weight: number | null;
-    weightUnits: string | null;
-    width: number | null;
 };
-type TempCart = {
-    additionalHandling: boolean;
-    boxCount: string | null;
-    /**
-     * @param contShopingUrl should always be set, backend will ensure this. If not set, backend will fallback to the store vendor url
-     */
-    contShoppingURL: string;
-    createdInMillis: number | null;
-    customerId: string | null;
-    customerNote: string | null;
-    discountAmount: number | null;
-    domesticShippingCharge: number | null;
-    exchangeRate: number | null;
-    externalConfirmationPageURL: string | null;
-    footerHtml: string | null;
-    giftCardDescription: string | null;
-    giftCardForeignTotal: number | null;
-    giftCardTotal: number | null;
-    guid: string;
-    iGlobalId: string | null;
-    id: number;
-    iglobalCheckoutFlags: string | null;
-    interpayRateOfferId: string | null;
-    items: TempCartItem[] | null;
-    message: string | null;
-    misc1: string | null;
-    misc2: string | null;
-    misc3: string | null;
-    misc4: string | null;
-    misc5: string | null;
-    misc6: string | null;
-    poAllowed: boolean;
-    referenceId: string | null;
-    shippingAmountOverride: number | null;
-    showForeignCurrency: boolean;
+type NormalizedTempCart = {
+    adjustments: {
+        amount: number;
+        currencyCode: CurrencyCode;
+        description: string;
+        productId: string | null;
+        sku: string | null;
+        type: CartAdjustmentType;
+    }[];
+    credentialToken: string;
+    items: NormalizedTempCartItem[];
+    storeBaseUrl: string;
     storeId: number;
-    usedInMillis: number | null;
-    vendorPassedCurrencyCode: string | null;
 };
 
 /**
@@ -4303,17 +4285,17 @@ type LoadZonosParamsConfig = {
 type LoadZonosParams = LoadZonosParamsConfig & {
     storeId: number;
     /**
-     * Temporary cart UUID to be used for legacy zonos checkout. If this is provided, no need to configure `buildCartDetail`, `buildLandedCost` callback, zonosApiKey or storeId
-     * @note This would be deprecated in the future when we fully migrate to new zonos checkout
+     * If cart id is provided in the url with query param zCartUUID, you don't need to provide zonosApiKey
      */
-    tempCartUUID?: string;
-    zonosApiKey: string;
+    zonosApiKey?: string;
 };
 interface Zonos {
     /**
      * Mock error response for Paypal. Mainly used for testing purposes
      */
     _paypalMockResponse: PaypalMockResponse | null;
+    cartData: NormalizedTempCart | null;
+    cartId: string | null;
     /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
@@ -4321,6 +4303,10 @@ interface Zonos {
     debug?: boolean;
     doneInit: boolean;
     isBigCommerce: boolean;
+    /**
+     * This will be set to true when it's called form legacy checkout
+     */
+    isLegacyCheckout: boolean;
     isNpm: boolean;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
     modeAlerted: boolean;
@@ -4332,9 +4318,8 @@ interface Zonos {
     storeId: number;
     /** Stripe instance */
     stripe: Stripe;
-    tempCartData: TempCart | null;
     version: string;
-    zonosApiKey: string;
+    zonosApiKey?: string;
     /**
      * Flag to send tracking event to api for conversion testing, since we don't send tracking event to api when in debug/development mode
      */
@@ -4350,7 +4335,7 @@ interface Zonos {
     updateOrganizationName: (organizationName: string) => void;
 }
 declare abstract class Zonos {
-    static zonosApiKey: string;
+    static zonosApiKey?: string;
     static stripe: Stripe;
     static storeId: number;
     static doneInit: boolean;
@@ -4359,6 +4344,7 @@ declare abstract class Zonos {
     static _paypalMockResponse: PaypalMockResponse | null;
     static isBigCommerce: boolean;
     static releaseDate: string;
+    static isLegacyCheckout: boolean;
     /**
      * By default, the package will load from npm
      */
@@ -4366,9 +4352,10 @@ declare abstract class Zonos {
     static zonosQaUrl: string | null;
     static version: string;
     static modeAlerted: boolean;
-    static tempCartData: TempCart | null;
+    static cartData: NormalizedTempCart | null;
     static paypal: PayPalNamespace | null;
     static getCurrentTimestamp: () => number;
+    static cartId: string | null;
     private static zonosController;
     static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
     static displayCurrency: () => void;

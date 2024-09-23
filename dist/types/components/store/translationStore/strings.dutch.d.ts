@@ -68,6 +68,9 @@ export declare const stringsDutch: {
     'Delivery options': {
         value: string;
     };
+    Discounts: {
+        value: string;
+    };
     "Don't close": {
         value: string;
     };
@@ -144,9 +147,6 @@ export declare const stringsDutch: {
         value: string;
     };
     'Nothing due at the door': {
-        value: string;
-    };
-    'Order is over the de minimis threshold for both duty and tax': {
         value: string;
     };
     'Order total': {

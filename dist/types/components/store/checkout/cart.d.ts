@@ -1,6 +1,6 @@
 /// <reference types="node" />
 import { stripeStoreUpdateCheckoutSession } from "./stripe";
-import type { CalculateLandedCostMutation, CheckoutPresentmentFragment, CurrencyCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.customer.types";
+import type { CalculateLandedCostMutation, CartQuery, CheckoutPresentmentFragment, CurrencyCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.customer.types";
 type Step = 'customer-info' | 'shipping' | 'payment' | 'finish' | 'error';
 export type TabItem = {
     index: number;
@@ -47,10 +47,16 @@ export type CartItem = {
     quantity: number;
     sku?: string;
 };
+export type CartAdjustment = NonNullable<CartQuery['cart']>['adjustments'][number];
 type CartItemToUse = CartItem & {
     isRestricted: boolean;
 };
 type CartStore = {
+    adjustmentTotal: number;
+    /**
+     * Adjustments from cart
+     */
+    adjustments: CartAdjustment[];
     checkoutSessionId: string | null;
     /**
      * Checkout session timeout
@@ -133,6 +139,7 @@ declare const cartStoreUpdateToErrorState: ({ messages, title, }: {
     title: string;
 }) => void;
 type CartSubtotals = {
+    adjustments: number;
     exchangeRate: {
         id: string;
         rate: number;
@@ -152,7 +159,7 @@ type CartStoreRecalculateTotalParams = Omit<Parameters<typeof stripeStoreUpdateC
  * Detect if there are any items in cart that are not restricted and have positive amount, exclude negative amount items
  */
 declare const cartStoreHasOneEligibleItem: () => boolean;
-declare const cartStoreReCalculateTotal: ({ currency, itemsAmount, landedCostId, }: CartStoreRecalculateTotalParams) => Promise<boolean>;
+declare const cartStoreReCalculateTotal: ({ adjustmentAmount, cartId, currency, itemsAmount, landedCostId, }: CartStoreRecalculateTotalParams) => Promise<boolean>;
 declare const cartStoreUpdateSelectedShippingOption: (selectedShippingOption: ShipmentRatingFragment) => Promise<boolean>;
 declare const cartStoreStartCheckoutInterval: ({ isPreview, sessionTimeout, }: {
     isPreview: boolean;
@@ -163,7 +170,10 @@ declare const cartStoreStartCheckoutInterval: ({ isPreview, sessionTimeout, }: {
 }) => void;
 declare const cartStoreClearCheckoutInterval: () => void;
 declare const cartStoreResetCartItems: () => void;
-declare const cartStoreUpdateItems: (cartItems: CartItem[]) => Promise<void>;
+declare const cartStoreUpdateItems: ({ adjustments, cartItems, }: {
+    adjustments: CartAdjustment[];
+    cartItems: CartItem[];
+}) => Promise<void>;
 declare const cartStoreNextStep: () => void;
 declare const cartStoreResetTabItems: () => void;
 export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreClearCheckoutInterval, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreNextStep, cartStoreReCalculateTotal, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreStartCheckoutInterval, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateToErrorState, };

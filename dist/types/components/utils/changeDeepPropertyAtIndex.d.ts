@@ -60,7 +60,7 @@ import type { IDeepKeyofAtIndex, IDeepPropertyTypeAtIndex } from "../../types/ut
       },
     };
  */
-export declare const changeDeepPropertyAtIndex: <T extends object, P extends IDeepKeyofAtIndex<T, Depth>, Depth extends 0 | 2 | 1 | 3 | 5 | 8 | 4 | 6 | 7 | 9 = 4>({ index, obj, propertyPath, value, }: {
+export declare const changeDeepPropertyAtIndex: <T extends object, P extends IDeepKeyofAtIndex<T, Depth>, Depth extends 0 | 1 | 2 | 6 | 3 | 4 | 5 | 7 | 8 | 9 = 4>({ index, obj, propertyPath, value, }: {
     index: number;
     obj: T;
     propertyPath: P;

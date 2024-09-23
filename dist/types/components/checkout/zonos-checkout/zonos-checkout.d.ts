@@ -48,8 +48,6 @@ export declare class ZonosCheckout {
     isMobile: boolean;
     zonosReviewRef?: HTMLZonosReviewElement;
     storybookPaymentStatusOverride?: PaymentIntent['status'];
-    domesticRedirectedBtnSelector: string;
-    legacyCheckoutHiddenBtnSelector: string;
     isLegacyCheckout: boolean;
     /**
      * Confirm dialog open state

@@ -68,6 +68,10 @@ export type AccountHolderType = (typeof accountHolderType)[keyof typeof accountH
 export declare const accountingFeeType: {
     readonly BugFix: "BUG_FIX";
     readonly DutyTaxFee: "DUTY_TAX_FEE";
+    readonly ExistingConnectAdjustmentCredits: "EXISTING_CONNECT_ADJUSTMENT_CREDITS";
+    readonly ExistingCreditNotes: "EXISTING_CREDIT_NOTES";
+    readonly ExistingInvoiceLineRecordCredits: "EXISTING_INVOICE_LINE_RECORD_CREDITS";
+    readonly ExistingInvoiceVoided: "EXISTING_INVOICE_VOIDED";
     readonly General: "GENERAL";
     readonly Item: "ITEM";
     readonly LandedCostGuarantee: "LANDED_COST_GUARANTEE";
@@ -417,6 +421,11 @@ export declare const classificationCalculateSource: {
     readonly Single: "SINGLE";
 };
 export type ClassificationCalculateSource = (typeof classificationCalculateSource)[keyof typeof classificationCalculateSource];
+export declare const classificationMethod: {
+    readonly Augmented: "AUGMENTED";
+    readonly Calculated: "CALCULATED";
+};
+export type ClassificationMethod = (typeof classificationMethod)[keyof typeof classificationMethod];
 export declare const classificationRequestField: {
     readonly Category: "CATEGORY";
     readonly Description: "DESCRIPTION";
@@ -1403,6 +1412,12 @@ export declare const fedExCategoryCode: {
     readonly Shipping: "SHIPPING";
 };
 export type FedExCategoryCode = (typeof fedExCategoryCode)[keyof typeof fedExCategoryCode];
+export declare const fieldStatus: {
+    readonly Hidden: "HIDDEN";
+    readonly Required: "REQUIRED";
+    readonly Visible: "VISIBLE";
+};
+export type FieldStatus = (typeof fieldStatus)[keyof typeof fieldStatus];
 export declare const fulfillmentCenterType: {
     readonly ConsolidationCenter: "CONSOLIDATION_CENTER";
     readonly Primary: "PRIMARY";
@@ -2593,6 +2608,116 @@ export declare const zonosAttribution: {
     readonly Enabled: "ENABLED";
 };
 export type ZonosAttribution = (typeof zonosAttribution)[keyof typeof zonosAttribution];
+export type CartCalculateLandedCostMutation = {
+    cartWorkflow: {
+        id: string;
+        items: Array<{
+            amount: number;
+            attributes: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+            description: string | null;
+            id: string;
+            imageUrl: string | null;
+            name: string | null;
+            quantity: number;
+            restriction: {
+                action: RestrictedItemAction;
+                reason: string;
+            } | null;
+            sku: string | null;
+        }>;
+    };
+    cartonizeWorkflow: Array<{
+        id: string;
+        items: Array<{
+            item: {
+                id: string;
+            };
+        }> | null;
+        type: PackagingType;
+    } | null> | null;
+    checkoutSessionWorkflow: Array<{
+        landedCost: {
+            id: string;
+        } | null;
+        landedCostId: string;
+        subtotals: {
+            adjustments: number;
+            duties: number;
+            presentmentCurrencyCode: CurrencyCode;
+            fees: number;
+            items: number;
+            landedCostTotal: number;
+            taxes: number;
+            shipping: number;
+            exchangeRate: {
+                id: string;
+                rate: number;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                type: ExchangeRateType;
+            };
+            total: number;
+        };
+    }> | null;
+    landedCostCalculateWorkflow: Array<{
+        amountSubtotals: {
+            discounts: number | null;
+        } | null;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
+        deMinimis: Array<{
+            formula: string;
+            threshold: DeMinimisThreshold;
+            method: IncotermCode;
+            note: string;
+            type: DeMinimisType;
+        }>;
+        duties: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
+        }>;
+        fees: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
+        }>;
+        id: string;
+        appliedAdjustments: Array<{
+            amount: number;
+            item: {
+                amount: number;
+            } | null;
+            type: LandedCostAdjustmentType | null;
+        }> | null;
+        method: IncotermCode;
+        shipmentRating: {
+            amount: number;
+            currencyCode: CurrencyCode;
+            displayName: string;
+            id: string;
+            maxTransitAt: string | null;
+            minTransitAt: string | null;
+        };
+        taxes: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
+        }>;
+    } | null> | null;
+    partyCreateWorkflow: Array<{
+        id: string;
+        organization: string;
+        type: PartyType | null;
+    }>;
+    shipmentRatingCalculateWorkflow: Array<{
+        amount: number;
+        currencyCode: CurrencyCode;
+        displayName: string;
+        id: string;
+        maxTransitAt: string | null;
+        minTransitAt: string | null;
+    }>;
+};
 export type CalculateLandedCostMutation = {
     cartonizeWorkflow: Array<{
         id: string;
@@ -2607,7 +2732,9 @@ export type CalculateLandedCostMutation = {
         landedCost: {
             id: string;
         } | null;
+        landedCostId: string;
         subtotals: {
+            adjustments: number;
             duties: number;
             exchangeRate: {
                 id: string;
@@ -2643,6 +2770,9 @@ export type CalculateLandedCostMutation = {
         sku: string | null;
     }>;
     landedCostCalculateWorkflow: Array<{
+        amountSubtotals: {
+            discounts: number | null;
+        } | null;
         appliedAdjustments: Array<{
             amount: number;
             item: {
@@ -2653,8 +2783,8 @@ export type CalculateLandedCostMutation = {
         deMinimis: Array<{
             formula: string;
             method: IncotermCode;
-            note: string;
             threshold: DeMinimisThreshold;
+            note: string;
             type: DeMinimisType;
         }>;
         duties: Array<{
@@ -2670,8 +2800,8 @@ export type CalculateLandedCostMutation = {
         method: IncotermCode;
         shipmentRating: {
             amount: number;
-            displayName: string;
             currencyCode: CurrencyCode;
+            displayName: string;
             id: string;
             maxTransitAt: string | null;
             minTransitAt: string | null;
@@ -2695,11 +2825,30 @@ export type CalculateLandedCostMutation = {
         minTransitAt: string | null;
     }>;
 };
+export type CartItemFragmentFragment = {
+    amount: number;
+    attributes: Array<{
+        key: string | null;
+        value: string | null;
+    } | null> | null;
+    description: string | null;
+    id: string;
+    imageUrl: string | null;
+    name: string | null;
+    quantity: number;
+    restriction: {
+        action: RestrictedItemAction;
+        reason: string;
+    } | null;
+    sku: string | null;
+};
 export type CheckoutPresentmentFragment = {
     landedCost: {
         id: string;
     } | null;
+    landedCostId: string;
     subtotals: {
+        adjustments: number;
         duties: number;
         exchangeRate: {
             id: string;
@@ -2718,6 +2867,9 @@ export type CheckoutPresentmentFragment = {
     };
 };
 export type LandedCostFragment = {
+    amountSubtotals: {
+        discounts: number | null;
+    } | null;
     appliedAdjustments: Array<{
         amount: number;
         item: {
@@ -2835,10 +2987,12 @@ export type GetTaxIdByCountryQuery = {
 };
 export type CheckoutSessionCreateMutation = {
     checkoutSessionCreate: {
+        cartId: string | null;
         clientSecret: string;
         id: string;
         landedCost: {
             amountSubtotals: {
+                discounts: number | null;
                 duties: number;
                 fees: number;
                 items: number;
@@ -2859,6 +3013,7 @@ export type CheckoutSessionCreateMutation = {
         } | null> | null;
         organizationId: string;
         subtotals: {
+            adjustments: number;
             duties: number;
             exchangeRate: {
                 id: string;
@@ -2878,10 +3033,12 @@ export type CheckoutSessionCreateMutation = {
     };
 };
 export type CheckoutDetailsFragment = {
+    cartId: string | null;
     clientSecret: string;
     id: string;
     landedCost: {
         amountSubtotals: {
+            discounts: number | null;
             duties: number;
             fees: number;
             items: number;
@@ -2902,6 +3059,7 @@ export type CheckoutDetailsFragment = {
     } | null> | null;
     organizationId: string;
     subtotals: {
+        adjustments: number;
         duties: number;
         exchangeRate: {
             id: string;
@@ -2994,10 +3152,12 @@ export type CheckoutSessionUpdateMetadataMutation = {
 };
 export type CheckoutSessionUpdateMutation = {
     checkoutSessionUpdate: {
+        cartId: string | null;
         clientSecret: string;
         id: string;
         landedCost: {
             amountSubtotals: {
+                discounts: number | null;
                 duties: number;
                 fees: number;
                 items: number;
@@ -3018,6 +3178,7 @@ export type CheckoutSessionUpdateMutation = {
         } | null> | null;
         organizationId: string;
         subtotals: {
+            adjustments: number;
             duties: number;
             exchangeRate: {
                 id: string;
@@ -3037,10 +3198,12 @@ export type CheckoutSessionUpdateMutation = {
     };
 };
 export type CheckoutSessionUpdateDetailsFragment = {
+    cartId: string | null;
     clientSecret: string;
     id: string;
     landedCost: {
         amountSubtotals: {
+            discounts: number | null;
             duties: number;
             fees: number;
             items: number;
@@ -3061,6 +3224,7 @@ export type CheckoutSessionUpdateDetailsFragment = {
     } | null> | null;
     organizationId: string;
     subtotals: {
+        adjustments: number;
         duties: number;
         exchangeRate: {
             id: string;
@@ -3175,6 +3339,7 @@ export type ZonosSettingsQuery = {
     } | null;
     onlineStoreSettings: {
         allowedDomains: Array<string>;
+        url: string;
     };
     organization: {
         id: string;
@@ -3468,6 +3633,91 @@ export type RemoveTrackingNumberMutation = {
         trackingNumbers: Array<string | null> | null;
     } | null;
 };
+export type CartQuery = {
+    cart: {
+        adjustments: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
+            description: string;
+            productId: string | null;
+            sku: string | null;
+            type: CartAdjustmentType;
+        }>;
+        id: string;
+        items: Array<{
+            amount: number;
+            attributes: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+            countryOfOrigin: CountryCode | null;
+            currencyCode: CurrencyCode;
+            description: string | null;
+            id: string;
+            imageUrl: string | null;
+            itemType: ItemType | null;
+            measurements: Array<{
+                type: ItemMeasurementType;
+                unitOfMeasure: ItemUnitOfMeasure;
+                value: number;
+            } | null> | null;
+            name: string | null;
+            productId: string;
+            quantity: number;
+            sku: string | null;
+        }>;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }>;
+        organizationId: string;
+    } | null;
+};
+export type GetCartOrganizationInfoQuery = {
+    onlineStoreSettings: {
+        url: string;
+    };
+    organization: {
+        references: {
+            storeId: number | null;
+        } | null;
+    } | null;
+};
+export type CartCreateMutation = {
+    cartCreate: {
+        adjustments: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
+            description: string;
+            productId: string | null;
+            sku: string | null;
+            type: CartAdjustmentType;
+        }>;
+        id: string;
+        items: Array<{
+            amount: number;
+            attributes: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+            description: string | null;
+            id: string;
+            imageUrl: string | null;
+            name: string | null;
+            quantity: number;
+            restriction: {
+                action: RestrictedItemAction;
+                reason: string;
+            } | null;
+            sku: string | null;
+        }>;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }>;
+        organizationId: string;
+    };
+};
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionWrapper): {
     addTrackingNumber(variables?: {
@@ -3479,6 +3729,15 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     calculateLandedCost(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CalculateLandedCostMutation>;
+    cart(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartQuery>;
+    cartCalculateLandedCost(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartCalculateLandedCostMutation>;
+    cartCreate(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartCreateMutation>;
     checkItemRestrictions(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckItemRestrictionsMutation>;
@@ -3503,6 +3762,9 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     fulfillmentCenter(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<FulfillmentCenterQuery>;
+    getCartOrganizationInfo(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCartOrganizationInfoQuery>;
     getCheckoutPlaceOrderButtonSelector(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCheckoutPlaceOrderButtonSelectorQuery>;

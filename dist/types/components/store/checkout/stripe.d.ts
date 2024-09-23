@@ -105,6 +105,8 @@ declare const stripeStoreConfirmPayment: () => Promise<void>;
  */
 declare const stripeStoreInitCheckoutSession: () => Promise<boolean>;
 type CheckoutSessionUpdateRequest = {
+    adjustmentAmount: number;
+    cartId: string | null;
     currency?: string;
     id: string;
     itemsAmount?: number;
@@ -118,7 +120,7 @@ type CheckoutSessionUpdateRequest = {
 /**
  * Update checkout session. Use for updating amount with landed cost id, or update session when cart items change
  */
-declare const stripeStoreUpdateCheckoutSession: ({ currency, id, itemsAmount, landedCostId, presentmentCountryCode, }: CheckoutSessionUpdateRequest) => Promise<{
+declare const stripeStoreUpdateCheckoutSession: ({ adjustmentAmount, cartId, currency, id, itemsAmount, landedCostId, presentmentCountryCode, }: CheckoutSessionUpdateRequest) => Promise<{
     errors: import("../../..").JsonError[];
     json: CheckoutSessionUpdateMutation | null;
 }>;
