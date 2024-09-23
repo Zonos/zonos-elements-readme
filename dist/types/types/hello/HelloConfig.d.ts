@@ -12,9 +12,17 @@ export type HelloConfig = {
     countryOverrideBehavior?: CountryOverrideBehavior;
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
+    /**
+    * This is for hello widget to float at specific location when `anchorElementSelector` is not set. This field has no effect if `anchorElementSelect` is specified.
+    * @default BOTTOM_RIGHT
+    */
     desktopLocation?: HelloMobileLocation | null;
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
+    /**
+    * This is for Hello widget to float at specific location when in mobile. Set to `null` if you don't want hello to float on mobile
+    * @default BOTTOM_RIGHT
+    */
     mobileLocation: HelloMobileLocation | null;
     mode: Mode;
     organization: string;
