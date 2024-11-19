@@ -27,6 +27,10 @@ declare global {
      */
     bcConfig?: unknown;
     /**
+     * This flag would be set to true if zonosQaUrl is present in the query params and preview script loadZonos.js is injected to DOM
+     */
+    isZonosPreview?: boolean;
+    /**
      * A flag to determine if the current page is a BigCommerce page
      */
     stencilBootstrap?: unknown;

@@ -1,5 +1,5 @@
-import type { CountryCode } from "./generated/graphql.customer.types";
 import type { Locale_ElementsSupportedLocationCode_Enum } from "./generated/graphql.frontend.types";
+import type { CountryCode } from "./generated/graphql.internal.types";
 export type ICountry = {
     bigcommerceDisplayName?: string;
     code: CountryCode;

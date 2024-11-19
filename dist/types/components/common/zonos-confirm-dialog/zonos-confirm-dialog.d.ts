@@ -25,6 +25,11 @@ export declare class ZonosConfirmDialog {
      */
     dialogConfirmBtnText: string;
     /**
+     * Dialog width
+     * @default 350 px
+     */
+    dialogWidth: number;
+    /**
      * Cancel button text
      */
     dialogCancelBtnText?: string;

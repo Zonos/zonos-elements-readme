@@ -7,7 +7,7 @@ export declare class ZonosIcon {
     autoHeight: boolean;
     /**
      * Color of the SVG
-     * @default 'gray-1200'
+     * @default 'gray-1000'
      */
     iconColor: Color | (string & {
         _placeholder?: never;

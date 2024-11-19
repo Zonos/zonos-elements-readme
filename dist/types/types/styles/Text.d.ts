@@ -93,5 +93,5 @@ export declare const textOptions: {
 type TextOptions = typeof textOptions;
 export type Size = TextOptions[keyof TextOptions]['size'];
 export type Type = keyof TextOptions;
-export type FontWeight = TextOptions[keyof TextOptions]['weight'] | 800;
+export type FontWeight = TextOptions[keyof TextOptions]['weight'];
 export {};

@@ -1,11 +1,19 @@
 import type { CartItem } from "../../../components/store/checkout/cart";
-import type { CurrencyCode, LandedCostAdjustmentType } from "../../generated/graphql.customer.types";
+import type { CountryCode, CurrencyCode, LandedCostAdjustmentType } from "../../generated/graphql.internal.types";
+export type CalculateLandedCostAdjustmentInput = {
+    amount: number;
+    name?: string | null;
+    productId: string | null;
+    promoCode?: string | null;
+    sku: string | null;
+    type: LandedCostAdjustmentType;
+};
 export type CalculateLandedCostRequest = {
     billingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;
         city: string;
-        country: string;
+        country: CountryCode;
         postalCode: string;
         state: string;
     };
@@ -21,13 +29,12 @@ export type CalculateLandedCostRequest = {
         lastName: string;
         phone: string;
     };
+    /**
+     * When this is set, the created quote will not be shown on the Quote List page in the Zonos Dashboard.
+     */
+    isTest?: boolean;
     items: CartItem[];
-    landedCostAdjustments?: {
-        amount: number;
-        productId: string | null;
-        sku: string | null;
-        type: LandedCostAdjustmentType;
-    }[];
+    landedCostAdjustments?: CalculateLandedCostAdjustmentInput[];
     metadata?: {
         key: string;
         value: string;
@@ -36,7 +43,7 @@ export type CalculateLandedCostRequest = {
         addressLine1: string;
         addressLine2?: string | undefined;
         city: string;
-        country: string;
+        country: CountryCode;
         postalCode: string;
         state: string;
     };
@@ -46,7 +53,7 @@ export type CartCalculateLandedCostRequest = {
         addressLine1: string;
         addressLine2?: string | undefined;
         city: string;
-        country: string;
+        country: CountryCode;
         postalCode: string;
         state: string;
     };
@@ -67,6 +74,11 @@ export type CartCalculateLandedCostRequest = {
         lastName: string;
         phone: string;
     };
+    /**
+     * When this is set, the created quote will not be shown on the Quote List page in the Zonos Dashboard.
+     */
+    isTest?: boolean;
+    landedCostAdjustments?: CalculateLandedCostAdjustmentInput[];
     metadata?: {
         key: string;
         value: string;
@@ -75,7 +87,7 @@ export type CartCalculateLandedCostRequest = {
         addressLine1: string;
         addressLine2?: string | undefined;
         city: string;
-        country: string;
+        country: CountryCode;
         postalCode: string;
         state: string;
     };

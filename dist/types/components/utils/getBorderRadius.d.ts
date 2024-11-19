@@ -1,4 +1,4 @@
-import type { ElementsUiStyle } from "../../types/generated/graphql.customer.types";
+import type { ElementsUiStyle } from "../../types/generated/graphql.internal.types";
 /**
  * Get the border radius for the elements based on the style
  * @param overrideBorderStyle

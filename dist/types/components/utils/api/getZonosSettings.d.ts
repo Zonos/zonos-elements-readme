@@ -1,4 +1,4 @@
-import type { ZonosSettingsQuery } from "../../../types/generated/graphql.customer.types";
+import type { ZonosSettingsQuery } from "../../../types/generated/graphql.internal.types";
 export declare const getZonosSettings: () => Promise<{
     errors: import("../../..").JsonError[];
     json: null;

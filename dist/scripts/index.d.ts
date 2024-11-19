@@ -4,6 +4,11 @@ import { BrowserOptions } from '@sentry/browser';
 import { z } from 'zod';
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
+declare const adjustmentSource: {
+    readonly ApiRequest: "API_REQUEST";
+    readonly PromoCode: "PROMO_CODE";
+};
+type AdjustmentSource = (typeof adjustmentSource)[keyof typeof adjustmentSource];
 declare const analyticsProviderStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -17,6 +22,7 @@ type AnalyticsProviderType = (typeof analyticsProviderType)[keyof typeof analyti
 declare const cartAdjustmentType: {
     readonly CartTotal: "CART_TOTAL";
     readonly Item: "ITEM";
+    readonly PromoCode: "PROMO_CODE";
     readonly Shipping: "SHIPPING";
 };
 type CartAdjustmentType = (typeof cartAdjustmentType)[keyof typeof cartAdjustmentType];
@@ -579,6 +585,7 @@ type ItemUnitOfMeasure = (typeof itemUnitOfMeasure)[keyof typeof itemUnitOfMeasu
 declare const landedCostAdjustmentType: {
     readonly CartTotal: "CART_TOTAL";
     readonly Item: "ITEM";
+    readonly PromoCode: "PROMO_CODE";
     readonly Shipping: "SHIPPING";
 };
 type LandedCostAdjustmentType = (typeof landedCostAdjustmentType)[keyof typeof landedCostAdjustmentType];
@@ -649,6 +656,12 @@ declare const shipmentAmountType: {
     readonly Surcharge: "SURCHARGE";
 };
 type ShipmentAmountType = (typeof shipmentAmountType)[keyof typeof shipmentAmountType];
+declare const transitTypeCode: {
+    readonly BusinessDays: "BUSINESS_DAYS";
+    readonly Days: "DAYS";
+    readonly Weeks: "WEEKS";
+};
+type TransitTypeCode = (typeof transitTypeCode)[keyof typeof transitTypeCode];
 declare const zonosAttribution: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -665,9 +678,6 @@ type CalculateLandedCostMutation = {
         type: PackagingType;
     } | null> | null;
     checkoutSessionWorkflow: Array<{
-        landedCost: {
-            id: string;
-        } | null;
         landedCostId: string;
         subtotals: {
             adjustments: number;
@@ -698,6 +708,7 @@ type CalculateLandedCostMutation = {
         id: string;
         imageUrl: string | null;
         name: string | null;
+        productId: string;
         quantity: number;
         restriction: {
             action: RestrictedItemAction;
@@ -707,9 +718,13 @@ type CalculateLandedCostMutation = {
     }>;
     landedCostCalculateWorkflow: Array<{
         amountSubtotals: {
-            discounts: number | null;
+            landedCostTotal: number;
         } | null;
         appliedAdjustments: Array<{
+            adjustment: {
+                name: string | null;
+                source: AdjustmentSource | null;
+            } | null;
             amount: number;
             item: {
                 amount: number;
@@ -735,12 +750,7 @@ type CalculateLandedCostMutation = {
         landedCostGuaranteeCode: LandedCostGuaranteeCode;
         method: IncotermCode;
         shipmentRating: {
-            amount: number;
-            currencyCode: CurrencyCode;
-            displayName: string;
             id: string;
-            maxTransitAt: string | null;
-            minTransitAt: string | null;
         };
         taxes: Array<{
             amount: number;
@@ -757,8 +767,14 @@ type CalculateLandedCostMutation = {
         currencyCode: CurrencyCode;
         displayName: string;
         id: string;
-        maxTransitAt: string | null;
-        minTransitAt: string | null;
+        shippingProfile: {
+            transitTime: {
+                guaranteedDelivery: string | null;
+                max: number | null;
+                min: number | null;
+                type: TransitTypeCode | null;
+            } | null;
+        } | null;
     }>;
 };
 type CheckItemRestrictionsMutation = {
@@ -776,6 +792,51 @@ type CheckItemRestrictionsMutation = {
                 type: ItemRestrictionType;
             } | null> | null;
         } | null>;
+    };
+};
+type CheckoutSessionDetailsFragment = {
+    cartId: string | null;
+    clientSecret: string;
+    id: string;
+    landedCost: {
+        amountSubtotals: {
+            discounts: number | null;
+            duties: number;
+            fees: number;
+            items: number;
+            landedCostTotal: number;
+            shipping: number;
+            taxes: number;
+        } | null;
+        id: string;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
+        method: IncotermCode;
+        shipmentRating: {
+            displayName: string;
+        };
+    } | null;
+    metadata: Array<{
+        key: string;
+        value: string;
+    } | null> | null;
+    organizationId: string;
+    subtotals: {
+        adjustments: number;
+        duties: number;
+        exchangeRate: {
+            id: string;
+            rate: number;
+            sourceCurrencyCode: CurrencyCode;
+            targetCurrencyCode: CurrencyCode;
+            type: ExchangeRateType;
+        };
+        fees: number;
+        items: number;
+        landedCostTotal: number;
+        presentmentCurrencyCode: CurrencyCode;
+        shipping: number;
+        taxes: number;
+        total: number;
     };
 };
 type GetOrderQuery = {
@@ -820,9 +881,6 @@ type GetOrderQuery = {
                 taxes: number;
             } | null;
             appliedAdjustments: Array<{
-                Adjustment: {
-                    amount: number;
-                } | null;
                 amount: number;
                 item: {
                     amount: number;
@@ -876,6 +934,10 @@ type GetOrderQuery = {
             } | null;
             type: PartyType | null;
         }> | null;
+        references: Array<{
+            key: string | null;
+            value: string | null;
+        }> | null;
         root: {
             exchangeRates: Array<{
                 rate: number;
@@ -887,6 +949,340 @@ type GetOrderQuery = {
         status: OrderStatus;
         trackingNumbers: Array<string | null> | null;
     } | null;
+};
+
+type TabItem = {
+    index: number;
+    isDone: boolean;
+    label: 'Customer' | 'Shipping' | 'Payment';
+    value: 'customer-info' | 'shipping' | 'payment';
+};
+type TabItems = Record<TabItem['value'], TabItem>;
+type ItemMeasurement = {
+    /** Indicates what type of `Measurement`, e.g. weight, specific dim unit. */
+    type: ItemMeasurementType;
+    /** Indicates the `Measurement` units to be used. */
+    unitOfMeasure: ItemUnitOfMeasure;
+    /** The `Measurement` value. */
+    value: number;
+};
+type CartItem = {
+    amount: number;
+    attributes?: {
+        key: string;
+        value: string;
+    }[];
+    countryOfOrigin?: CountryCode;
+    currencyCode: CurrencyCode;
+    description?: string;
+    hsCode?: string;
+    imageUrl?: string;
+    itemType?: ItemType;
+    measurements?: ItemMeasurement[];
+    metadata?: {
+        key: string;
+        value: string;
+    }[];
+    name: string;
+    productId?: string;
+    quantity: number;
+    sku?: string;
+};
+
+type CalculateLandedCostAdjustmentInput = {
+    amount: number;
+    name?: string | null;
+    productId: string | null;
+    promoCode?: string | null;
+    sku: string | null;
+    type: LandedCostAdjustmentType;
+};
+type CalculateLandedCostRequest = {
+    billingAddress: {
+        addressLine1: string;
+        addressLine2?: string | undefined;
+        city: string;
+        country: CountryCode;
+        postalCode: string;
+        state: string;
+    };
+    billingContact: {
+        firstName: string;
+        lastName: string;
+        phone: string;
+    };
+    checkoutSessionId: string;
+    contact: {
+        email?: string;
+        firstName: string;
+        lastName: string;
+        phone: string;
+    };
+    /**
+     * When this is set, the created quote will not be shown on the Quote List page in the Zonos Dashboard.
+     */
+    isTest?: boolean;
+    items: CartItem[];
+    landedCostAdjustments?: CalculateLandedCostAdjustmentInput[];
+    metadata?: {
+        key: string;
+        value: string;
+    }[];
+    shippingAddress: {
+        addressLine1: string;
+        addressLine2?: string | undefined;
+        city: string;
+        country: CountryCode;
+        postalCode: string;
+        state: string;
+    };
+};
+
+type BuildLandedCostParams = {
+    billingAddress: CalculateLandedCostRequest['billingAddress'];
+    billingContact: CalculateLandedCostRequest['billingContact'];
+    checkoutSessionId: string;
+    contact: CalculateLandedCostRequest['contact'];
+    landedCostAdjustments?: CalculateLandedCostRequest['landedCostAdjustments'];
+    shippingAddress: CalculateLandedCostRequest['shippingAddress'];
+    zonosApiRoute: string;
+};
+type BuildLandedCostResponse = (CalculateLandedCostMutation & {
+    errors?: {
+        message: string;
+    }[];
+}) | null;
+
+type ZonosOrder = GetOrderQuery['order'];
+
+type BuildCardDetailParams = {
+    countryCode: CountryCode;
+    currencyCode: CurrencyCode;
+};
+type CheckoutConfig = {
+    /**
+     * Validate address to allow specific character sets
+     * @default ALL
+     */
+    allowedCharacterSets?: 'ALL' | 'LATIN';
+    analyticsProviders: Array<{
+        status: AnalyticsProviderStatus;
+        type: AnalyticsProviderType;
+    }>;
+    /**
+     * Duration (in minutes) for which the cart remains valid for checkout in hosted checkout.
+     * @default 60 (1 hour)
+     */
+    cartExpiration?: number;
+    /**
+     * @default false - when false, the place order button will be disabled until the script is loaded
+     * @note if set to true, the place order button will not be enabled or disabled
+     */
+    disablePlaceOrderButtonActivation?: boolean;
+    externalPaymentMethods: Array<{
+        status: ExternalPaymentMethodStatus;
+        type: ExternalPaymentMethodType;
+    }> | null;
+    externalServiceTokens: {
+        token: string;
+        type: ExternalServiceTokenType;
+    }[];
+    /**
+     * Test mode for checkout (sandbox or production)
+     * @default TEST
+     */
+    mode: Mode;
+    orderNotifications: {
+        abandonedCart: {
+            delay: number;
+            discountPercent: number;
+            status: {
+                active: NotificationActiveStatus;
+                sendCopiesTo: Array<string>;
+            };
+        };
+        orderCancelled: {
+            active: NotificationActiveStatus;
+            sendCopiesTo: Array<string>;
+        };
+        orderShipped: {
+            active: NotificationActiveStatus;
+            sendCopiesTo: Array<string>;
+        };
+    };
+    organization: string;
+    placeOrderButtonSelector: string | null;
+    /**
+     * @param subscriptionStatus subscription status for checkout, checkout only available if subscription status is ENABLED and visibility status is ENABLED
+     *
+     * **NOTE: this value can't be overridden in Zonos.init**
+     */
+    subscriptionStatus: CheckoutSubscriptionStatus;
+    successBehavior: CheckoutSuccessBehavior;
+    /**
+     * The success page action text for checkout.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageActionText?: string;
+    /**
+     * The success page subtitle text for checkout. Each item in the array will appear on a new line.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageSubtitleText?: string[];
+    /**
+     * The success page title text for checkout.
+     * @note Default text supports translation automatically, but any custom text will not be translated.
+     */
+    successPageTitleText?: string;
+    successRedirectUrl: string;
+    visibilityStatus: CheckoutVisibilityStatus;
+    /**
+     * Cart info callback for checkout (optional),
+     * @deprecated This is deprecated in favor of the new callback `createCartId`. The new API would only need the cart ID to retrieve cart data.
+     * @note will attempt to use cart data if available
+     * User can dispatch an event 'zonos--init-cart-info' to update the cart
+     * @example
+     * const initEvent = new CustomEvent<CartItem[]>('zonos--init-cart-info', {
+     *    detail: cartItems,
+     * });
+     * document.body.dispatchEvent(initEvent);
+     * @returns {object[]} - object with the the item info to be added to cart:
+     * - amount: number;
+     * - countryOfOrigin?: string;
+     * - currencyCode: string;
+     * - description?: string;
+     * - hsCode?: string;
+     * - imageUrl?: string;
+     * - name: string;
+     * - productId?: string;
+     * - quantity: number;
+     */
+    buildCartDetail?: (params: BuildCardDetailParams) => Promise<CartItem[]>;
+    /**
+     * Calculate landed cost callback for checkout (optional)
+     * @deprecated This is deprecated in favor of the new callback `createCartId`. When using the new callback, the cart details will be retrieved using the cart ID, so this callback would no longer be needed.
+     * @note will attempt to use cart data if available
+     */
+    buildLandedCost?: (params: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
+    /**
+     * A callback that returns the cart id from `cartCreate` mutation. You would use your cart data to call the `cartCreate` mutation and return the cart ID that was created.
+     * @note
+     * The mutation `cartCreate` should be called on the server side
+     * @returns string - Cart ID
+     */
+    createCartId?: () => Promise<string> | string;
+    /**
+     * Callback trigger when the checkout is closed
+     */
+    onClose?: () => void;
+    /**
+     * This callback is optional. If provided, it will be called right before the payment is processed.
+     * @param items - The cart items.
+     * @returns {string | null} - The error message to display to the user. If the message is empty or null, the payment will proceed.
+     * @example
+     * onInventoryCheck: async ({ items }) => {
+     *   // Check if all items are available from the server. If the fetch is throwing an error, show a generic error message "Unable to check inventory. Please try again.".
+     *   const itemsInfo = await fetch('https://yourserver.com/api/get-available-items', {
+     *     method: 'POST',
+     *     body: JSON.stringify({ items }),
+     *   });
+     *   const items = await itemsInfo.json();
+     *   // Filter out unavailable items.
+     *   const unavailableItems = items.filter(item => !item.available);
+     *   if (unavailableItems.length) {
+     *     // Display an error message to the user.
+     *     return `The following items are not available: ${unavailableItems.map(item => item.name).join(', ')}`;
+     *   }
+     *   // Proceed with the payment if you return an empty string or null.
+     *   return '';
+     * }
+     */
+    onInventoryCheck?: (params: {
+        items: CartItem[];
+    }) => Promise<string | null>;
+    /**
+     * Callback trigger when payment succeeds
+     */
+    onOrderSuccess?: (props: {
+        zonosApiRoute: string;
+        zonosOrder: ZonosOrder;
+    }) => Promise<void>;
+};
+
+type CountryOverrideBehavior = 'URL_PARAM' | 'SESSION';
+type ShowForCountries = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
+type ShowCountryList = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
+type HelloConfig = {
+    anchorElementSelector: string;
+    cartUrlPattern: string | null;
+    /**
+     * The behavior to use when determining the country to use for the user.
+     * @default 'URL_PARAM'
+     */
+    countryOverrideBehavior?: CountryOverrideBehavior;
+    currencyBehavior: HelloCurrencyBehavior;
+    currencyElementSelector: string;
+    desktopLocation?: HelloMobileLocation | null;
+    excludedUrlPatterns: Array<string>;
+    homepageUrlPattern: string | null;
+    mobileLocation: HelloMobileLocation | null;
+    mode: Mode;
+    /**
+     * Position of floating hello if `anchorElementSelector` is not found after 3 seconds
+     *
+     * null: don't render if not found
+     *
+     * @default null
+     */
+    notFoundElementFallback: HelloMobileLocation | null;
+    organization: string;
+    peekMessageBehavior: HelloPeekMessageBehavior;
+    peekMessageDelay: number;
+    productAddToCartElementSelector: string | null;
+    productDescriptionElementSelector: string | null;
+    productDetailUrlPattern: string | null;
+    productListUrlPattern: string | null;
+    productTitleElementSelector: string | null;
+    restrictionBehavior: HelloRestrictionBehavior;
+    /**
+     * The countries to include in the country list dropdown of the Hello widget.
+     * @default ONLY_SHIPPABLE
+     */
+    showCountryList?: ShowCountryList;
+    /**
+     * The countries to show the widget for.
+     * @default ONLY_SHIPPABLE
+     */
+    showForCountries?: ShowForCountries;
+    visibilityStatus?: 'ENABLED' | 'DISABLED';
+    /**
+     * Callback function to run after the Hello widget has been initialized. This should be triggered only once when hello is attached to the DOM.
+     * **Note**: If hello is detached from the DOM and reattached, this callback will be called again.
+     * @param params - The parameters containing the country code and currency code that hello is initialized with.
+     */
+    onInitSuccess?: (params: {
+        countryCode: CountryCode;
+        currencyCode: CurrencyCode;
+    }) => Promise<void>;
+};
+
+type AppearanceConfig = {
+    colorPrimary?: string;
+    colorSecondary?: string;
+    fontFamily: string;
+    fontSize2XL?: number;
+    fontSize3XL?: number;
+    fontSizeBase?: number;
+    fontSizeInputLabel?: number;
+    fontSizeInputValue?: number;
+    fontSizeL?: number;
+    fontSizeS?: number;
+    fontSizeXL?: number;
+    fontSizeXS?: number;
+    logoUrl: string;
+    style: ElementsUiStyle;
+    theme: ElementsUiTheme;
+    zonosAttribution: ZonosAttribution | null;
 };
 
 type CustomEventMap = {
@@ -956,6 +1352,10 @@ declare global {
      */
     bcConfig?: unknown;
     /**
+     * This flag would be set to true if zonosQaUrl is present in the query params and preview script loadZonos.js is injected to DOM
+     */
+    isZonosPreview?: boolean;
+    /**
      * A flag to determine if the current page is a BigCommerce page
      */
     stencilBootstrap?: unknown;
@@ -995,10 +1395,10 @@ type SubmitEventData = {
 };
 
 declare const colorPrefixes: readonly ["blue", "cyan", "green", "orange", "purple", "red", "gray", "glass"];
-declare const colorContrasts: readonly ["100", "200", "300", "400", "500", "600", "700", "800", "900", "1000"];
+declare const colorContrasts: readonly ["50", "100", "200", "300", "400", "500", "600", "700", "800", "900", "950"];
 type ColorContrast = (typeof colorContrasts)[number];
 type ColorPrefix = (typeof colorPrefixes)[number];
-type Color = 'gray-0' | 'gray-50' | 'glass-0' | 'glass-50' | `${ColorPrefix}-${ColorContrast}` | 'gray-1100' | 'gray-1200' | 'glass-1100' | 'glass-1200';
+type Color = 'gray-0' | 'gray-50' | 'glass-0' | 'glass-50' | `${ColorPrefix}-${ColorContrast}` | 'gray-1000' | 'glass-1100' | 'glass-1200';
 declare const checkboxColorPrefix: readonly ["blue", "cyan", "green", "orange", "purple", "red", "gray"];
 type CheckboxColorPrefix = (typeof checkboxColorPrefix)[number];
 
@@ -1099,7 +1499,21 @@ declare const textOptions: {
 type TextOptions = typeof textOptions;
 type Size = TextOptions[keyof TextOptions]['size'];
 type Type = keyof TextOptions;
-type FontWeight = TextOptions[keyof TextOptions]['weight'] | 800;
+type FontWeight = TextOptions[keyof TextOptions]['weight'];
+
+type StripeStoreContactOption = {
+    address: {
+        city: string;
+        country: string;
+        line1: string;
+        line2?: string;
+        postal_code: string;
+        state: string;
+    };
+    email: string;
+    name: string;
+    phone?: string;
+};
 
 type NotificationInit = {
     message: string;
@@ -1162,12 +1576,21 @@ type ShippingRichRadioItem = {
     amount: number;
     caption?: string;
     label: string;
+    landedCostId: string;
+    method: IncotermCode;
     price: string;
+    shipmentRatingId: string;
     sublabel?: string;
     value: string | number;
 };
 
 type SpinnerColor = 'primary' | 'info' | 'success' | 'danger' | 'warning' | 'black' | 'white';
+
+type ToggleItem<TValue> = {
+    isDisabled?: boolean;
+    label: string;
+    value: TValue;
+};
 
 type GridSpacing = 0 | 4 | 8 | 12 | 16 | 20 | 24 | 32 | 40;
 
@@ -1271,6 +1694,10 @@ declare namespace Components {
          */
         "bold": boolean;
         /**
+          * Callback for when the badge is dismissed. Also determines if dismiss icon shown.
+         */
+        "dismissHandler"?: () => void;
+        /**
           * The icon element to display
           * @default null
          */
@@ -1280,6 +1707,11 @@ declare namespace Components {
           * @default false
          */
         "iconRight": boolean;
+        /**
+          * Whether or not the badge is loading
+          * @default false
+         */
+        "loading": boolean;
         /**
           * Whether or not the badge is rounded
           * @default false
@@ -1425,6 +1857,14 @@ declare namespace Components {
         "hide": boolean;
     }
     interface ZonosCartSubtotal {
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosCheckbox {
         /**
@@ -1483,6 +1923,10 @@ declare namespace Components {
           * Flag to determine if the checkout is on mobile
          */
         "mobile": boolean;
+        /**
+          * For usage in storybook for a mocked flow.
+         */
+        "mockCheckoutSession": (session: CheckoutSessionDetailsFragment) => Promise<void>;
         /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
          */
@@ -1610,6 +2054,11 @@ declare namespace Components {
          */
         "dialogType": 'alert' | 'confirm';
         /**
+          * Dialog width
+          * @default 350 px
+         */
+        "dialogWidth": number;
+        /**
           * Whether or not the dialog is open
          */
         "isMobile": boolean;
@@ -1642,7 +2091,7 @@ declare namespace Components {
          */
         "overrideConfig": (config: LoadZonosParamsConfig) => Promise<void>;
         /**
-          * Override country code for storybook
+          * Override country code. Used in dashboard create test cart.
          */
         "overrideCountry": (countryCode: CountryCode) => Promise<void>;
         /**
@@ -1684,6 +2133,8 @@ declare namespace Components {
           * @default () => {}
          */
         "handleOnClose": () => void;
+    }
+    interface ZonosCurrencyToggle {
     }
     interface ZonosCustomMessage {
         /**
@@ -1883,7 +2334,7 @@ declare namespace Components {
         "content": string;
         /**
           * Color of the SVG
-          * @default 'gray-1200'
+          * @default 'gray-1000'
          */
         "iconColor": Color | (string & { _placeholder?: never });
         /**
@@ -1948,6 +2399,10 @@ declare namespace Components {
           * Default email for stripe
          */
         "defaultEmail": string | null;
+        /**
+          * Email error text to dispaly
+         */
+        "isEmailError": boolean;
         /**
           * The title text for the authentication element
          */
@@ -2036,13 +2491,14 @@ declare namespace Components {
          */
         "borderStyle"?: ElementsUiStyle;
         /**
-          * Initial selected value
-         */
-        "initialSelectedValue"?: string | number;
-        /**
           * List of items to display
          */
         "items": ShippingRichRadioItem[];
+        /**
+          * Selected item
+          * @default {null|firstItem}
+         */
+        "selectedItem": ShippingRichRadioItem | null;
         /**
           * Theme of the radio item
          */
@@ -2076,6 +2532,16 @@ declare namespace Components {
           * The weight of the text
          */
         "weight"?: FontWeight;
+    }
+    interface ZonosToggle {
+        /**
+          * Options for the toggle
+         */
+        "options": ToggleItem<string>[];
+        /**
+          * The selected option
+         */
+        "value": string;
     }
     interface ZonosTooltip {
         /**
@@ -2173,6 +2639,10 @@ interface ZonosInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosInputElement;
 }
+interface ZonosLinkAuthenticationCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosLinkAuthenticationElement;
+}
 interface ZonosPaypalPaymentCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosPaypalPaymentElement;
@@ -2184,6 +2654,10 @@ interface ZonosShippingCustomEvent<T> extends CustomEvent<T> {
 interface ZonosShippingRichRadioCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosShippingRichRadioElement;
+}
+interface ZonosToggleCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosToggleElement;
 }
 declare global {
     interface HTMLZonosAddressElementEventMap {
@@ -2417,6 +2891,12 @@ declare global {
         prototype: HTMLZonosCountrySelectElement;
         new (): HTMLZonosCountrySelectElement;
     };
+    interface HTMLZonosCurrencyToggleElement extends Components.ZonosCurrencyToggle, HTMLStencilElement {
+    }
+    var HTMLZonosCurrencyToggleElement: {
+        prototype: HTMLZonosCurrencyToggleElement;
+        new (): HTMLZonosCurrencyToggleElement;
+    };
     interface HTMLZonosCustomMessageElement extends Components.ZonosCustomMessage, HTMLStencilElement {
     }
     var HTMLZonosCustomMessageElement: {
@@ -2521,7 +3001,18 @@ declare global {
         prototype: HTMLZonosLinkElement;
         new (): HTMLZonosLinkElement;
     };
+    interface HTMLZonosLinkAuthenticationElementEventMap {
+        "linkAuthenticationChange": void;
+    }
     interface HTMLZonosLinkAuthenticationElement extends Components.ZonosLinkAuthentication, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosLinkAuthenticationElementEventMap>(type: K, listener: (this: HTMLZonosLinkAuthenticationElement, ev: ZonosLinkAuthenticationCustomEvent<HTMLZonosLinkAuthenticationElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosLinkAuthenticationElementEventMap>(type: K, listener: (this: HTMLZonosLinkAuthenticationElement, ev: ZonosLinkAuthenticationCustomEvent<HTMLZonosLinkAuthenticationElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLZonosLinkAuthenticationElement: {
         prototype: HTMLZonosLinkAuthenticationElement;
@@ -2627,6 +3118,23 @@ declare global {
         prototype: HTMLZonosTextElement;
         new (): HTMLZonosTextElement;
     };
+    interface HTMLZonosToggleElementEventMap {
+        "toggleChanged": string;
+    }
+    interface HTMLZonosToggleElement extends Components.ZonosToggle, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosToggleElementEventMap>(type: K, listener: (this: HTMLZonosToggleElement, ev: ZonosToggleCustomEvent<HTMLZonosToggleElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosToggleElementEventMap>(type: K, listener: (this: HTMLZonosToggleElement, ev: ZonosToggleCustomEvent<HTMLZonosToggleElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosToggleElement: {
+        prototype: HTMLZonosToggleElement;
+        new (): HTMLZonosToggleElement;
+    };
     interface HTMLZonosTooltipElement extends Components.ZonosTooltip, HTMLStencilElement {
     }
     var HTMLZonosTooltipElement: {
@@ -2674,6 +3182,7 @@ declare global {
         "zonos-controller": HTMLZonosControllerElement;
         "zonos-country-flag": HTMLZonosCountryFlagElement;
         "zonos-country-select": HTMLZonosCountrySelectElement;
+        "zonos-currency-toggle": HTMLZonosCurrencyToggleElement;
         "zonos-custom-message": HTMLZonosCustomMessageElement;
         "zonos-customer-info": HTMLZonosCustomerInfoElement;
         "zonos-dialog": HTMLZonosDialogElement;
@@ -2696,6 +3205,7 @@ declare global {
         "zonos-shipping-rich-radio": HTMLZonosShippingRichRadioElement;
         "zonos-spinner": HTMLZonosSpinnerElement;
         "zonos-text": HTMLZonosTextElement;
+        "zonos-toggle": HTMLZonosToggleElement;
         "zonos-tooltip": HTMLZonosTooltipElement;
         "zonos-v-stack": HTMLZonosVStackElement;
         "zonos-virtual-scroll": HTMLZonosVirtualScrollElement;
@@ -2810,6 +3320,10 @@ declare namespace LocalJSX {
          */
         "bold"?: boolean;
         /**
+          * Callback for when the badge is dismissed. Also determines if dismiss icon shown.
+         */
+        "dismissHandler"?: () => void;
+        /**
           * The icon element to display
           * @default null
          */
@@ -2819,6 +3333,11 @@ declare namespace LocalJSX {
           * @default false
          */
         "iconRight"?: boolean;
+        /**
+          * Whether or not the badge is loading
+          * @default false
+         */
+        "loading"?: boolean;
         /**
           * Whether or not the badge is rounded
           * @default false
@@ -2964,6 +3483,14 @@ declare namespace LocalJSX {
         "hide"?: boolean;
     }
     interface ZonosCartSubtotal {
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosCheckbox {
         /**
@@ -3149,6 +3676,11 @@ declare namespace LocalJSX {
          */
         "dialogType"?: 'alert' | 'confirm';
         /**
+          * Dialog width
+          * @default 350 px
+         */
+        "dialogWidth"?: number;
+        /**
           * Whether or not the dialog is open
          */
         "isMobile"?: boolean;
@@ -3206,6 +3738,8 @@ declare namespace LocalJSX {
           * @default () => {}
          */
         "handleOnClose"?: () => void;
+    }
+    interface ZonosCurrencyToggle {
     }
     interface ZonosCustomMessage {
         /**
@@ -3388,7 +3922,7 @@ declare namespace LocalJSX {
         "content": string;
         /**
           * Color of the SVG
-          * @default 'gray-1200'
+          * @default 'gray-1000'
          */
         "iconColor"?: Color | (string & { _placeholder?: never });
         /**
@@ -3457,6 +3991,14 @@ declare namespace LocalJSX {
           * Default email for stripe
          */
         "defaultEmail"?: string | null;
+        /**
+          * Email error text to dispaly
+         */
+        "isEmailError"?: boolean;
+        /**
+          * Event emitted when the authentication element changes
+         */
+        "onLinkAuthenticationChange"?: (event: ZonosLinkAuthenticationCustomEvent<void>) => void;
         /**
           * The title text for the authentication element
          */
@@ -3553,10 +4095,6 @@ declare namespace LocalJSX {
          */
         "borderStyle"?: ElementsUiStyle;
         /**
-          * Initial selected value
-         */
-        "initialSelectedValue"?: string | number;
-        /**
           * List of items to display
          */
         "items": ShippingRichRadioItem[];
@@ -3564,6 +4102,11 @@ declare namespace LocalJSX {
           * Event emitted when an item is selected
          */
         "onRadioSelected"?: (event: ZonosShippingRichRadioCustomEvent<ShippingRichRadioItem>) => void;
+        /**
+          * Selected item
+          * @default {null|firstItem}
+         */
+        "selectedItem"?: ShippingRichRadioItem | null;
         /**
           * Theme of the radio item
          */
@@ -3597,6 +4140,20 @@ declare namespace LocalJSX {
           * The weight of the text
          */
         "weight"?: FontWeight;
+    }
+    interface ZonosToggle {
+        /**
+          * Event emitted when the toggle changes
+         */
+        "onToggleChanged"?: (event: ZonosToggleCustomEvent<string>) => void;
+        /**
+          * Options for the toggle
+         */
+        "options"?: ToggleItem<string>[];
+        /**
+          * The selected option
+         */
+        "value": string;
     }
     interface ZonosTooltip {
         /**
@@ -3669,6 +4226,7 @@ declare namespace LocalJSX {
         "zonos-controller": ZonosController;
         "zonos-country-flag": ZonosCountryFlag;
         "zonos-country-select": ZonosCountrySelect;
+        "zonos-currency-toggle": ZonosCurrencyToggle;
         "zonos-custom-message": ZonosCustomMessage;
         "zonos-customer-info": ZonosCustomerInfo;
         "zonos-dialog": ZonosDialog;
@@ -3691,6 +4249,7 @@ declare namespace LocalJSX {
         "zonos-shipping-rich-radio": ZonosShippingRichRadio;
         "zonos-spinner": ZonosSpinner;
         "zonos-text": ZonosText;
+        "zonos-toggle": ZonosToggle;
         "zonos-tooltip": ZonosTooltip;
         "zonos-v-stack": ZonosVStack;
         "zonos-virtual-scroll": ZonosVirtualScroll;
@@ -3723,6 +4282,7 @@ declare module "@stencil/core" {
             "zonos-controller": LocalJSX.ZonosController & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
             "zonos-country-flag": LocalJSX.ZonosCountryFlag & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
             "zonos-country-select": LocalJSX.ZonosCountrySelect & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
+            "zonos-currency-toggle": LocalJSX.ZonosCurrencyToggle & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
             "zonos-custom-message": LocalJSX.ZonosCustomMessage & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
             "zonos-customer-info": LocalJSX.ZonosCustomerInfo & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
             "zonos-dialog": LocalJSX.ZonosDialog & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
@@ -3745,6 +4305,7 @@ declare module "@stencil/core" {
             "zonos-shipping-rich-radio": LocalJSX.ZonosShippingRichRadio & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
             "zonos-spinner": LocalJSX.ZonosSpinner & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
             "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
+            "zonos-toggle": LocalJSX.ZonosToggle & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
             "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
             "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
             /**
@@ -3757,338 +4318,13 @@ declare module "@stencil/core" {
     }
 }
 
-type CalculateLandedCostRequest = {
-    billingAddress: {
-        addressLine1: string;
-        addressLine2?: string | undefined;
-        city: string;
-        country: string;
-        postalCode: string;
-        state: string;
-    };
-    billingContact: {
-        firstName: string;
-        lastName: string;
-        phone: string;
-    };
-    checkoutSessionId: string;
-    contact: {
-        email?: string;
-        firstName: string;
-        lastName: string;
-        phone: string;
-    };
-    items: CartItem[];
-    landedCostAdjustments?: {
-        amount: number;
-        productId: string | null;
-        sku: string | null;
-        type: LandedCostAdjustmentType;
-    }[];
-    metadata?: {
-        key: string;
-        value: string;
-    }[];
-    shippingAddress: {
-        addressLine1: string;
-        addressLine2?: string | undefined;
-        city: string;
-        country: string;
-        postalCode: string;
-        state: string;
-    };
+type NormalizedItemAttribute = {
+    key: string;
+    value: string;
 };
-
-type CountryOverrideBehavior = 'URL_PARAM' | 'SESSION';
-type ShowForCountries = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
-type ShowCountryList = 'ALL' | 'ONLY_SHIPPABLE' | CountryCode[];
-type HelloConfig = {
-    anchorElementSelector: string;
-    cartUrlPattern: string | null;
-    /**
-     * The behavior to use when determining the country to use for the user.
-     * @default 'URL_PARAM'
-     */
-    countryOverrideBehavior?: CountryOverrideBehavior;
-    currencyBehavior: HelloCurrencyBehavior;
-    currencyElementSelector: string;
-    desktopLocation?: HelloMobileLocation | null;
-    excludedUrlPatterns: Array<string>;
-    homepageUrlPattern: string | null;
-    mobileLocation: HelloMobileLocation | null;
-    mode: Mode;
-    organization: string;
-    peekMessageBehavior: HelloPeekMessageBehavior;
-    peekMessageDelay: number;
-    productAddToCartElementSelector: string | null;
-    productDescriptionElementSelector: string | null;
-    productDetailUrlPattern: string | null;
-    productListUrlPattern: string | null;
-    productTitleElementSelector: string | null;
-    restrictionBehavior: HelloRestrictionBehavior;
-    /**
-     * The countries to include in the country list dropdown of the Hello widget.
-     * @default ONLY_SHIPPABLE
-     */
-    showCountryList?: ShowCountryList;
-    /**
-     * The countries to show the widget for.
-     * @default ONLY_SHIPPABLE
-     */
-    showForCountries?: ShowForCountries;
-    visibilityStatus?: 'ENABLED' | 'DISABLED';
-    /**
-     * Callback function to run after the Hello widget has been initialized. This should be triggered only once when hello is attached to the DOM.
-     * **Note**: If hello is detached from the DOM and reattached, this callback will be called again.
-     * @param params - The parameters containing the country code and currency code that hello is initialized with.
-     */
-    onInitSuccess?: (params: {
-        countryCode: CountryCode;
-        currencyCode: CurrencyCode;
-    }) => Promise<void>;
-};
-
-type StripeStoreContactOption = {
-    address: {
-        city: string;
-        country: string;
-        line1: string;
-        line2?: string;
-        postal_code: string;
-        state: string;
-    };
-    email: string;
-    name: string;
-    phone?: string;
-};
-
-type TabItem = {
-    index: number;
-    isDone: boolean;
-    label: 'Customer' | 'Delivery' | 'Payment';
-    value: 'customer-info' | 'shipping' | 'payment';
-};
-type TabItems = Record<TabItem['value'], TabItem>;
-type ItemMeasurement = {
-    /** Indicates what type of `Measurement`, e.g. weight, specific dim unit. */
-    type?: ItemMeasurementType;
-    /** Indicates the `Measurement` units to be used. */
-    unitOfMeasure?: ItemUnitOfMeasure;
-    /** The `Measurement` value. */
-    value?: number;
-};
-type CartItem = {
-    amount: number;
-    attributes?: {
-        key: string;
-        value: string;
-    }[];
-    countryOfOrigin?: string;
-    currencyCode: string;
-    description?: string;
-    hsCode?: string;
-    imageUrl?: string;
-    itemType?: ItemType;
-    measurements?: ItemMeasurement[];
-    metadata?: {
-        key: string;
-        value: string;
-    }[];
-    name: string;
-    productId?: string;
-    quantity: number;
-    sku?: string;
-};
-
-type BuildLandedCostParams = {
-    billingAddress: CalculateLandedCostRequest['billingAddress'];
-    billingContact: CalculateLandedCostRequest['billingContact'];
-    checkoutSessionId: string;
-    contact: CalculateLandedCostRequest['contact'];
-    shippingAddress: CalculateLandedCostRequest['shippingAddress'];
-    zonosApiRoute: string;
-};
-type BuildLandedCostResponse = (CalculateLandedCostMutation & {
-    errors?: {
-        message: string;
-    }[];
-}) | null;
-
-type ZonosOrder = GetOrderQuery['order'];
-
-type BuildCardDetailParams = {
-    countryCode: CountryCode;
-    currencyCode: CurrencyCode;
-};
-type CheckoutConfig = {
-    /**
-     * Validate address to allow specific character sets
-     * @default ALL
-     */
-    allowedCharacterSets?: 'ALL' | 'LATIN';
-    analyticsProviders: Array<{
-        status: AnalyticsProviderStatus;
-        type: AnalyticsProviderType;
-    }>;
-    /**
-     * @default false - when false, we disable the place order button until the script is loaded
-     * @note if set to true, we will not enable or disable the place order button
-     */
-    disablePlaceOrderButtonActivation?: boolean;
-    externalPaymentMethods: Array<{
-        status: ExternalPaymentMethodStatus;
-        type: ExternalPaymentMethodType;
-    }> | null;
-    externalServiceTokens: {
-        token: string;
-        type: ExternalServiceTokenType;
-    }[];
-    /**
-     * Test mode for checkout (sandbox or production)
-     * @default TEST
-     */
-    mode: Mode;
-    orderNotifications: {
-        abandonedCart: {
-            delay: number;
-            discountPercent: number;
-            status: {
-                active: NotificationActiveStatus;
-                sendCopiesTo: Array<string>;
-            };
-        };
-        orderCancelled: {
-            active: NotificationActiveStatus;
-            sendCopiesTo: Array<string>;
-        };
-        orderConfirmation: {
-            active: NotificationActiveStatus;
-            sendCopiesTo: Array<string>;
-        } | null;
-        orderShipped: {
-            active: NotificationActiveStatus;
-            sendCopiesTo: Array<string>;
-        };
-    };
-    organization: string;
-    placeOrderButtonSelector: string | null;
-    /**
-     * @param subscriptionStatus subscription status for checkout, checkout only available if subscription status is ENABLED and visibility status is ENABLED
-     *
-     * **NOTE: this value can't be overridden in Zonos.init**
-     */
-    subscriptionStatus: CheckoutSubscriptionStatus;
-    successBehavior: CheckoutSuccessBehavior;
-    /**
-     * The success page action text for checkout.
-     * @note Default text supports translation automatically, but any custom text will not be translated.
-     */
-    successPageActionText?: string;
-    /**
-     * The success page subtitle text for checkout. Each item in the array will appear on a new line.
-     * @note Default text supports translation automatically, but any custom text will not be translated.
-     */
-    successPageSubtitleText?: string[];
-    /**
-     * The success page title text for checkout.
-     * @note Default text supports translation automatically, but any custom text will not be translated.
-     */
-    successPageTitleText?: string;
-    successRedirectUrl: string;
-    visibilityStatus: CheckoutVisibilityStatus;
-    /**
-     * Cart info callback for checkout (optional),
-     * @deprecated
-     * @note
-     * This function is deprecated in favor of new API `createCartId`
-     * @note will attempt to use cart data if available
-     * User can dispatch an event 'zonos--init-cart-info' to update the cart
-     * @example
-     * const initEvent = new CustomEvent<CartItem[]>('zonos--init-cart-info', {
-     *    detail: cartItems,
-     * });
-     * document.body.dispatchEvent(initEvent);
-     * @returns {object[]} - object with the the item info to be added to cart:
-     * - amount: number;
-     * - countryOfOrigin?: string;
-     * - currencyCode: string;
-     * - description?: string;
-     * - hsCode?: string;
-     * - imageUrl?: string;
-     * - name: string;
-     * - productId?: string;
-     * - quantity: number;
-     */
-    buildCartDetail?: (params: BuildCardDetailParams) => Promise<CartItem[]>;
-    /**
-     * Calculate landed cost callback for checkout (optional)
-     * @deprecated
-     * @note
-     * This function is deprecated in favor of new API `createCartId`
-     * @note will attempt to use cart data if available
-     */
-    buildLandedCost?: (params: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
-    /**
-     * Callback that returns the cart id from `cartCreate` mutation.
-     * @note
-     * The mutation `cartCreate` is preferred to be called in the server side
-     * @returns string - Cart ID
-     */
-    createCartId?: () => Promise<string> | string;
-    /**
-     * Callback trigger when the checkout is closed
-     */
-    onClose?: () => void;
-    /**
-     * This callback is optional. If provided, it will be called right before the payment is processed.
-     * @param items - The cart items.
-     * @returns {string | null} - The error message to display to the user. If the message is empty or null, the payment will proceed.
-     * @example
-     * onInventoryCheck: async ({ items }) => {
-     *   // Check if all items are available from the server. If the fetch is throwing an error, we will show a generic error message "Unable to check inventory. Please try again.".
-     *   const itemsInfo = await fetch('https://yourserver.com/api/get-available-items', {
-     *     method: 'POST',
-     *     body: JSON.stringify({ items }),
-     *   });
-     *   const items = await itemsInfo.json();
-     *   // Filter out unavailable items.
-     *   const unavailableItems = items.filter(item => !item.available);
-     *   if (unavailableItems.length) {
-     *     // Display an error message to the user.
-     *     return `The following items are not available: ${unavailableItems.map(item => item.name).join(', ')}`;
-     *   }
-     *   // Proceed with the payment if you return an empty string or null.
-     *   return '';
-     * }
-     */
-    onInventoryCheck?: (params: {
-        items: CartItem[];
-    }) => Promise<string | null>;
-    /**
-     * Callback trigger when payment succeeds
-     */
-    onOrderSuccess?: (props: {
-        zonosApiRoute: string;
-        zonosOrder: ZonosOrder;
-    }) => Promise<void>;
-};
-
-type AppearanceConfig = {
-    colorPrimary?: string;
-    colorSecondary?: string;
-    fontFamily: string;
-    logoUrl: string;
-    style: ElementsUiStyle;
-    theme: ElementsUiTheme;
-    zonosAttribution: ZonosAttribution | null;
-};
-
 type NormalizedTempCartItem = {
     amount: number;
-    attributes: {
-        key: string;
-        value: string;
-    }[];
+    attributes: NormalizedItemAttribute[];
     countryOfOrigin: CountryCode | null;
     currencyCode: CurrencyCode;
     description: string | null;
@@ -4109,13 +4345,20 @@ type NormalizedTempCart = {
     adjustments: {
         amount: number;
         currencyCode: CurrencyCode;
-        description: string;
+        description: string | null;
         productId: string | null;
+        promoCode?: string | null;
         sku: string | null;
         type: CartAdjustmentType;
     }[];
+    createdAt: string;
     credentialToken: string;
+    id: string;
     items: NormalizedTempCartItem[];
+    metadata: {
+        key: string;
+        value: string;
+    }[];
     storeBaseUrl: string;
     storeId: number;
 };
@@ -4301,6 +4544,7 @@ interface Zonos {
      * @default false
      */
     debug?: boolean;
+    domain: string;
     doneInit: boolean;
     isBigCommerce: boolean;
     /**
@@ -4315,6 +4559,12 @@ interface Zonos {
      * Version release timestamp
      */
     releaseDate: string;
+    /**
+     * Show toggle on checkout modal to show amount in base or foreign currency.
+     * Set this to true or set param `zonosShowBaseForeign=1` in url to show the toggle
+     * @default false
+     */
+    showBaseForeign: boolean;
     storeId: number;
     /** Stripe instance */
     stripe: Stripe;
@@ -4325,6 +4575,7 @@ interface Zonos {
      */
     zonosConversionTest?: boolean;
     zonosQaUrl: string | null;
+    zonosQaUrlApi: string | null;
     displayCurrency: () => void;
     getCurrentTimestamp: () => number;
     init: (params: LoadZonosParams) => Promise<void>;
@@ -4345,11 +4596,14 @@ declare abstract class Zonos {
     static isBigCommerce: boolean;
     static releaseDate: string;
     static isLegacyCheckout: boolean;
+    static domain: string;
+    static showBaseForeign: boolean;
     /**
      * By default, the package will load from npm
      */
     static isNpm: boolean;
     static zonosQaUrl: string | null;
+    static zonosQaUrlApi: string | null;
     static version: string;
     static modeAlerted: boolean;
     static cartData: NormalizedTempCart | null;
@@ -4357,7 +4611,7 @@ declare abstract class Zonos {
     static getCurrentTimestamp: () => number;
     static cartId: string | null;
     private static zonosController;
-    static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
+    static init: (params: LoadZonosParams) => Promise<void>;
     static displayCurrency: () => void;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;

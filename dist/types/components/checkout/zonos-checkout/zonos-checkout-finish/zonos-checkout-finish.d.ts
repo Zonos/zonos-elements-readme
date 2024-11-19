@@ -1,7 +1,7 @@
 import { type EventEmitter } from '../../../../stencil-public-runtime';
 import type { PaymentIntent } from '@stripe/stripe-js';
 import type { ZonosOrder } from "../../../../types/checkout/CheckoutConfig";
-import type { ElementsUiStyle } from "../../../../types/generated/graphql.customer.types";
+import type { ElementsUiStyle } from "../../../../types/generated/graphql.internal.types";
 export declare class ZonosCheckoutFinish {
     /**
      * The border radius style of the dialog
@@ -32,12 +32,17 @@ export declare class ZonosCheckoutFinish {
     order: ZonosOrder | null;
     private pullOrder;
     private redirectToUrl;
+    /**
+     * It would make more sense to have keep shopping button if the success behavior is not redirecting to a different page
+     */
+    private shouldRenderKeepShoppingButton;
     private handleSuccessBehavior;
     private getPullOrder;
     private useOverrideSuccessNotification;
     private checkStripePaymentStatus;
     private checkPaypalPaymentStatus;
     private closeClickHandler;
+    private saveOrderIdForDuplicationIssue;
     componentDidLoad(): void;
     render(): any;
 }

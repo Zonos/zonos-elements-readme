@@ -1,5 +1,5 @@
 type LoadEventName = 'vercel' | 'jsdelivr' | 'unpkg' | 'cdnjs';
-export type LogLoadScriptRequestBody = {
+export type LogLoadScriptRequest = {
     cache: 'hit' | 'miss';
     cdnLoadTime?: number;
     eventName: LoadEventName;

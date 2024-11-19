@@ -1,6 +1,6 @@
 import type { StripeAddressElementChangeEvent } from '@stripe/stripe-js';
 import type { containsNonLatinChars } from "../containsNonLatinChars";
-import type { ValidateAddressRequestBody } from "../../../types/checkout/api/ValidateAddressRequest";
+import type { ValidateAddressRequest } from "../../../types/checkout/api/ValidateAddress";
 type Params = {
     addressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
     billingAddressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
@@ -20,7 +20,7 @@ type Params = {
  * @param {StripeAddressEventData} params.stripeBillingAddressEventData - The Stripe event data for the billing address.
  * @param {boolean} params.stripeShippingSameAsBilling - A flag indicating whether the shipping address is the same as the billing address.
  *
- * @returns {ValidateAddressRequestBody | null} - An object that contains the address fields that have invalid characters, the destination country, and the first and last name. If the conditions are not met, the function returns null.
+ * @returns {ValidateAddressRequest | null} - An object that contains the address fields that have invalid characters, the destination country, and the first and last name. If the conditions are not met, the function returns null.
  */
-export declare const buildTranslateRequestBody: ({ addressInvalidCharactersList, billingAddressInvalidCharactersList, stripeAddressEventData, stripeBillingAddressEventData, stripeShippingSameAsBilling, }: Params) => ValidateAddressRequestBody | null;
+export declare const buildTranslateRequest: ({ addressInvalidCharactersList, billingAddressInvalidCharactersList, stripeAddressEventData, stripeBillingAddressEventData, stripeShippingSameAsBilling, }: Params) => ValidateAddressRequest | null;
 export {};

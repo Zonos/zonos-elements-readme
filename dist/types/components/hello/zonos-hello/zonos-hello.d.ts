@@ -1,5 +1,5 @@
 import { type AppearanceConfig } from "../../store/zonosStore";
-import type { HelloMobileLocation } from "../../../types/generated/graphql.customer.types";
+import type { HelloMobileLocation } from "../../../types/generated/graphql.internal.types";
 import type { Product } from "../../../types/hello/Product";
 import type { RestrictedItem } from "../../../types/hello/RestrictedItem";
 import type { ICountryJson } from "../../../types/ICountryJson";

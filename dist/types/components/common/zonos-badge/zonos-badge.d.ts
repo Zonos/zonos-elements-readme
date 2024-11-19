@@ -30,5 +30,14 @@ export declare class ZonosBadge {
      * @default false
      */
     rounded: boolean;
+    /**
+     * Whether or not the badge is loading
+     * @default false
+     */
+    loading: boolean;
+    /**
+     * Callback for when the badge is dismissed. Also determines if dismiss icon shown.
+     */
+    dismissHandler?: () => void;
     render(): any;
 }

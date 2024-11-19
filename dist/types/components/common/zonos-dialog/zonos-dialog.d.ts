@@ -1,5 +1,5 @@
 import { type EventEmitter } from '../../../stencil-public-runtime';
-import type { ElementsUiStyle } from "../../../types/generated/graphql.customer.types";
+import type { ElementsUiStyle } from "../../../types/generated/graphql.internal.types";
 export declare class ZonosDialog {
     /**
      * Whether or not the dialog is open

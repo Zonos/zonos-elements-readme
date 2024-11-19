@@ -1,14 +1,6 @@
-import type { CountryCode } from "../../../types/generated/graphql.customer.types";
-type Item = {
-    description: string;
-    name: string;
-};
-export declare const checkItemRestrictions: ({ items, shipFrom, shipTo, }: {
-    items: Item[];
-    shipFrom: CountryCode;
-    shipTo: CountryCode;
-}) => Promise<{
-    action: import("src/types/generated/graphql.customer.types").ItemRestrictionAction | null;
+import type { CheckItemRestrictionRequest } from "../../../types/hello/RestrictedItem";
+export declare const checkItemRestrictions: ({ items, shipFrom, shipTo, }: CheckItemRestrictionRequest) => Promise<{
+    action: import("src/types/generated/graphql.internal.types").ItemRestrictionAction | null;
     id: string;
     itemDescription: string | null;
     itemRestrictions: ({
@@ -16,7 +8,6 @@ export declare const checkItemRestrictions: ({ items, shipFrom, shipTo, }: {
         id: string;
         note: string;
         sources: (string | null)[] | null;
-        type: import("src/types/generated/graphql.customer.types").ItemRestrictionType;
+        type: import("src/types/generated/graphql.internal.types").ItemRestrictionType;
     } | null)[] | null;
 }[]>;
-export {};

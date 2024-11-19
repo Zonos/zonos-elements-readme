@@ -18,6 +18,7 @@ export declare class ZonosShipping {
      */
     continueClicked: EventEmitter<void>;
     selectedShippingMethod: ShippingRichRadioItem | null;
+    collapsedDAPOptions: boolean;
     /**
      * Whether or not the user is selecting a shipping method
      */
@@ -27,14 +28,22 @@ export declare class ZonosShipping {
      * @default false
      */
     showErrorBanner: boolean;
-    serviceLevels: ShippingRichRadioItem[];
+    serviceLevelsDDP: ShippingRichRadioItem[];
+    serviceLevelsDAP: ShippingRichRadioItem[];
+    serviceLevelsOther: ShippingRichRadioItem[];
+    serviceLevelsAll: ShippingRichRadioItem[];
+    displayBaseCurrency: boolean;
     private handleRadioSelected;
     private handleValidate;
+    private isOutdatedShippingData;
     /**
      * handler for continue button click
      */
     private continueClickHandler;
+    private getLandedCostMethodLabelSuffix;
     private initServiceLevels;
+    private isCurrencyToggled;
+    private preselectFirstShippingMethod;
     componentWillLoad(): void;
     render(): any;
 }

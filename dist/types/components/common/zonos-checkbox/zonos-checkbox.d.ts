@@ -1,5 +1,5 @@
 import { type EventEmitter } from '../../../stencil-public-runtime';
-import type { ElementsUiStyle } from "../../../types/generated/graphql.customer.types";
+import type { ElementsUiStyle } from "../../../types/generated/graphql.internal.types";
 import type { CheckboxColorPrefix } from "../../../types/styles/Color";
 import type { Size } from "../../../types/styles/Text";
 export declare class ZonosCheckbox {

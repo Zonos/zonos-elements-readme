@@ -1,21 +1,20 @@
 /// <reference types="node" />
-import { stripeStoreUpdateCheckoutSession } from "./stripe";
-import type { CalculateLandedCostMutation, CartQuery, CheckoutPresentmentFragment, CurrencyCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.customer.types";
+import type { CalculateLandedCostMutation, CartQuery, CheckoutPresentmentFragment, CheckoutSessionDetailsFragment, CountryCode, CurrencyCode, IncotermCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.internal.types";
 type Step = 'customer-info' | 'shipping' | 'payment' | 'finish' | 'error';
 export type TabItem = {
     index: number;
     isDone: boolean;
-    label: 'Customer' | 'Delivery' | 'Payment';
+    label: 'Customer' | 'Shipping' | 'Payment';
     value: 'customer-info' | 'shipping' | 'payment';
 };
 export type TabItems = Record<TabItem['value'], TabItem>;
 export type ItemMeasurement = {
     /** Indicates what type of `Measurement`, e.g. weight, specific dim unit. */
-    type?: ItemMeasurementType;
+    type: ItemMeasurementType;
     /** Indicates the `Measurement` units to be used. */
-    unitOfMeasure?: ItemUnitOfMeasure;
+    unitOfMeasure: ItemUnitOfMeasure;
     /** The `Measurement` value. */
-    value?: number;
+    value: number;
 };
 type MappedCheckoutLandedCost = CheckoutPresentmentFragment & {
     landedCost: LandedCostFragment;
@@ -31,8 +30,8 @@ export type CartItem = {
         key: string;
         value: string;
     }[];
-    countryOfOrigin?: string;
-    currencyCode: string;
+    countryOfOrigin?: CountryCode;
+    currencyCode: CurrencyCode;
     description?: string;
     hsCode?: string;
     imageUrl?: string;
@@ -57,6 +56,10 @@ type CartStore = {
      * Adjustments from cart
      */
     adjustments: CartAdjustment[];
+    /**
+     * Remove ID type from this so it is forced to be used from the `checkoutSessionId` which could also be loaded from session storage.
+     */
+    checkoutSession: Omit<CheckoutSessionDetailsFragment, 'id'> | null;
     checkoutSessionId: string | null;
     /**
      * Checkout session timeout
@@ -64,7 +67,15 @@ type CartStore = {
     checkoutSessionTimeoutShow: boolean;
     checkoutTimeoutInterval: NodeJS.Timeout | null;
     currency: CurrencyCode;
-    dutiesTaxFees: number;
+    /**
+     * Toggle to show the amount in base currency instead. Only applicable when url param `zonosShowBaseForeign` is set
+     */
+    displayBaseCurrency: boolean;
+    dutiesTaxesFees: number | null;
+    /**
+     * For DAP
+     */
+    dutiesTaxesFeesEstimate: number | null;
     error: {
         messages: string[];
         title: string;
@@ -76,6 +87,7 @@ type CartStore = {
         targetCurrencyCode: CurrencyCode;
         type: string;
     } | null;
+    externalConfirmationPageURL: string | null;
     /**
      * Inventory check error message. When this error message is not null, we will show the inventory check error modal
      */
@@ -84,13 +96,23 @@ type CartStore = {
     isSelectedShippingGuarantee: boolean;
     items: CartItemToUse[];
     landedCostData: MappedCheckoutLandedCost[] | null;
+    landedCostMethod: IncotermCode;
+    promoCode: string;
+    /**
+     * Only show promo code error when promo code applied clicked by user
+     */
+    promoCodeApplied: boolean;
+    promoCodeError: boolean;
     restrictedItems: RestrictedItem[];
     selectedLandedCost: MappedCheckoutLandedCost | null;
     selectedShippingOption: ShipmentRatingFragment | null;
-    selectedShippingOptionExpectedDate: string;
     selectedShippingOptionTransitTime: string;
     shipping: number;
     shippingData: ShipmentRatingFragment[] | null;
+    /**
+     * Hide discount input or not
+     */
+    shouldHideDiscountInput: boolean;
     step: Step;
     subtotal: number;
     tabItems: TabItems;
@@ -105,10 +127,10 @@ declare const cartStore: CartStore;
  * - minTransit: 3
  */
 declare const cartStoreGetShippingTransitInfo: (item: ShipmentRatingFragment) => {
-    expectedDate: string;
-    maxTransit: string | number;
-    minTransit: string | number;
-};
+    maxTransit: number;
+    minTransit: number;
+    unit: string;
+} | null;
 /**
  * Check and set restricted items in cart
  */
@@ -116,7 +138,7 @@ declare const cartStoreCheckItemRestrictions: (itemsWorkflow: ItemWorkflowInfo[]
     cartItems: CartItemToUse[];
     restrictedItems: {
         restriction: {
-            action: import("src/types/generated/graphql.customer.types").RestrictedItemAction;
+            action: import("src/types/generated/graphql.internal.types").RestrictedItemAction;
             reason: string;
         };
         amount: number;
@@ -128,6 +150,7 @@ declare const cartStoreCheckItemRestrictions: (itemsWorkflow: ItemWorkflowInfo[]
         id: string;
         imageUrl: string | null;
         name: string | null;
+        productId: string;
         quantity: number;
         sku: string | null;
         matchedItem: CartItemToUse | undefined;
@@ -153,14 +176,17 @@ type CartSubtotals = {
     shipping: number;
     total: number;
 };
-declare const cartStoreApplySubtotals: (subtotals: CartSubtotals) => void;
-type CartStoreRecalculateTotalParams = Omit<Parameters<typeof stripeStoreUpdateCheckoutSession>[0], 'id' | 'presentmentCountryCode'>;
+declare const cartStoreApplySubtotals: ({ dutiesTaxesFeesEstimate, method, subtotals, }: {
+    dutiesTaxesFeesEstimate?: number;
+    method: IncotermCode;
+    subtotals: CartSubtotals;
+}) => void;
 /**
  * Detect if there are any items in cart that are not restricted and have positive amount, exclude negative amount items
  */
 declare const cartStoreHasOneEligibleItem: () => boolean;
-declare const cartStoreReCalculateTotal: ({ adjustmentAmount, cartId, currency, itemsAmount, landedCostId, }: CartStoreRecalculateTotalParams) => Promise<boolean>;
-declare const cartStoreUpdateSelectedShippingOption: (selectedShippingOption: ShipmentRatingFragment) => Promise<boolean>;
+declare const cartStoreSetCheckoutSession: (checkoutSession: CheckoutSessionDetailsFragment) => void;
+declare const cartStoreUpdateSelectedShippingOption: (selectedShippingOption: ShipmentRatingFragment, landedCostId: string) => Promise<boolean>;
 declare const cartStoreStartCheckoutInterval: ({ isPreview, sessionTimeout, }: {
     isPreview: boolean;
     /**
@@ -174,6 +200,7 @@ declare const cartStoreUpdateItems: ({ adjustments, cartItems, }: {
     adjustments: CartAdjustment[];
     cartItems: CartItem[];
 }) => Promise<void>;
+declare const cartStorePreviousStep: () => void;
 declare const cartStoreNextStep: () => void;
 declare const cartStoreResetTabItems: () => void;
-export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreClearCheckoutInterval, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreNextStep, cartStoreReCalculateTotal, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreStartCheckoutInterval, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateToErrorState, };
+export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreClearCheckoutInterval, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreNextStep, cartStorePreviousStep, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreSetCheckoutSession, cartStoreStartCheckoutInterval, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateToErrorState, };

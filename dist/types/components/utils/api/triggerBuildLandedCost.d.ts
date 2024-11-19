@@ -1,10 +1,11 @@
-import type { CalculateLandedCostRequest } from "../../../types/checkout/api/CalculateLandedCostRequest";
-import type { CalculateLandedCostMutation } from "../../../types/generated/graphql.customer.types";
+import type { CalculateLandedCostRequest } from "../../../types/checkout/api/CalculateLandedCost";
+import type { CalculateLandedCostMutation } from "../../../types/generated/graphql.internal.types";
 export type BuildLandedCostParams = {
     billingAddress: CalculateLandedCostRequest['billingAddress'];
     billingContact: CalculateLandedCostRequest['billingContact'];
     checkoutSessionId: string;
     contact: CalculateLandedCostRequest['contact'];
+    landedCostAdjustments?: CalculateLandedCostRequest['landedCostAdjustments'];
     shippingAddress: CalculateLandedCostRequest['shippingAddress'];
     zonosApiRoute: string;
 };

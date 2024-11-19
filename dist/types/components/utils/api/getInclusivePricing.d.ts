@@ -1,5 +1,5 @@
 import type { CountryCode } from "../../../types/index";
-import type { InclusivePriceSettingFieldsFragment } from "../../../types/generated/graphql.customer.types";
+import type { InclusivePriceSettingFieldsFragment } from "../../../types/generated/graphql.internal.types";
 export type ZonosInclusivePriceSetting = {
     setting: InclusivePriceSettingFieldsFragment | null;
 };

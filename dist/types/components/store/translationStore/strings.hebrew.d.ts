@@ -1,5 +1,14 @@
 export declare const stringsHebrew: {
+    ' (Duties due at door)': {
+        value: string;
+    };
+    ' (Duties prepaid)': {
+        value: string;
+    };
     'Above de minimis threshold for': {
+        value: string;
+    };
+    'Add promotional code': {
         value: string;
     };
     Address: {
@@ -12,6 +21,9 @@ export declare const stringsHebrew: {
         value: string;
     };
     'An unexpected error occurred when processing PayPal order.': {
+        value: string;
+    };
+    Apply: {
         value: string;
     };
     'Are you sure?': {
@@ -74,10 +86,16 @@ export declare const stringsHebrew: {
     "Don't close": {
         value: string;
     };
+    'Due at delivery': {
+        value: string;
+    };
     'Duties & taxes in Australia, VAT or GST is [percentage] and is due on all orders.': {
         value: string;
     };
     'Duties and taxes will be applied to items and shipping.': {
+        value: string;
+    };
+    'Duties and taxes will be charged upon delivery.': {
         value: string;
     };
     'Duties will apply to all orders.': {
@@ -93,6 +111,9 @@ export declare const stringsHebrew: {
         value: string;
     };
     'Error updating Checkout': {
+        value: string;
+    };
+    Estimated: {
         value: string;
     };
     'Expected delivery': {
@@ -114,6 +135,18 @@ export declare const stringsHebrew: {
         value: string;
     };
     Hide: {
+        value: string;
+    };
+    'Hide non-prepaid options': {
+        value: string;
+    };
+    'Invalid promo code': {
+        value: string;
+    };
+    'It looks like you placed an order just a few minutes ago ([date] at [time]) under order number #[orderNumber]. Check your email for the order confirmation. Are you sure you want to place another order?': {
+        value: string;
+    };
+    'It looks like you placed an order just a few minutes ago ([date] at [time]). Check your email for the order confirmation. Are you sure you want to place another one?': {
         value: string;
     };
     'Keep shopping': {
@@ -146,7 +179,16 @@ export declare const stringsHebrew: {
     'No shipping methods found - try editing your address or contacting support if the error persists': {
         value: string;
     };
+    'Nothing due at delivery': {
+        value: string;
+    };
     'Nothing due at the door': {
+        value: string;
+    };
+    OK: {
+        value: string;
+    };
+    'Order complete!': {
         value: string;
     };
     'Order total': {
@@ -182,6 +224,9 @@ export declare const stringsHebrew: {
     'Please ensure your text uses the Latin alphabet only (A-Z, a-z).': {
         value: string;
     };
+    'Please enter a valid email address.': {
+        value: string;
+    };
     'Postal code': {
         value: string;
     };
@@ -189,6 +234,9 @@ export declare const stringsHebrew: {
         value: string;
     };
     'Prepay duties and taxes at checkout': {
+        value: string;
+    };
+    'Proceed with order': {
         value: string;
     };
     'Product prices already include duties and fees. No additional duties or fees will be added at checkout, with rare exceptions.': {
@@ -212,6 +260,9 @@ export declare const stringsHebrew: {
     'Product prices already include taxes. No additional taxes will be added at checkout, with rare exceptions.': {
         value: string;
     };
+    Quantity: {
+        value: string;
+    };
     Reload: {
         value: string;
     };
@@ -222,6 +273,9 @@ export declare const stringsHebrew: {
         value: string;
     };
     'Return to cart': {
+        value: string;
+    };
+    'Return to merchant site': {
         value: string;
     };
     'Search countries': {
@@ -248,7 +302,13 @@ export declare const stringsHebrew: {
     'Shipping method': {
         value: string;
     };
+    'Shopping cart expired': {
+        value: string;
+    };
     Show: {
+        value: string;
+    };
+    'Show non-prepaid options': {
         value: string;
     };
     'Something went wrong.': {
@@ -279,6 +339,9 @@ export declare const stringsHebrew: {
         value: string;
     };
     'The following items are unable to be shipped to your country and are not included in your cart total.': {
+        value: string;
+    };
+    "The item you're looking for is currently unavailable in our inventory. Please check back later or contact support for assistance with availability.": {
         value: string;
     };
     'The low-value GST law passed July 1st, 2018 applies to this retailer.': {
@@ -323,10 +386,22 @@ export declare const stringsHebrew: {
     'Would you like to close checkout and return to the site?': {
         value: string;
     };
+    'You are being sent back to the shop to re-add items to your cart.': {
+        value: string;
+    };
+    'You may incur additional fees from the shipping carrier by not prepaying.': {
+        value: string;
+    };
+    "You will be redirected back to the merchant's site in a few seconds.": {
+        value: string;
+    };
     "You're all set!": {
         value: string;
     };
     'Your checkout session has expired. Please reload the page to continue.': {
+        value: string;
+    };
+    'Your order has been successfully placed.': {
         value: string;
     };
     'Your payment went through successfully! Thank you for shopping with us! We hope you had an enjoyable experience and your support means the world to us.': {
@@ -344,10 +419,13 @@ export declare const stringsHebrew: {
     'click to learn more': {
         value: string;
     };
-    or: {
+    days: {
         value: string;
     };
     'restricted items': {
+        value: string;
+    };
+    weeks: {
         value: string;
     };
 };

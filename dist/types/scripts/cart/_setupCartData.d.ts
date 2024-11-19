@@ -1,5 +1,5 @@
 export declare const setupCartData: (cartId: string) => Promise<{
-    cartData: import("../../types/checkout/api/NormalizedTempCart").NormalizedTempCart;
+    cartData: import("../..").NormalizedTempCart;
     storeFavicon: string;
     storeId: number;
     storeLogo: string;

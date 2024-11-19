@@ -1,4 +1,4 @@
-import type { CountryCode } from "../../../types/generated/graphql.customer.types";
+import type { CountryCode } from "../../../types/generated/graphql.internal.types";
 export declare class ZonosCountryFlag {
     /**
      * The country code for the flag

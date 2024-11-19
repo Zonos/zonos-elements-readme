@@ -1,4 +1,4 @@
-import type { ElementsUiStyle, ElementsUiTheme } from "../../../types/generated/graphql.customer.types";
+import type { ElementsUiStyle, ElementsUiTheme } from "../../../types/generated/graphql.internal.types";
 import type { Color } from "../../../types/styles/Color";
 export declare class ZonosButton {
     ele: HTMLZonosButtonElement;

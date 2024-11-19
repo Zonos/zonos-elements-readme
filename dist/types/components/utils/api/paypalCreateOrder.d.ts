@@ -1,9 +1,6 @@
-import type { PaypalOrderCreateMutation } from "../../../types/generated/graphql.customer.types";
-type PaypalCreateOrderPayload = {
-    checkoutSessionId: string;
-};
-export declare const paypalCreateOrder: ({ checkoutSessionId, }: PaypalCreateOrderPayload) => Promise<{
+import type { PaypalCreateOrderRequest } from "../../../types/checkout/api/Paypal";
+import type { PaypalOrderCreateMutation } from "../../../types/generated/graphql.internal.types";
+export declare const paypalCreateOrder: ({ checkoutSessionId, }: PaypalCreateOrderRequest) => Promise<{
     errors: import("../../..").JsonError[];
     json: PaypalOrderCreateMutation | null;
 }>;
-export {};

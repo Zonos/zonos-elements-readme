@@ -1,5 +1,5 @@
 import type { StripeAddressElementChangeEvent } from '@stripe/stripe-js';
-import type { CountryCode } from "../generated/graphql.customer.types";
+import type { CountryCode } from "../generated/graphql.internal.types";
 export type TranslatedText = {
     [key: string]: string;
 };

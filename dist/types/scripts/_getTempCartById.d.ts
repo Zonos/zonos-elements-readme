@@ -4,5 +4,8 @@ type TempCartResult = {
     storeFaviconUrl: string;
     storeLogoUrl: string;
 };
-export declare const getTempCartById: (cartId: string) => Promise<TempCartResult | null>;
+export declare const getTempCartById: ({ cartId, retries, }: {
+    cartId: string;
+    retries: number;
+}) => Promise<TempCartResult | null>;
 export {};

@@ -1,5 +1,5 @@
-import type { CountryCode } from "../../generated/graphql.customer.types";
-export type ValidateAddressRequestBody = {
+import type { CountryCode } from "../../generated/graphql.internal.types";
+export type ValidateAddressRequest = {
     address?: {
         city?: string;
         line1?: string;

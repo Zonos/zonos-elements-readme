@@ -1,6 +1,6 @@
 import { type EventEmitter } from '../../../stencil-public-runtime';
 import type { AppearanceConfig } from "../../store/zonosStore";
-import type { HelloMobileLocation } from "../../../types/generated/graphql.customer.types";
+import type { HelloMobileLocation } from "../../../types/generated/graphql.internal.types";
 import type { RestrictedItem } from "../../../types/hello/RestrictedItem";
 export declare class ZonosHelloDialog {
     /**

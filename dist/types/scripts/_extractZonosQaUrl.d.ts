@@ -9,3 +9,4 @@
  * invalid: https://www.zonos.com/?zonosQaUrl=https://zonos-something
  */
 export declare const extractZonosQaUrl: (url: string | undefined) => string | null;
+export declare const extractZonosQaUrlApi: (url: string | undefined) => string | null;

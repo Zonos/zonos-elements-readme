@@ -10,7 +10,7 @@ import { EnteredInfo, TranslatedAddressObject } from "./types/checkout/Translate
 import { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-address-update-dialog/zonos-address-update-dialog";
 import { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
 import { BannerIntent } from "./components/common/zonos-banner/zonos-banner";
-import { CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.customer.types";
+import { CheckoutSessionDetailsFragment, CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.internal.types";
 import { Color as Color1 } from "./types/index";
 import { FontWeight, Size, Type } from "./types/styles/Text";
 import { AppearanceConfig } from "./components/store/zonosStore";
@@ -24,13 +24,14 @@ import { AppearanceConfig as AppearanceConfig1 } from "./components.d";
 import { RestStateType } from "./components/utils/restStateType";
 import { ShippingRichRadioItem } from "./components/common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 import { SpinnerColor } from "./components/common/zonos-spinner/zonos-spinner";
+import { ToggleItem } from "./types/common-ui/Toggle";
 import { GridSpacing } from "./types/styles/GridSpacing";
 export { ContactOption, PaymentIntent, Stripe } from "@stripe/stripe-js";
 export { EnteredInfo, TranslatedAddressObject } from "./types/checkout/TranslatedText";
 export { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-address-update-dialog/zonos-address-update-dialog";
 export { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
 export { BannerIntent } from "./components/common/zonos-banner/zonos-banner";
-export { CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.customer.types";
+export { CheckoutSessionDetailsFragment, CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.internal.types";
 export { Color as Color1 } from "./types/index";
 export { FontWeight, Size, Type } from "./types/styles/Text";
 export { AppearanceConfig } from "./components/store/zonosStore";
@@ -44,6 +45,7 @@ export { AppearanceConfig as AppearanceConfig1 } from "./components.d";
 export { RestStateType } from "./components/utils/restStateType";
 export { ShippingRichRadioItem } from "./components/common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 export { SpinnerColor } from "./components/common/zonos-spinner/zonos-spinner";
+export { ToggleItem } from "./types/common-ui/Toggle";
 export { GridSpacing } from "./types/styles/GridSpacing";
 export namespace Components {
     interface ZonosAddress {
@@ -138,6 +140,10 @@ export namespace Components {
          */
         "bold": boolean;
         /**
+          * Callback for when the badge is dismissed. Also determines if dismiss icon shown.
+         */
+        "dismissHandler"?: () => void;
+        /**
           * The icon element to display
           * @default null
          */
@@ -147,6 +153,11 @@ export namespace Components {
           * @default false
          */
         "iconRight": boolean;
+        /**
+          * Whether or not the badge is loading
+          * @default false
+         */
+        "loading": boolean;
         /**
           * Whether or not the badge is rounded
           * @default false
@@ -292,6 +303,14 @@ export namespace Components {
         "hide": boolean;
     }
     interface ZonosCartSubtotal {
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosCheckbox {
         /**
@@ -350,6 +369,10 @@ export namespace Components {
           * Flag to determine if the checkout is on mobile
          */
         "mobile": boolean;
+        /**
+          * For usage in storybook for a mocked flow.
+         */
+        "mockCheckoutSession": (session: CheckoutSessionDetailsFragment) => Promise<void>;
         /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
          */
@@ -477,6 +500,11 @@ export namespace Components {
          */
         "dialogType": 'alert' | 'confirm';
         /**
+          * Dialog width
+          * @default 350 px
+         */
+        "dialogWidth": number;
+        /**
           * Whether or not the dialog is open
          */
         "isMobile": boolean;
@@ -509,7 +537,7 @@ export namespace Components {
          */
         "overrideConfig": (config: LoadZonosParamsConfig) => Promise<void>;
         /**
-          * Override country code for storybook
+          * Override country code. Used in dashboard create test cart.
          */
         "overrideCountry": (countryCode: CountryCode) => Promise<void>;
         /**
@@ -551,6 +579,8 @@ export namespace Components {
           * @default () => {}
          */
         "handleOnClose": () => void;
+    }
+    interface ZonosCurrencyToggle {
     }
     interface ZonosCustomMessage {
         /**
@@ -750,7 +780,7 @@ export namespace Components {
         "content": string;
         /**
           * Color of the SVG
-          * @default 'gray-1200'
+          * @default 'gray-1000'
          */
         "iconColor": Color | (string & { _placeholder?: never });
         /**
@@ -815,6 +845,10 @@ export namespace Components {
           * Default email for stripe
          */
         "defaultEmail": string | null;
+        /**
+          * Email error text to dispaly
+         */
+        "isEmailError": boolean;
         /**
           * The title text for the authentication element
          */
@@ -903,13 +937,14 @@ export namespace Components {
          */
         "borderStyle"?: ElementsUiStyle;
         /**
-          * Initial selected value
-         */
-        "initialSelectedValue"?: string | number;
-        /**
           * List of items to display
          */
         "items": ShippingRichRadioItem[];
+        /**
+          * Selected item
+          * @default {null|firstItem}
+         */
+        "selectedItem": ShippingRichRadioItem | null;
         /**
           * Theme of the radio item
          */
@@ -943,6 +978,16 @@ export namespace Components {
           * The weight of the text
          */
         "weight"?: FontWeight;
+    }
+    interface ZonosToggle {
+        /**
+          * Options for the toggle
+         */
+        "options": ToggleItem<string>[];
+        /**
+          * The selected option
+         */
+        "value": string;
     }
     interface ZonosTooltip {
         /**
@@ -1040,6 +1085,10 @@ export interface ZonosInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosInputElement;
 }
+export interface ZonosLinkAuthenticationCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosLinkAuthenticationElement;
+}
 export interface ZonosPaypalPaymentCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosPaypalPaymentElement;
@@ -1051,6 +1100,10 @@ export interface ZonosShippingCustomEvent<T> extends CustomEvent<T> {
 export interface ZonosShippingRichRadioCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosShippingRichRadioElement;
+}
+export interface ZonosToggleCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosToggleElement;
 }
 declare global {
     interface HTMLZonosAddressElementEventMap {
@@ -1284,6 +1337,12 @@ declare global {
         prototype: HTMLZonosCountrySelectElement;
         new (): HTMLZonosCountrySelectElement;
     };
+    interface HTMLZonosCurrencyToggleElement extends Components.ZonosCurrencyToggle, HTMLStencilElement {
+    }
+    var HTMLZonosCurrencyToggleElement: {
+        prototype: HTMLZonosCurrencyToggleElement;
+        new (): HTMLZonosCurrencyToggleElement;
+    };
     interface HTMLZonosCustomMessageElement extends Components.ZonosCustomMessage, HTMLStencilElement {
     }
     var HTMLZonosCustomMessageElement: {
@@ -1388,7 +1447,18 @@ declare global {
         prototype: HTMLZonosLinkElement;
         new (): HTMLZonosLinkElement;
     };
+    interface HTMLZonosLinkAuthenticationElementEventMap {
+        "linkAuthenticationChange": void;
+    }
     interface HTMLZonosLinkAuthenticationElement extends Components.ZonosLinkAuthentication, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosLinkAuthenticationElementEventMap>(type: K, listener: (this: HTMLZonosLinkAuthenticationElement, ev: ZonosLinkAuthenticationCustomEvent<HTMLZonosLinkAuthenticationElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosLinkAuthenticationElementEventMap>(type: K, listener: (this: HTMLZonosLinkAuthenticationElement, ev: ZonosLinkAuthenticationCustomEvent<HTMLZonosLinkAuthenticationElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLZonosLinkAuthenticationElement: {
         prototype: HTMLZonosLinkAuthenticationElement;
@@ -1494,6 +1564,23 @@ declare global {
         prototype: HTMLZonosTextElement;
         new (): HTMLZonosTextElement;
     };
+    interface HTMLZonosToggleElementEventMap {
+        "toggleChanged": string;
+    }
+    interface HTMLZonosToggleElement extends Components.ZonosToggle, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosToggleElementEventMap>(type: K, listener: (this: HTMLZonosToggleElement, ev: ZonosToggleCustomEvent<HTMLZonosToggleElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosToggleElementEventMap>(type: K, listener: (this: HTMLZonosToggleElement, ev: ZonosToggleCustomEvent<HTMLZonosToggleElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosToggleElement: {
+        prototype: HTMLZonosToggleElement;
+        new (): HTMLZonosToggleElement;
+    };
     interface HTMLZonosTooltipElement extends Components.ZonosTooltip, HTMLStencilElement {
     }
     var HTMLZonosTooltipElement: {
@@ -1541,6 +1628,7 @@ declare global {
         "zonos-controller": HTMLZonosControllerElement;
         "zonos-country-flag": HTMLZonosCountryFlagElement;
         "zonos-country-select": HTMLZonosCountrySelectElement;
+        "zonos-currency-toggle": HTMLZonosCurrencyToggleElement;
         "zonos-custom-message": HTMLZonosCustomMessageElement;
         "zonos-customer-info": HTMLZonosCustomerInfoElement;
         "zonos-dialog": HTMLZonosDialogElement;
@@ -1563,6 +1651,7 @@ declare global {
         "zonos-shipping-rich-radio": HTMLZonosShippingRichRadioElement;
         "zonos-spinner": HTMLZonosSpinnerElement;
         "zonos-text": HTMLZonosTextElement;
+        "zonos-toggle": HTMLZonosToggleElement;
         "zonos-tooltip": HTMLZonosTooltipElement;
         "zonos-v-stack": HTMLZonosVStackElement;
         "zonos-virtual-scroll": HTMLZonosVirtualScrollElement;
@@ -1677,6 +1766,10 @@ declare namespace LocalJSX {
          */
         "bold"?: boolean;
         /**
+          * Callback for when the badge is dismissed. Also determines if dismiss icon shown.
+         */
+        "dismissHandler"?: () => void;
+        /**
           * The icon element to display
           * @default null
          */
@@ -1686,6 +1779,11 @@ declare namespace LocalJSX {
           * @default false
          */
         "iconRight"?: boolean;
+        /**
+          * Whether or not the badge is loading
+          * @default false
+         */
+        "loading"?: boolean;
         /**
           * Whether or not the badge is rounded
           * @default false
@@ -1831,6 +1929,14 @@ declare namespace LocalJSX {
         "hide"?: boolean;
     }
     interface ZonosCartSubtotal {
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosCheckbox {
         /**
@@ -2016,6 +2122,11 @@ declare namespace LocalJSX {
          */
         "dialogType"?: 'alert' | 'confirm';
         /**
+          * Dialog width
+          * @default 350 px
+         */
+        "dialogWidth"?: number;
+        /**
           * Whether or not the dialog is open
          */
         "isMobile"?: boolean;
@@ -2073,6 +2184,8 @@ declare namespace LocalJSX {
           * @default () => {}
          */
         "handleOnClose"?: () => void;
+    }
+    interface ZonosCurrencyToggle {
     }
     interface ZonosCustomMessage {
         /**
@@ -2255,7 +2368,7 @@ declare namespace LocalJSX {
         "content": string;
         /**
           * Color of the SVG
-          * @default 'gray-1200'
+          * @default 'gray-1000'
          */
         "iconColor"?: Color | (string & { _placeholder?: never });
         /**
@@ -2324,6 +2437,14 @@ declare namespace LocalJSX {
           * Default email for stripe
          */
         "defaultEmail"?: string | null;
+        /**
+          * Email error text to dispaly
+         */
+        "isEmailError"?: boolean;
+        /**
+          * Event emitted when the authentication element changes
+         */
+        "onLinkAuthenticationChange"?: (event: ZonosLinkAuthenticationCustomEvent<void>) => void;
         /**
           * The title text for the authentication element
          */
@@ -2420,10 +2541,6 @@ declare namespace LocalJSX {
          */
         "borderStyle"?: ElementsUiStyle;
         /**
-          * Initial selected value
-         */
-        "initialSelectedValue"?: string | number;
-        /**
           * List of items to display
          */
         "items": ShippingRichRadioItem[];
@@ -2431,6 +2548,11 @@ declare namespace LocalJSX {
           * Event emitted when an item is selected
          */
         "onRadioSelected"?: (event: ZonosShippingRichRadioCustomEvent<ShippingRichRadioItem>) => void;
+        /**
+          * Selected item
+          * @default {null|firstItem}
+         */
+        "selectedItem"?: ShippingRichRadioItem | null;
         /**
           * Theme of the radio item
          */
@@ -2464,6 +2586,20 @@ declare namespace LocalJSX {
           * The weight of the text
          */
         "weight"?: FontWeight;
+    }
+    interface ZonosToggle {
+        /**
+          * Event emitted when the toggle changes
+         */
+        "onToggleChanged"?: (event: ZonosToggleCustomEvent<string>) => void;
+        /**
+          * Options for the toggle
+         */
+        "options"?: ToggleItem<string>[];
+        /**
+          * The selected option
+         */
+        "value": string;
     }
     interface ZonosTooltip {
         /**
@@ -2536,6 +2672,7 @@ declare namespace LocalJSX {
         "zonos-controller": ZonosController;
         "zonos-country-flag": ZonosCountryFlag;
         "zonos-country-select": ZonosCountrySelect;
+        "zonos-currency-toggle": ZonosCurrencyToggle;
         "zonos-custom-message": ZonosCustomMessage;
         "zonos-customer-info": ZonosCustomerInfo;
         "zonos-dialog": ZonosDialog;
@@ -2558,6 +2695,7 @@ declare namespace LocalJSX {
         "zonos-shipping-rich-radio": ZonosShippingRichRadio;
         "zonos-spinner": ZonosSpinner;
         "zonos-text": ZonosText;
+        "zonos-toggle": ZonosToggle;
         "zonos-tooltip": ZonosTooltip;
         "zonos-v-stack": ZonosVStack;
         "zonos-virtual-scroll": ZonosVirtualScroll;
@@ -2590,6 +2728,7 @@ declare module "@stencil/core" {
             "zonos-controller": LocalJSX.ZonosController & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
             "zonos-country-flag": LocalJSX.ZonosCountryFlag & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
             "zonos-country-select": LocalJSX.ZonosCountrySelect & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
+            "zonos-currency-toggle": LocalJSX.ZonosCurrencyToggle & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
             "zonos-custom-message": LocalJSX.ZonosCustomMessage & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
             "zonos-customer-info": LocalJSX.ZonosCustomerInfo & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
             "zonos-dialog": LocalJSX.ZonosDialog & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
@@ -2612,6 +2751,7 @@ declare module "@stencil/core" {
             "zonos-shipping-rich-radio": LocalJSX.ZonosShippingRichRadio & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
             "zonos-spinner": LocalJSX.ZonosSpinner & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
             "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
+            "zonos-toggle": LocalJSX.ZonosToggle & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
             "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
             "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
             /**

@@ -1,5 +1,5 @@
 import type { TargetFormat } from "../../api/getExchangeRate";
-import type { CurrencyCode } from "../../../../types/generated/graphql.customer.types";
+import type { CurrencyCode } from "../../../../types/generated/graphql.internal.types";
 type NumberFormatParams = {
     amount: number;
     currency: CurrencyCode;

@@ -1,11 +1,14 @@
 import { type EventEmitter } from '../../../stencil-public-runtime';
-import type { ElementsUiStyle, ElementsUiTheme } from "../../../types/generated/graphql.customer.types";
+import type { ElementsUiStyle, ElementsUiTheme, IncotermCode } from "../../../types/generated/graphql.internal.types";
 import type { Color } from "../../../types/styles/Color";
 export type ShippingRichRadioItem = {
     amount: number;
     caption?: string;
     label: string;
+    landedCostId: string;
+    method: IncotermCode;
     price: string;
+    shipmentRatingId: string;
     sublabel?: string;
     value: string | number;
 };
@@ -29,10 +32,6 @@ export declare class ZonosShippingRichRadio {
      */
     theme?: ElementsUiTheme;
     /**
-     * Initial selected value
-     */
-    initialSelectedValue?: string | number;
-    /**
      * Selected item
      * @default {null|firstItem}
      */
@@ -43,6 +42,5 @@ export declare class ZonosShippingRichRadio {
     radioSelected?: EventEmitter<ShippingRichRadioItem>;
     private handleRichRadioSelect;
     private getRadioItemStyleVariables;
-    componentWillLoad(): void;
     render(): any;
 }

@@ -1,3 +1,2 @@
-type ConversionEvent = 'checkout_open' | 'checkout_customerInfoCompleted' | 'checkout_shippingInfoCompleted' | 'checkout_paymentInfoCompleted' | 'checkout_orderCompleted';
+import type { ConversionEvent } from "../../../types/ConversionEvent";
 export declare const trackConversionEvent: (eventName: ConversionEvent, metadata?: Record<string, unknown>) => Promise<void>;
-export {};

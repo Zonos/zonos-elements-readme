@@ -3,7 +3,7 @@ import type { Stripe } from '@stripe/stripe-js';
 import type { NotificationInit } from "../common/zonos-notification/zonos-notification";
 import { type AppearanceConfig } from "../store/zonosStore";
 import type { LoadZonosParamsConfig } from "../../scripts/_zonosBase";
-import type { CountryCode } from "../../types/generated/graphql.customer.types";
+import type { CountryCode } from "../../types/generated/graphql.internal.types";
 export declare class ZonosController {
     /**
      * The zonos config object
@@ -57,7 +57,7 @@ export declare class ZonosController {
      */
     overrideConfig(config: LoadZonosParamsConfig): Promise<void>;
     /**
-     * Override country code for storybook
+     * Override country code. Used in dashboard create test cart.
      */
     overrideCountry(countryCode: CountryCode): Promise<void>;
     /**

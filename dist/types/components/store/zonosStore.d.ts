@@ -1,11 +1,20 @@
 import type { CurrencyConverter, LoadZonosParamsConfig } from "../../scripts/_zonosBase";
 import type { CheckoutConfig } from "../../types/checkout/CheckoutConfig";
-import type { ElementsUiStyle, ElementsUiTheme, ZonosAttribution, ZonosSettingsQuery } from "../../types/generated/graphql.customer.types";
+import type { CountryCode, ElementsUiStyle, ElementsUiTheme, ZonosAttribution, ZonosSettingsQuery } from "../../types/generated/graphql.internal.types";
 import type { HelloConfig } from "../../types/hello/HelloConfig";
 export type AppearanceConfig = {
     colorPrimary?: string;
     colorSecondary?: string;
     fontFamily: string;
+    fontSize2XL?: number;
+    fontSize3XL?: number;
+    fontSizeBase?: number;
+    fontSizeInputLabel?: number;
+    fontSizeInputValue?: number;
+    fontSizeL?: number;
+    fontSizeS?: number;
+    fontSizeXL?: number;
+    fontSizeXS?: number;
     logoUrl: string;
     style: ElementsUiStyle;
     theme: ElementsUiTheme;
@@ -17,11 +26,19 @@ export type ZonosConfig = {
     checkoutSettings: CheckoutConfig;
     currencyConverter?: CurrencyConverter;
     currentHelloPage: Page | '';
+    /**
+     * List of countries that are disabled in the checkout, will also be disabled for hello
+     */
+    disabledCountries: CountryCode[];
     helloSettings: HelloConfig;
     /**
      * Callback to be called when the country is changed
      */
     onCountryChange?: LoadZonosParamsConfig['onCountryChange'];
+    onlineStoreSettings: {
+        allowedDomains: string[];
+        url: string;
+    };
     organizationId: string;
     organizationName: string;
     /**

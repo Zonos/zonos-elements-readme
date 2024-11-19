@@ -4,7 +4,7 @@ import type { AppearanceConfig } from "../components/store/zonosStore";
 import type { NotificationInit } from "../types/index";
 import type { NormalizedTempCart } from "../types/checkout/api/NormalizedTempCart";
 import { type CheckoutConfig } from "../types/checkout/CheckoutConfig";
-import type { CountryCode, CurrencyCode, PaypalMockResponse } from "../types/generated/graphql.customer.types";
+import type { CountryCode, CurrencyCode, PaypalMockResponse } from "../types/generated/graphql.internal.types";
 import type { HelloConfig } from "../types/hello/HelloConfig";
 /**
  * Currency converter function to be used in Hello and Checkout
@@ -139,51 +139,6 @@ export type LoadZonosParamsConfig = {
      * Custom currency format function to be used in Hello and Checkout.
      * @note This function would override the default behavior of `format` function inside of `CurrencyConverter`
      * @note You can combine this function with `currencyConverter` to customize the currency format
-     * 
-     * ------
-     * @option1 Customize currency format (use `convert` and `format` in `currencyConverter`)
-     * @note This function would override the default behavior of `format`, and `convertAndFormat` function inside of `CurrencyConverter`
-     * @note You can combine this function with `currencyConverter` to customize the currency format
-     * @example
-     * Price:  "1200.99"
-     * End result: "USD - 1,200.99"
-     *
-     * Zonos.init({
-     *   // `format` function in `currencyConverter` will trigger this function instead.
-     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
-     *     return `- ${numberFormat({ amount })}`;
-     *   }
-     *   currencyConverter: ({ convert, currencyCode, originalAmount, selector }) => {
-     *      const convertedAmount = convert(originalAmount);
-     *      // `format` function will call `overrideCurrencyFormat` function instead and it will just format the converted amount
-     *      const formattedAmount = `${currencyCode} ${format(convertedAmount)}`;
-     *      selector.innerText = formattedAmount;
-     *
-     *      revealPrice();
-     *      return formattedAmount;
-     *    },
-     * });
-     *
-     * ------
-     * @option2 Customize currency format (use `convertAndFormat`)
-     * @example
-     * Price: "1200.99"
-     * End result: "USD - 1,200.99"
-     *
-     * Zonos.init({
-     *   // `format` function in `currencyConverter` will trigger this function instead.
-     *   overrideCurrencyFormat: ({ amount, currencyCode, numberFormat }) => {
-     *     return `${currencyCode} - ${numberFormat({ amount })}`;
-     *   }
-     *   currencyConverter: ({ convertAndFormat, originalAmount, selector }) => {
-     *      // `convertAndFormat` function calls `format` under the hood, so it will also call `overrideCurrencyFormat` function
-     *      const convertedAndFormatedAmount = convertAndFormat(originalAmount);
-     *      selector.innerText = convertedAndFormatedAmount;
-     *
-     *      revealPrice();
-     *      return formattedAmount;
-     *    },
-     * });
      */
      | ((params: {
         /**
@@ -232,6 +187,7 @@ export interface Zonos {
      * @default false
      */
     debug?: boolean;
+    domain: string;
     doneInit: boolean;
     isBigCommerce: boolean;
     /**
@@ -246,6 +202,12 @@ export interface Zonos {
      * Version release timestamp
      */
     releaseDate: string;
+    /**
+     * Show toggle on checkout modal to show amount in base or foreign currency.
+     * Set this to true or set param `zonosShowBaseForeign=1` in url to show the toggle
+     * @default false
+     */
+    showBaseForeign: boolean;
     storeId: number;
     /** Stripe instance */
     stripe: Stripe;
@@ -256,6 +218,7 @@ export interface Zonos {
      */
     zonosConversionTest?: boolean;
     zonosQaUrl: string | null;
+    zonosQaUrlApi: string | null;
     displayCurrency: () => void;
     getCurrentTimestamp: () => number;
     init: (params: LoadZonosParams) => Promise<void>;
@@ -276,11 +239,14 @@ export declare abstract class Zonos {
     static isBigCommerce: boolean;
     static releaseDate: string;
     static isLegacyCheckout: boolean;
+    static domain: string;
+    static showBaseForeign: boolean;
     /**
      * By default, the package will load from npm
      */
     static isNpm: boolean;
     static zonosQaUrl: string | null;
+    static zonosQaUrlApi: string | null;
     static version: string;
     static modeAlerted: boolean;
     static cartData: NormalizedTempCart | null;
@@ -288,7 +254,7 @@ export declare abstract class Zonos {
     static getCurrentTimestamp: () => number;
     static cartId: string | null;
     private static zonosController;
-    static init: ({ appearance, checkoutSettings, currencyConverter, helloSettings, onCountryChange, overrideCurrencyFormat, storeId, zonosApiKey, }: LoadZonosParams) => Promise<void>;
+    static init: (params: LoadZonosParams) => Promise<void>;
     static displayCurrency: () => void;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;

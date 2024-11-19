@@ -2,6 +2,8 @@ import type { PaymentIntent, Stripe } from '@stripe/stripe-js';
 import { type CartItem } from "../../store/checkout/cart";
 import { type StripeStoreContactOption } from "../../store/checkout/stripe";
 import { type AppearanceConfig } from "../../store/zonosStore";
+import type { OrderPlacedInfo } from "../../../types/checkout/OrderPlacedInfo";
+import type { CheckoutSessionDetailsFragment } from "../../../types/generated/graphql.internal.types";
 export declare class ZonosCheckout {
     /**
      * Listener for locale change in localization store
@@ -46,6 +48,7 @@ export declare class ZonosCheckout {
      */
     isAttachError: boolean;
     isMobile: boolean;
+    isIframed: boolean;
     zonosReviewRef?: HTMLZonosReviewElement;
     storybookPaymentStatusOverride?: PaymentIntent['status'];
     isLegacyCheckout: boolean;
@@ -54,9 +57,17 @@ export declare class ZonosCheckout {
      */
     confirmDialogOpen: boolean;
     /**
+     * Cart expired state to show the cart expired dialog
+     */
+    isCartExpired: boolean;
+    /**
      * Error message from onInventoryCheck callback
      */
     inventoryCheckErrorMessage: string | null;
+    /**
+     * Placed order info to show the confirm dialog to the user
+     */
+    placedOrderInfo: OrderPlacedInfo | null;
     /**
      * Init cart info handler event
      */
@@ -72,14 +83,23 @@ export declare class ZonosCheckout {
         confirmed: boolean;
     }): Promise<void>;
     private applyStripeTheme;
+    /**
+     * Check if the cart is expired, return `true` if the cart is expired
+     */
+    private handleCartExpiredCheck;
     private buildCartAndInit;
     private reloadCheckoutSession;
+    private handleOrderDuplication;
+    private confirmProceedWithOrderDuplication;
+    private handleCancelOrderDuplication;
     private attachCheckout;
+    private formatDate;
+    private formatTime;
     appearanceSettingsOverrideChanged(): void;
     /**
      * Set default address from query param if it's valid
      */
-    private useLegacyQueryParam;
+    private useLegacyQueryParams;
     /**
      * Setup all of the event listeners for the component on first load
      */
@@ -88,10 +108,14 @@ export declare class ZonosCheckout {
      * For storybook to set to finish step, this is to trigger in the story for zonos-checkout-finish
      */
     setToFinishStep(forcePaymentStatus?: PaymentIntent['status']): Promise<void>;
+    /**
+     * For usage in storybook for a mocked flow.
+     */
+    mockCheckoutSession(session: CheckoutSessionDetailsFragment): Promise<void>;
     private handleCustomerInfoContinue;
     private handleShippingContinue;
-    private handleInventoryCheckDialogCancel;
     private handleInventoryCheckDialogConfirm;
+    private handleCartExpiredDialogConfirm;
     private handleStripePaymentContinue;
     private handleFinishClick;
     private getCurrentLocalePageEnum;

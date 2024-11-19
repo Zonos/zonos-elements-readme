@@ -94,11 +94,13 @@ export declare const featureAspectKeyEnum: {
     readonly ExploreFrontendMutation: "explore_frontend_mutation";
     readonly ExploreWeaviateMutation: "explore_weaviate_mutation";
     readonly FeatureAspect: "feature_aspect";
+    readonly FeatureFlagManagement: "feature_flag_management";
     readonly LocaleMessage: "locale_message";
     readonly NewCheckoutBeta: "new_checkout_beta";
     readonly NewPayoutReport: "new_payout_report";
     readonly PageAuditor: "page_auditor";
     readonly PromptExplorer: "prompt_explorer";
+    readonly SupportTicketSystem: "support_ticket_system";
     readonly TeamAuditor: "team_auditor";
 };
 export type Feature_AspectKey_Enum = (typeof featureAspectKeyEnum)[keyof typeof featureAspectKeyEnum];
@@ -113,6 +115,7 @@ export declare const featureAudienceNameEnum: {
     readonly DocsContributor: "docs_contributor";
     readonly Executive: "executive";
     readonly ExecutiveAssistant: "executive_assistant";
+    readonly FeatureFlagAdmin: "feature_flag_admin";
     readonly Finance: "finance";
     readonly FrontendEngineer: "frontend_engineer";
     readonly I18nKnownLanguage: "i18n_known_language";
@@ -124,6 +127,7 @@ export declare const featureAudienceNameEnum: {
     readonly PrincipalEngineer: "principal_engineer";
     readonly ProServeHead: "pro_serve_head";
     readonly ProductManager: "product_manager";
+    readonly SupportTicketMerchants: "support_ticket_merchants";
     readonly TechLead: "tech_lead";
 };
 export type Feature_AudienceName_Enum = (typeof featureAudienceNameEnum)[keyof typeof featureAudienceNameEnum];
@@ -527,33 +531,27 @@ export declare const promptBulkJobStatusEnum: {
     readonly Queued: "queued";
 };
 export type Prompt_BulkJobStatus_Enum = (typeof promptBulkJobStatusEnum)[keyof typeof promptBulkJobStatusEnum];
-export type CleanupTestZonosElementSettingMutation = {
-    delete_ux_zonosElementsSetting: {
-        affected_rows: number;
-    } | null;
-};
-export type ZonosElementsSettingQuery = {
-    ux_zonosElementsSetting: Array<{
-        currentVersion: string;
-        previousVersion: string | null;
-        storeId: number | null;
-        token: string | null;
-    }>;
-};
-export type UpdateCacheStoreVersionMutation = {
-    insert_ux_zonosElementsSetting: {
-        affected_rows: number;
-        returning: Array<{
-            currentVersion: string;
-            previousVersion: string | null;
-            storeId: number | null;
-            token: string | null;
+export type FailToGetQuoteErrorsQuery = {
+    error_event_aggregate: {
+        aggregate: {
+            count: number;
+        } | null;
+        nodes: Array<{
+            createdAt: string;
+            endpoint: string;
+            errors: Record<string, unknown> | Record<string, unknown>[];
+            href: string | null;
+            id: number;
+            metadata: Record<string, unknown> | Record<string, unknown>[] | null;
+            requestPayload: Record<string, unknown> | Record<string, unknown>[];
+            responseBody: Record<string, unknown> | Record<string, unknown>[] | null;
+            status: number;
         }>;
-    } | null;
+    };
 };
 export type LocaleCountryMessagesQuery = {
     locale_countryCodesPage: Array<{
-        countryCodes: Array<string>;
+        countryCodes: Array<string> | null;
         countryCodesPageMessageLinks: Array<{
             id: number;
             message: {
@@ -752,6 +750,29 @@ export type InsertBigCommerceSettingsEventMutation = {
         id: number;
     } | null;
 };
+export type StoreVersionSettingQuery = {
+    ux_zonosElementsSetting: Array<{
+        currentVersion: string;
+        previousVersion: string | null;
+        storeId: number | null;
+        token: string | null;
+    }>;
+};
+export type CreateStoreVersionSettingMutation = {
+    insert_ux_zonosElementsSetting: {
+        affected_rows: number;
+        returning: Array<{
+            currentVersion: string;
+            previousVersion: string | null;
+            storeId: number | null;
+        }>;
+    } | null;
+};
+export type CleanupTestZonosElementSettingMutation = {
+    delete_ux_zonosElementsSetting: {
+        affected_rows: number;
+    } | null;
+};
 export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
 export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionWrapper): {
     allSettings(variables?: {
@@ -769,6 +790,9 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     createScriptLoadEvent(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateScriptLoadEventMutation>;
+    createStoreVersionSetting(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateStoreVersionSettingMutation>;
     deleteAllStoreReserveOrders(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteAllStoreReserveOrdersMutation>;
@@ -781,6 +805,9 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     deleteReserveOrders(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteReserveOrdersMutation>;
+    failToGetQuoteErrors(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<FailToGetQuoteErrorsQuery>;
     getAudienceByAspectKey(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetAudienceByAspectKeyQuery>;
@@ -817,17 +844,14 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     localeCountryMessages(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<LocaleCountryMessagesQuery>;
-    updateCacheStoreVersion(variables?: {
+    storeVersionSetting(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateCacheStoreVersionMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreVersionSettingQuery>;
     updateReserveOrder(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateReserveOrderMutation>;
     upsertBigCommerceSettings(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpsertBigCommerceSettingsMutation>;
-    zonosElementsSetting(variables?: {
-        [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<ZonosElementsSettingQuery>;
 };
 export type Sdk = ReturnType<typeof getSdk>;

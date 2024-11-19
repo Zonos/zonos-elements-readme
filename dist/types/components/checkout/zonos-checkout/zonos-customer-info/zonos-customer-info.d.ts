@@ -49,6 +49,10 @@ export declare class ZonosCustomerInfo {
      * Handler for the dialog close button
      */
     openAddressValidationDialog: boolean;
+    /**
+     * Handler for the email error state
+     */
+    isEmailError: boolean;
     private checkInvalidCharacters;
     /**
      * Handler for invalid characters in the address
@@ -60,6 +64,7 @@ export declare class ZonosCustomerInfo {
      */
     private continueClickHandler;
     private handleValidate;
+    private handleEmailValidation;
     private prepareAddressObject;
     render(): any;
 }

@@ -1,4 +1,4 @@
-import type { ElementsUiTheme } from "../../../types/generated/graphql.customer.types";
+import type { ElementsUiTheme } from "../../../types/generated/graphql.internal.types";
 export declare class ZonosLogo {
     /**
      * Theme to change the color of the logo

@@ -1,5 +1,5 @@
 import { type PayPalButtonsComponent } from '@paypal/paypal-js';
-import type { CurrencyCode, ElementsUiStyle } from "../../../types/generated/graphql.customer.types";
+import type { CurrencyCode, ElementsUiStyle } from "../../../types/generated/graphql.internal.types";
 type PaypalStore = {
     /**
      * Zonos order id created by paypal
