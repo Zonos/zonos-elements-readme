@@ -5,6 +5,7 @@ import { cwd } from "process";
 const redundantFilesToRemove = [
   `graphql.customer.types.ts`,
   `graphql.frontend.types.ts`,
+  `graphql.internal.types.ts`,
 ];
 
 const removeRedundantFiles = (path: string) => {
