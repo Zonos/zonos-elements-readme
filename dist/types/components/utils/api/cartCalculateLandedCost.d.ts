@@ -1,5 +1,5 @@
-import type { CartCalculateLandedCostMutation } from "../../../types/generated/graphql.internal.types";
+import type { CartCalculateLandedCostResponse } from "../../../types/checkout/api/CalculateLandedCost";
 export declare const cartCalculateLandedCost: ({ abortController, cartId, }: {
     abortController?: AbortController;
     cartId: string;
-}) => Promise<CartCalculateLandedCostMutation>;
+}) => Promise<CartCalculateLandedCostResponse>;

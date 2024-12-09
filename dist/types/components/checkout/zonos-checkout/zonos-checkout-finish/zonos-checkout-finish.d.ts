@@ -30,12 +30,21 @@ export declare class ZonosCheckoutFinish {
     notificationMessages: string[];
     notificationActionText: string;
     order: ZonosOrder | null;
+    /**
+     * Is waiting to redirect to a different page
+     */
+    isWaitingToRedirect: boolean;
     private pullOrder;
     private redirectToUrl;
+    private isRedirectBehavior;
     /**
      * It would make more sense to have keep shopping button if the success behavior is not redirecting to a different page
      */
     private shouldRenderKeepShoppingButton;
+    /**
+     * Should render close button for redirect behavior when the success behavior is redirecting to a different page or when it's an error screen
+     */
+    private shouldRenderCloseButtonForRedirectBehavior;
     private handleSuccessBehavior;
     private getPullOrder;
     private useOverrideSuccessNotification;

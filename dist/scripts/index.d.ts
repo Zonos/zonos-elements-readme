@@ -997,6 +997,20 @@ type CalculateLandedCostAdjustmentInput = {
     sku: string | null;
     type: LandedCostAdjustmentType;
 };
+type Extensions = {
+    [key: string]: unknown;
+} & {
+    rule?: {
+        description: string;
+        id: string;
+        name: string;
+    };
+    ruleMessageType?: 'CUSTOM' | 'DEFAULT';
+};
+type ApiError = {
+    extensions?: Extensions | null;
+    message: string;
+};
 type CalculateLandedCostRequest = {
     billingAddress: {
         addressLine1: string;
@@ -1044,13 +1058,12 @@ type BuildLandedCostParams = {
     checkoutSessionId: string;
     contact: CalculateLandedCostRequest['contact'];
     landedCostAdjustments?: CalculateLandedCostRequest['landedCostAdjustments'];
+    publicCredential: string;
     shippingAddress: CalculateLandedCostRequest['shippingAddress'];
     zonosApiRoute: string;
 };
 type BuildLandedCostResponse = (CalculateLandedCostMutation & {
-    errors?: {
-        message: string;
-    }[];
+    errors: ApiError[];
 }) | null;
 
 type ZonosOrder = GetOrderQuery['order'];

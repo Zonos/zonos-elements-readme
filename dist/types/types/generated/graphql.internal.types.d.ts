@@ -1385,6 +1385,7 @@ export declare const emailTemplateStatus: {
 export type EmailTemplateStatus = (typeof emailTemplateStatus)[keyof typeof emailTemplateStatus];
 export declare const emailTemplateType: {
     readonly AbandonedCart: "ABANDONED_CART";
+    readonly AccountOrderReceipt: "ACCOUNT_ORDER_RECEIPT";
     readonly CatalogExport: "CATALOG_EXPORT";
     readonly ClassificationExport: "CLASSIFICATION_EXPORT";
     readonly Custom: "CUSTOM";
@@ -2114,6 +2115,7 @@ export declare const orderNoteType: {
 };
 export type OrderNoteType = (typeof orderNoteType)[keyof typeof orderNoteType];
 export declare const orderRefundSubtotalType: {
+    readonly Discount: "DISCOUNT";
     readonly DutyTaxFee: "DUTY_TAX_FEE";
     readonly Item: "ITEM";
     readonly Shipping: "SHIPPING";
@@ -3798,7 +3800,6 @@ export type GetCartOrganizationInfoQuery = {
         url: string;
     };
     organization: {
-        id: string;
         references: {
             storeId: number | null;
         } | null;

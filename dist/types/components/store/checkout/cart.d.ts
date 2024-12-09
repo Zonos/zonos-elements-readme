@@ -67,6 +67,7 @@ type CartStore = {
     checkoutSessionTimeoutShow: boolean;
     checkoutTimeoutInterval: NodeJS.Timeout | null;
     currency: CurrencyCode;
+    customQuotingError: string | null;
     /**
      * Toggle to show the amount in base currency instead. Only applicable when url param `zonosShowBaseForeign` is set
      */

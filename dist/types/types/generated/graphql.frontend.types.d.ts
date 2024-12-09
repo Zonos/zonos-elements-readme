@@ -100,6 +100,7 @@ export declare const featureAspectKeyEnum: {
     readonly NewPayoutReport: "new_payout_report";
     readonly PageAuditor: "page_auditor";
     readonly PromptExplorer: "prompt_explorer";
+    readonly RulesUiCreate: "rules_ui_create";
     readonly SupportTicketSystem: "support_ticket_system";
     readonly TeamAuditor: "team_auditor";
 };
@@ -127,6 +128,7 @@ export declare const featureAudienceNameEnum: {
     readonly PrincipalEngineer: "principal_engineer";
     readonly ProServeHead: "pro_serve_head";
     readonly ProductManager: "product_manager";
+    readonly RulesUiCreateMerchant: "rules_ui_create_merchant";
     readonly SupportTicketMerchants: "support_ticket_merchants";
     readonly TechLead: "tech_lead";
 };
@@ -537,14 +539,18 @@ export type FailToGetQuoteErrorsQuery = {
             count: number;
         } | null;
         nodes: Array<{
+            cartId: Record<string, unknown> | Record<string, unknown>[] | null;
             createdAt: string;
+            domain: Record<string, unknown> | Record<string, unknown>[] | null;
             endpoint: string;
             errors: Record<string, unknown> | Record<string, unknown>[];
             href: string | null;
             id: number;
             metadata: Record<string, unknown> | Record<string, unknown>[] | null;
+            requestLocation: Record<string, unknown> | Record<string, unknown>[] | null;
             requestPayload: Record<string, unknown> | Record<string, unknown>[];
             responseBody: Record<string, unknown> | Record<string, unknown>[] | null;
+            shipToAddress: Record<string, unknown> | Record<string, unknown>[] | null;
             status: number;
         }>;
     };

@@ -1,2 +1,2 @@
-import type { CalculateLandedCostMutation } from "../../../types/generated/graphql.internal.types";
-export declare const calculateLandedCostNormalized: (abortController: AbortController) => Promise<CalculateLandedCostMutation>;
+import type { CalculateLandedCostResponse } from "../../../types/index";
+export declare const calculateLandedCostNormalized: (abortController: AbortController) => Promise<CalculateLandedCostResponse>;

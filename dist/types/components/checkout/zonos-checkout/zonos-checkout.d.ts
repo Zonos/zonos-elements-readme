@@ -9,6 +9,7 @@ export declare class ZonosCheckout {
      * Listener for locale change in localization store
      */
     private onChangeLocaleListener;
+    private isRedirectAfterOrder;
     /**
      * Override appearance config
      */
@@ -29,6 +30,7 @@ export declare class ZonosCheckout {
      * Force dialog to be open
      */
     forceDialogOpen: boolean;
+    defaultAddressParams: StripeStoreContactOption | null;
     /**
      * Whether or not the dialog is open
      */
@@ -87,6 +89,10 @@ export declare class ZonosCheckout {
      * Check if the cart is expired, return `true` if the cart is expired
      */
     private handleCartExpiredCheck;
+    /**
+     * Check if stripe payment intent is succeeded or in a good state to move forward
+     */
+    private checkStripePaymentIntentStatus;
     private buildCartAndInit;
     private reloadCheckoutSession;
     private handleOrderDuplication;
@@ -123,6 +129,7 @@ export declare class ZonosCheckout {
     handleMobileChange(): void;
     handleAppearanceSettingsOverrideChange(): void;
     handleAddressChange(): void;
+    handleOpenChange(): void;
     componentWillLoad(): void;
     disconnectedCallback(): void;
     render(): any;

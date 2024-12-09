@@ -113,7 +113,7 @@ export declare const stringsNorwegian: {
     'Error updating Checkout': {
         value: string;
     };
-    Estimated: {
+    'Estimated [amount]': {
         value: string;
     };
     'Expected delivery': {
@@ -329,6 +329,9 @@ export declare const stringsNorwegian: {
     Success: {
         value: string;
     };
+    'Taxes and fees': {
+        value: string;
+    };
     'Taxes will apply to all orders.': {
         value: string;
     };
@@ -405,6 +408,9 @@ export declare const stringsNorwegian: {
         value: string;
     };
     'Your payment went through successfully! Thank you for shopping with us! We hope you had an enjoyable experience and your support means the world to us.': {
+        value: string;
+    };
+    'Your selected payment method requires additional verification. Please follow the instructions provided by your payment provider to complete the transaction.': {
         value: string;
     };
     '[percentage] GST due on any order above [threshold] along with an import entry transaction fee and MPI levy.': {
