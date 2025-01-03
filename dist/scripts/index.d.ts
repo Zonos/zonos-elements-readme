@@ -1,6 +1,5 @@
 import { PayPalNamespace } from '@paypal/paypal-js';
 import { StripeConstructor, StripeAddressElementChangeEvent, ContactOption, PaymentIntent, Stripe } from '@stripe/stripe-js';
-import { BrowserOptions } from '@sentry/browser';
 import { z } from 'zod';
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 
@@ -541,8 +540,10 @@ declare const incotermCode: {
 };
 type IncotermCode = (typeof incotermCode)[keyof typeof incotermCode];
 declare const itemMeasurementType: {
+    readonly AlcoholByVolume: "ALCOHOL_BY_VOLUME";
     readonly Height: "HEIGHT";
     readonly Length: "LENGTH";
+    readonly Volume: "VOLUME";
     readonly Weight: "WEIGHT";
     readonly Width: "WIDTH";
 };
@@ -575,9 +576,12 @@ declare const itemUnitOfMeasure: {
     readonly Gram: "GRAM";
     readonly Inch: "INCH";
     readonly Kilogram: "KILOGRAM";
+    readonly Liter: "LITER";
     readonly Meter: "METER";
+    readonly Milliliter: "MILLILITER";
     readonly Millimeter: "MILLIMETER";
     readonly Ounce: "OUNCE";
+    readonly Percentage: "PERCENTAGE";
     readonly Pound: "POUND";
     readonly Yard: "YARD";
 };
@@ -1042,6 +1046,10 @@ type CalculateLandedCostRequest = {
         key: string;
         value: string;
     }[];
+    /**
+     * TaxId that the some destination countries require for the shipment.
+     */
+    shipToTaxId?: string;
     shippingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;
@@ -1305,7 +1313,7 @@ type CustomEventMap = {
     };
 };
 
-declare const envClientSchema: z.ZodObject<{
+declare const _envClientSchema: z.ZodObject<{
     NEXT_PUBLIC_FLAG_URL: z.ZodString;
     NEXT_PUBLIC_RELEASE_DATE: z.ZodString;
     NEXT_PUBLIC_ZONOS_API_KEY: z.ZodString;
@@ -1339,7 +1347,7 @@ declare const envClientSchema: z.ZodObject<{
     NEXT_PUBLIC_ZONOS_ROUTE_URL: string;
     NEXT_PUBLIC_ZONOS_UNPKG_CDN_URL: string;
 }>;
-interface Env extends z.infer<typeof envClientSchema> {
+interface Env extends z.infer<typeof _envClientSchema> {
 }
 
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
@@ -1355,9 +1363,6 @@ declare global {
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Window {
-    Sentry?: {
-      init: (config: BrowserOptions) => void;
-    };
     Stripe?: StripeConstructor;
     Zonos: Zonos;
     /**
@@ -1372,7 +1377,6 @@ declare global {
      * A flag to determine if the current page is a BigCommerce page
      */
     stencilBootstrap?: unknown;
-    sentryOnLoad?: () => void;
   }
 
   namespace NodeJS {
@@ -1941,13 +1945,17 @@ declare namespace Components {
          */
         "mockCheckoutSession": (session: CheckoutSessionDetailsFragment) => Promise<void>;
         /**
+          * Override staging mode. Solely use for storybook
+         */
+        "overrideStagingMode"?: boolean;
+        /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
          */
         "preview": boolean;
         /**
           * For storybook to set to finish step, this is to trigger in the story for zonos-checkout-finish
          */
-        "setToFinishStep": (forcePaymentStatus?: PaymentIntent['status']) => Promise<void>;
+        "setToFinishStep": (forcePaymentStatus?: PaymentIntent["status"]) => Promise<void>;
     }
     interface ZonosCheckoutFinish {
         /**
@@ -1983,6 +1991,14 @@ declare namespace Components {
          */
         "continueLoading": boolean;
         /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "isMobile": boolean;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
           * Submit button main color
          */
         "submitBtnColor"?: string;
@@ -2003,7 +2019,7 @@ declare namespace Components {
         /**
           * Set selected tab. Only set the tab if it's clickable
          */
-        "setTabSelected": (tabValue: TabItem['value']) => Promise<void>;
+        "setTabSelected": (tabValue: TabItem["value"]) => Promise<void>;
         /**
           * Color of the tab progress bar and label, override the secondary color of the appearance settings
          */
@@ -2242,6 +2258,16 @@ declare namespace Components {
           * @default 460px
          */
         "width": string;
+    }
+    interface ZonosEmptyStatePayment {
+        /**
+          * Text to display in the empty state
+         */
+        "emptyStateText": string;
+        /**
+          * Theme color of the icon
+         */
+        "theme": ElementsUiTheme;
     }
     interface ZonosHello {
         /**
@@ -2528,6 +2554,43 @@ declare namespace Components {
          */
         "spinnerColor"?: SpinnerColor;
     }
+    /**
+     * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
+     */
+    interface ZonosStripeInput {
+        /**
+          * Input label
+         */
+        "inputLabel": string;
+        /**
+          * Placeholder for the input
+         */
+        "inputPlaceholder": string;
+        /**
+          * Value of the stripeInput
+         */
+        "inputValue": string;
+        /**
+          * Disables the input
+         */
+        "isDisabled": boolean;
+        /**
+          * Error state of the input
+         */
+        "isError": boolean;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Secondary color to override secondary color from appearance secondary color in setting
+         */
+        "overrideSecondaryColor"?: string;
+        /**
+          * The value of the input.
+         */
+        "value": string;
+    }
     interface ZonosText {
         /**
           * The size of the text
@@ -2667,6 +2730,10 @@ interface ZonosShippingCustomEvent<T> extends CustomEvent<T> {
 interface ZonosShippingRichRadioCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosShippingRichRadioElement;
+}
+interface ZonosStripeInputCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosStripeInputElement;
 }
 interface ZonosToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -2950,6 +3017,12 @@ declare global {
         prototype: HTMLZonosDialogElement;
         new (): HTMLZonosDialogElement;
     };
+    interface HTMLZonosEmptyStatePaymentElement extends Components.ZonosEmptyStatePayment, HTMLStencilElement {
+    }
+    var HTMLZonosEmptyStatePaymentElement: {
+        prototype: HTMLZonosEmptyStatePaymentElement;
+        new (): HTMLZonosEmptyStatePaymentElement;
+    };
     interface HTMLZonosHelloElement extends Components.ZonosHello, HTMLStencilElement {
     }
     var HTMLZonosHelloElement: {
@@ -3125,6 +3198,26 @@ declare global {
         prototype: HTMLZonosSpinnerElement;
         new (): HTMLZonosSpinnerElement;
     };
+    interface HTMLZonosStripeInputElementEventMap {
+        "inputChange": string;
+    }
+    /**
+     * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
+     */
+    interface HTMLZonosStripeInputElement extends Components.ZonosStripeInput, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosStripeInputElementEventMap>(type: K, listener: (this: HTMLZonosStripeInputElement, ev: ZonosStripeInputCustomEvent<HTMLZonosStripeInputElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosStripeInputElementEventMap>(type: K, listener: (this: HTMLZonosStripeInputElement, ev: ZonosStripeInputCustomEvent<HTMLZonosStripeInputElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosStripeInputElement: {
+        prototype: HTMLZonosStripeInputElement;
+        new (): HTMLZonosStripeInputElement;
+    };
     interface HTMLZonosTextElement extends Components.ZonosText, HTMLStencilElement {
     }
     var HTMLZonosTextElement: {
@@ -3199,6 +3292,7 @@ declare global {
         "zonos-custom-message": HTMLZonosCustomMessageElement;
         "zonos-customer-info": HTMLZonosCustomerInfoElement;
         "zonos-dialog": HTMLZonosDialogElement;
+        "zonos-empty-state-payment": HTMLZonosEmptyStatePaymentElement;
         "zonos-hello": HTMLZonosHelloElement;
         "zonos-hello-dialog": HTMLZonosHelloDialogElement;
         "zonos-hello-dialog-footer": HTMLZonosHelloDialogFooterElement;
@@ -3217,6 +3311,7 @@ declare global {
         "zonos-shipping": HTMLZonosShippingElement;
         "zonos-shipping-rich-radio": HTMLZonosShippingRichRadioElement;
         "zonos-spinner": HTMLZonosSpinnerElement;
+        "zonos-stripe-input": HTMLZonosStripeInputElement;
         "zonos-text": HTMLZonosTextElement;
         "zonos-toggle": HTMLZonosToggleElement;
         "zonos-tooltip": HTMLZonosTooltipElement;
@@ -3559,6 +3654,10 @@ declare namespace LocalJSX {
          */
         "mobile"?: boolean;
         /**
+          * Override staging mode. Solely use for storybook
+         */
+        "overrideStagingMode"?: boolean;
+        /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
          */
         "preview"?: boolean;
@@ -3601,6 +3700,10 @@ declare namespace LocalJSX {
          */
         "continueLoading"?: boolean;
         /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "isMobile"?: boolean;
+        /**
           * Event to emit when the continue button is clicked
          */
         "onContinueClicked"?: (event: ZonosCheckoutPaymentCustomEvent<void>) => void;
@@ -3612,6 +3715,10 @@ declare namespace LocalJSX {
           * Event to emit when the paypal session failed
          */
         "onPaypalSessionFailed"?: (event: ZonosCheckoutPaymentCustomEvent<void>) => void;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
         /**
           * Submit button main color
          */
@@ -3855,6 +3962,16 @@ declare namespace LocalJSX {
           * @default 460px
          */
         "width"?: string;
+    }
+    interface ZonosEmptyStatePayment {
+        /**
+          * Text to display in the empty state
+         */
+        "emptyStateText": string;
+        /**
+          * Theme color of the icon
+         */
+        "theme"?: ElementsUiTheme;
     }
     interface ZonosHello {
         /**
@@ -4136,6 +4253,47 @@ declare namespace LocalJSX {
          */
         "spinnerColor"?: SpinnerColor;
     }
+    /**
+     * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
+     */
+    interface ZonosStripeInput {
+        /**
+          * Input label
+         */
+        "inputLabel": string;
+        /**
+          * Placeholder for the input
+         */
+        "inputPlaceholder"?: string;
+        /**
+          * Value of the stripeInput
+         */
+        "inputValue"?: string;
+        /**
+          * Disables the input
+         */
+        "isDisabled"?: boolean;
+        /**
+          * Error state of the input
+         */
+        "isError"?: boolean;
+        /**
+          * Event to emit when input value changes
+         */
+        "onInputChange"?: (event: ZonosStripeInputCustomEvent<string>) => void;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Secondary color to override secondary color from appearance secondary color in setting
+         */
+        "overrideSecondaryColor"?: string;
+        /**
+          * The value of the input.
+         */
+        "value"?: string;
+    }
     interface ZonosText {
         /**
           * The size of the text
@@ -4243,6 +4401,7 @@ declare namespace LocalJSX {
         "zonos-custom-message": ZonosCustomMessage;
         "zonos-customer-info": ZonosCustomerInfo;
         "zonos-dialog": ZonosDialog;
+        "zonos-empty-state-payment": ZonosEmptyStatePayment;
         "zonos-hello": ZonosHello;
         "zonos-hello-dialog": ZonosHelloDialog;
         "zonos-hello-dialog-footer": ZonosHelloDialogFooter;
@@ -4261,6 +4420,7 @@ declare namespace LocalJSX {
         "zonos-shipping": ZonosShipping;
         "zonos-shipping-rich-radio": ZonosShippingRichRadio;
         "zonos-spinner": ZonosSpinner;
+        "zonos-stripe-input": ZonosStripeInput;
         "zonos-text": ZonosText;
         "zonos-toggle": ZonosToggle;
         "zonos-tooltip": ZonosTooltip;
@@ -4299,6 +4459,7 @@ declare module "@stencil/core" {
             "zonos-custom-message": LocalJSX.ZonosCustomMessage & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
             "zonos-customer-info": LocalJSX.ZonosCustomerInfo & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
             "zonos-dialog": LocalJSX.ZonosDialog & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
+            "zonos-empty-state-payment": LocalJSX.ZonosEmptyStatePayment & JSXBase.HTMLAttributes<HTMLZonosEmptyStatePaymentElement>;
             "zonos-hello": LocalJSX.ZonosHello & JSXBase.HTMLAttributes<HTMLZonosHelloElement>;
             "zonos-hello-dialog": LocalJSX.ZonosHelloDialog & JSXBase.HTMLAttributes<HTMLZonosHelloDialogElement>;
             "zonos-hello-dialog-footer": LocalJSX.ZonosHelloDialogFooter & JSXBase.HTMLAttributes<HTMLZonosHelloDialogFooterElement>;
@@ -4317,6 +4478,10 @@ declare module "@stencil/core" {
             "zonos-shipping": LocalJSX.ZonosShipping & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
             "zonos-shipping-rich-radio": LocalJSX.ZonosShippingRichRadio & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
             "zonos-spinner": LocalJSX.ZonosSpinner & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
+            /**
+             * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
+             */
+            "zonos-stripe-input": LocalJSX.ZonosStripeInput & JSXBase.HTMLAttributes<HTMLZonosStripeInputElement>;
             "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
             "zonos-toggle": LocalJSX.ZonosToggle & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
             "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
@@ -4625,6 +4790,7 @@ declare abstract class Zonos {
     static cartId: string | null;
     private static zonosController;
     static init: (params: LoadZonosParams) => Promise<void>;
+    private static injectCustomScriptForHostedCheckout;
     static displayCurrency: () => void;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;

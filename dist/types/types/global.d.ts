@@ -1,5 +1,4 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import type { BrowserOptions } from '@sentry/browser';
 import type { StripeConstructor } from '@stripe/stripe-js';
 
 /** Need to use relative path so that this declaration file can be correctly bundled */
@@ -17,9 +16,6 @@ declare global {
 
   // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
   interface Window {
-    Sentry?: {
-      init: (config: BrowserOptions) => void;
-    };
     Stripe?: StripeConstructor;
     Zonos: Zonos;
     /**
@@ -34,7 +30,6 @@ declare global {
      * A flag to determine if the current page is a BigCommerce page
      */
     stencilBootstrap?: unknown;
-    sentryOnLoad?: () => void;
   }
 
   namespace NodeJS {

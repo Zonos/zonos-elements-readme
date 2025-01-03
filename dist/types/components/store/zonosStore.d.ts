@@ -65,7 +65,7 @@ declare const zonosStoreDispose: () => void, zonosStore: ZonosStore;
 /**
  * Get theme from media query if theme is SYSTEM, otherwise return the theme
  */
-declare const getZonosStoreTheme: (theme: ElementsUiTheme) => Exclude<ElementsUiTheme, 'SYSTEM'>;
+declare const getZonosStoreTheme: (theme: ElementsUiTheme) => Exclude<ElementsUiTheme, "SYSTEM">;
 /**
  * Init setting from zonos setting
  */

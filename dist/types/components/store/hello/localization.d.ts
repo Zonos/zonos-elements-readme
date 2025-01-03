@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import { type CountryLandedCost } from "../../utils/api/getCountryLandedCost";
 import { type TargetFormat } from "../../utils/api/getExchangeRate";
 import type { Locale_ElementsSupportedLocationCode_Enum, Locale_PageName_Enum } from "../../../types/generated/graphql.frontend.types";

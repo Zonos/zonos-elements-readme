@@ -1,4 +1,3 @@
-/// <reference types="node" />
 import type { CalculateLandedCostMutation, CartQuery, CheckoutPresentmentFragment, CheckoutSessionDetailsFragment, CountryCode, CurrencyCode, IncotermCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.internal.types";
 type Step = 'customer-info' | 'shipping' | 'payment' | 'finish' | 'error';
 export type TabItem = {
@@ -95,9 +94,14 @@ type CartStore = {
     inventoryCheckErrorMessage: string | null;
     isSelectedShippingAboveDeminimis: boolean;
     isSelectedShippingGuarantee: boolean;
+    /**
+     * Use staging mode or not (when it's staging store, we won't create payment intent when creating checkout session since they don't have Stripe connect setup)
+     */
+    isStagingMode: boolean;
     items: CartItemToUse[];
     landedCostData: MappedCheckoutLandedCost[] | null;
     landedCostMethod: IncotermCode;
+    partiesData: CalculateLandedCostMutation['partyCreateWorkflow'];
     promoCode: string;
     /**
      * Only show promo code error when promo code applied clicked by user
@@ -143,10 +147,10 @@ declare const cartStoreCheckItemRestrictions: (itemsWorkflow: ItemWorkflowInfo[]
             reason: string;
         };
         amount: number;
-        attributes: ({
+        attributes: Array<{
             key: string | null;
             value: string | null;
-        } | null)[] | null;
+        } | null> | null;
         description: string | null;
         id: string;
         imageUrl: string | null;

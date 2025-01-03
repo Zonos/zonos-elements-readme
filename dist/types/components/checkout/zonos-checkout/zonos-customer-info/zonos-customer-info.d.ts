@@ -66,5 +66,10 @@ export declare class ZonosCustomerInfo {
     private handleValidate;
     private handleEmailValidation;
     private prepareAddressObject;
+    private isInTaxIdCountry;
+    /**
+     * Render tax id input based on ship to country code
+     */
+    private renderTaxIdInput;
     render(): any;
 }

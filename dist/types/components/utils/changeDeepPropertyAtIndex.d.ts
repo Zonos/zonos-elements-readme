@@ -1,3 +1,4 @@
+import type { IRecursiveDepth } from "../../types/utils/deep/IDeepKeyof";
 import type { IDeepKeyofAtIndex, IDeepPropertyTypeAtIndex } from "../../types/utils/deep/IDeepKeyofAtIndex";
 /**
  * Will change a nested property on an object (with array), and return a copy of the object with only that property changed.
@@ -60,7 +61,7 @@ import type { IDeepKeyofAtIndex, IDeepPropertyTypeAtIndex } from "../../types/ut
       },
     };
  */
-export declare const changeDeepPropertyAtIndex: <T extends object, P extends IDeepKeyofAtIndex<T, Depth>, Depth extends 0 | 1 | 2 | 3 | 8 | 4 | 5 | 6 | 7 | 9 = 4>({ index, obj, propertyPath, value, }: {
+export declare const changeDeepPropertyAtIndex: <T extends object, P extends IDeepKeyofAtIndex<T, Depth>, Depth extends IRecursiveDepth = 4>({ index, obj, propertyPath, value, }: {
     index: number;
     obj: T;
     propertyPath: P;

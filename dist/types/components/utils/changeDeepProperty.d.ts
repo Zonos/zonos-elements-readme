@@ -1,4 +1,4 @@
-import type { IDeepKeyof, IDeepPropertyType } from "../../types/utils/deep/IDeepKeyof";
+import type { IDeepKeyof, IDeepPropertyType, IRecursiveDepth } from "../../types/utils/deep/IDeepKeyof";
 /**
  * Will change a nested property on an object, and return a copy of the object with only that property changed.
  *
@@ -37,7 +37,7 @@ import type { IDeepKeyof, IDeepPropertyType } from "../../types/utils/deep/IDeep
       },
     };
  */
-export declare const changeDeepProperty: <T extends Record<string, unknown>, P extends IDeepKeyof<T, Depth>, Depth extends 0 | 1 | 2 | 3 | 8 | 4 | 5 | 6 | 7 | 9 = 4>({ obj, propertyPath, value, }: {
+export declare const changeDeepProperty: <T extends Record<string, unknown>, P extends IDeepKeyof<T, Depth>, Depth extends IRecursiveDepth = 4>({ obj, propertyPath, value, }: {
     obj: T;
     propertyPath: P;
     value: IDeepPropertyType<T, P, Depth>;

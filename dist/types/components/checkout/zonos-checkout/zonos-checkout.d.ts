@@ -23,6 +23,10 @@ export declare class ZonosCheckout {
      */
     mobile: boolean;
     /**
+     * Override staging mode. Solely use for storybook
+     */
+    overrideStagingMode?: boolean;
+    /**
      * Default address to use for the checkout (preview mode)
      */
     defaultAddress: StripeStoreContactOption | null;
@@ -71,6 +75,10 @@ export declare class ZonosCheckout {
      */
     placedOrderInfo: OrderPlacedInfo | null;
     /**
+     * Client secret value
+     */
+    clientSecret: string | null;
+    /**
      * Init cart info handler event
      */
     initCartInfoHandler(e: CustomEvent<CartItem[]>): Promise<void>;
@@ -106,6 +114,7 @@ export declare class ZonosCheckout {
      * Set default address from query param if it's valid
      */
     private useLegacyQueryParams;
+    overrideStagingModeChanged(): void;
     /**
      * Setup all of the event listeners for the component on first load
      */
@@ -129,6 +138,7 @@ export declare class ZonosCheckout {
     handleMobileChange(): void;
     handleAppearanceSettingsOverrideChange(): void;
     handleAddressChange(): void;
+    handleClientSecretChange(): void;
     handleOpenChange(): void;
     componentWillLoad(): void;
     disconnectedCallback(): void;

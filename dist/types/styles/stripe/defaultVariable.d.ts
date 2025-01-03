@@ -3,4 +3,4 @@ import type { ElementsUiStyle, ElementsUiTheme } from "../../types/generated/gra
 export declare const defaultVariable: ({ borderStyle, theme, }: {
     borderStyle?: ElementsUiStyle;
     theme: ElementsUiTheme;
-}) => Appearance['variables'];
+}) => Appearance["variables"];

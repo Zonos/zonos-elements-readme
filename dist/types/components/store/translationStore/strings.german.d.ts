@@ -38,6 +38,9 @@ export declare const stringsGerman: {
     'Billing address': {
         value: string;
     };
+    'CPF/CNPJ number': {
+        value: string;
+    };
     Cancel: {
         value: string;
     };
@@ -170,6 +173,12 @@ export declare const stringsGerman: {
     'No countries found': {
         value: string;
     };
+    'No payment method needed for staging': {
+        value: string;
+    };
+    'No shipment rating selected. Please go back to the "Shipping" step and select a shipment rating to proceed.': {
+        value: string;
+    };
     'No shipping method selected': {
         value: string;
     };
@@ -218,7 +227,13 @@ export declare const stringsGerman: {
     "Payment processing. We'll update you when payment is received.": {
         value: string;
     };
+    'Personal Customers Clearance Code': {
+        value: string;
+    };
     'Phone number': {
+        value: string;
+    };
+    'Place test order': {
         value: string;
     };
     'Please ensure your text uses the Latin alphabet only (A-Z, a-z).': {
@@ -261,6 +276,9 @@ export declare const stringsGerman: {
         value: string;
     };
     Quantity: {
+        value: string;
+    };
+    'RFC number': {
         value: string;
     };
     Reload: {
@@ -320,6 +338,9 @@ export declare const stringsGerman: {
     'Spend [threshold] tax free.': {
         value: string;
     };
+    'Staging mode': {
+        value: string;
+    };
     State: {
         value: string;
     };
@@ -363,6 +384,12 @@ export declare const stringsGerman: {
         value: string;
     };
     'Unable to check inventory. Please try again.': {
+        value: string;
+    };
+    'Unable to retrieve the checkout session at the moment. Please try again or contact our support team.': {
+        value: string;
+    };
+    'Unique Labor Identification Code': {
         value: string;
     };
     'Update address': {

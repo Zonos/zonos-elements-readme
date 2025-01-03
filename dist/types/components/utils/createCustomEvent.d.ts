@@ -7,6 +7,6 @@ export type CustomEventMap = {
 /**
  * Strongly typed custom event creation for all available events in zonos-checkout project
  */
-export declare const createCustomEvent: <T extends (string & {
-    _placeholder?: undefined;
-}) | keyof CustomEventMap>(eventName: T, detail?: T extends keyof CustomEventMap ? CustomEventMap[T] : unknown) => CustomEvent<T extends keyof CustomEventMap ? CustomEventMap[T] : unknown>;
+export declare const createCustomEvent: <T extends keyof CustomEventMap | (string & {
+    _placeholder?: never;
+})>(eventName: T, detail?: T extends keyof CustomEventMap ? CustomEventMap[T] : unknown) => CustomEvent<T extends keyof CustomEventMap ? CustomEventMap[T] : unknown>;

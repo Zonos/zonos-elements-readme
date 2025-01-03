@@ -1,4 +1,8 @@
-import type { CountryCode } from "../../generated/graphql.internal.types";
+import type { CheckoutSessionPaymentIntentCreateMutation, CountryCode, GetCheckoutSessionQuery } from "../../generated/graphql.internal.types";
+export type GetCheckoutSessionRequest = {
+    checkoutSessionId: string;
+};
+export type GetCheckoutSessionResponse = GetCheckoutSessionQuery;
 export type CheckoutSessionUpdateRequest = {
     adjustmentsAmount: number;
     cartId: string | null;
@@ -11,6 +15,7 @@ export type CheckoutSessionUpdateRequest = {
         value: string;
     }[];
     presentmentCountryCode: CountryCode | null;
+    skipPaymentIntent?: boolean;
 };
 export type CheckoutSessionUpdateMetadata = {
     key: string;
@@ -21,10 +26,15 @@ export type CheckoutSessionUpdateMetadataRequest = {
     metadata: CheckoutSessionUpdateMetadata;
 };
 export type CheckoutSessionCreateRequest = {
-    adjustmentsAmount: number;
+    adjustmentsAmount?: number;
     cartId: string | null;
     currency: string;
     itemsAmount: number;
     metadata: CheckoutSessionUpdateMetadata;
     presentmentCountryCode: CountryCode | null;
+    skipPaymentIntent?: boolean;
 };
+export type PaymentIntentCreateRequest = {
+    checkoutSessionId: string;
+};
+export type PaymentIntentCreateResponse = CheckoutSessionPaymentIntentCreateMutation;

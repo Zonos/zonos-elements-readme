@@ -17,7 +17,11 @@ export type StripeStoreContactOption = {
     phone?: string;
 };
 type StripeStore = {
-    clientSecret: string | null;
+    clientSecret: string;
+    /**
+     * Custom error message when payment is failed
+     */
+    customErrorMessage: string | null;
     fetchingLandedCostAbortController: AbortController | null;
     hasPaymentError: boolean;
     isFetchingLandedCost: boolean;
@@ -26,6 +30,11 @@ type StripeStore = {
      * Toggle to indicate if we should refund the inventory when the payment is failed
      */
     shouldInventoryRefund: boolean;
+    /**
+     * Default to skip payment intent, only create payment intent when "skipPaymentIntent" in url's query params is set "0"
+     * @default true
+     */
+    skipPaymentIntent: boolean;
     stripe: Stripe | null;
     stripeAddressElement: StripeAddressElement | null;
     stripeAddressEventData: StripeAddressElementChangeEvent | null;
@@ -48,6 +57,14 @@ type StripeStore = {
      * @default true
      * */
     stripeShippingSameAsBilling: boolean;
+    /**
+     * Optional tax id for the destination country that requires it
+     */
+    taxId: string;
+    /**
+     * Tax id used when fetching landed cost
+     */
+    taxIdUsedWhenFetchingLC: string;
     translatedAddress: {
         address: TranslatedAddressObject;
         billingAddress: TranslatedAddressObject;
@@ -88,7 +105,7 @@ declare const stripeStorePrefetchLandedCost: (params?: {
 declare const stripeStoreApplyPromoCode: () => Promise<void>;
 declare const stripeStoreResetPromoCode: () => void;
 declare const stripeStoreRemovePromoCode: () => Promise<void>;
-declare const stripeStoreMessageBasedOnStatus: (status?: PaymentIntent['status']) => {
+declare const stripeStoreMessageBasedOnStatus: (status?: PaymentIntent["status"]) => {
     isError: boolean;
     messages: string[];
 };
@@ -102,7 +119,7 @@ declare const stripeStoreHandleInventoryCheck: () => Promise<string | null>;
 declare const stripeStoreHandleInventoryRefund: () => Promise<void>;
 declare const stripeStoreRetrievePayment: ({ clientSecret: _clientSecret, storybookForceStatus, }: {
     clientSecret: string | null;
-    storybookForceStatus?: PaymentIntent['status'];
+    storybookForceStatus?: PaymentIntent["status"];
 }) => Promise<{
     error: boolean;
     messages: string[];
@@ -127,6 +144,7 @@ declare const stripeStoreRetrievePayment: ({ clientSecret: _clientSecret, storyb
 }>;
 declare const stripeStoreConfirmPayment: () => Promise<void>;
 export declare const getCheckoutSessionBody: () => CheckoutSessionCreateRequest;
+declare const stripeStoreGetPaymentIntent: () => Promise<void>;
 /**
  * Init checkout session
  * @returns {boolean} whether or not the checkout session is successfully created
@@ -154,4 +172,4 @@ declare const stripeStoreTranslateAddressToLatin: ({ addressInvalidCharactersLis
     addressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
     billingAddressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
 }) => Promise<void>;
-export { initStripeElements, stripeCalculateLandedCost, stripeStore, stripeStoreApplyPromoCode, stripeStoreCleanupDomesticShippingSession, stripeStoreConfirmPayment, stripeStoreGetDomesticShippingSession, stripeStoreHandleInventoryCheck, stripeStoreHandleInventoryRefund, stripeStoreInitCheckoutSession, stripeStoreMessageBasedOnStatus, stripeStorePrefetchLandedCost, stripeStoreRemovePromoCode, stripeStoreReset, stripeStoreResetPromoCode, stripeStoreRetrievePayment, stripeStoreSaveDomesticShippingSession, stripeStoreTranslateAddressToLatin, stripeStoreUpdateCheckoutSession, };
+export { initStripeElements, stripeCalculateLandedCost, stripeStore, stripeStoreApplyPromoCode, stripeStoreCleanupDomesticShippingSession, stripeStoreConfirmPayment, stripeStoreGetDomesticShippingSession, stripeStoreGetPaymentIntent, stripeStoreHandleInventoryCheck, stripeStoreHandleInventoryRefund, stripeStoreInitCheckoutSession, stripeStoreMessageBasedOnStatus, stripeStorePrefetchLandedCost, stripeStoreRemovePromoCode, stripeStoreReset, stripeStoreResetPromoCode, stripeStoreRetrievePayment, stripeStoreSaveDomesticShippingSession, stripeStoreTranslateAddressToLatin, stripeStoreUpdateCheckoutSession, };

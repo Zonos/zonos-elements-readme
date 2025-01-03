@@ -56,6 +56,10 @@ export type CalculateLandedCostRequest = {
         key: string;
         value: string;
     }[];
+    /**
+     * TaxId that the some destination countries require for the shipment.
+     */
+    shipToTaxId?: string;
     shippingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;
@@ -103,6 +107,10 @@ export type CartCalculateLandedCostRequest = {
         key: string;
         value: string;
     }[];
+    /**
+     * TaxId that the some destination countries require for the shipment.
+     */
+    shipToTaxId?: string;
     shippingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;

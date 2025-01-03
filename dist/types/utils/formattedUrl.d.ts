@@ -4,6 +4,6 @@ export declare const formattedUrl: ({ branchName, inCI: _inCI, inVercel: _inVerc
     inVercel: boolean;
     isVercelPreview: boolean;
     packageVersion: string;
-    type: 'major' | 'full' | 'vercel-git';
+    type: "major" | "full" | "vercel-git";
     url?: string;
 }) => string | undefined;

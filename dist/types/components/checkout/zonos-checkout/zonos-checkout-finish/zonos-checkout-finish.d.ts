@@ -49,6 +49,7 @@ export declare class ZonosCheckoutFinish {
     private getPullOrder;
     private useOverrideSuccessNotification;
     private checkStripePaymentStatus;
+    private checkStagingOrderStatus;
     private checkPaypalPaymentStatus;
     private closeClickHandler;
     private saveOrderIdForDuplicationIssue;

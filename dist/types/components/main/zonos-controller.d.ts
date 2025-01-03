@@ -42,6 +42,7 @@ export declare class ZonosController {
      * Init history listener to know when the location changes to re-inject hello component
      */
     private initHistoryListener;
+    private injectCustomHTML;
     componentWillLoad(): Promise<void>;
     /**
      * Show notification

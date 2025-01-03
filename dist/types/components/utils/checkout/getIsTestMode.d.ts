@@ -1,1 +1,1 @@
-export declare const getIsTestMode: () => boolean | undefined;
+export declare const getIsTestMode: () => boolean;

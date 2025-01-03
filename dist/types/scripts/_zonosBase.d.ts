@@ -255,6 +255,7 @@ export declare abstract class Zonos {
     static cartId: string | null;
     private static zonosController;
     static init: (params: LoadZonosParams) => Promise<void>;
+    private static injectCustomScriptForHostedCheckout;
     static displayCurrency: () => void;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;

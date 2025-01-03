@@ -4,8 +4,8 @@ export declare const getLocaleMessages: ({ countryCode, localeTo, storeId, }: {
     localeTo?: string;
     storeId: number;
 }) => Promise<{
-    countryCodes: string[] | null;
-    countryCodesPageMessageLinks: {
+    countryCodes: Array<string> | null;
+    countryCodesPageMessageLinks: Array<{
         id: number;
         message: {
             id: number;
@@ -14,7 +14,7 @@ export declare const getLocaleMessages: ({ countryCode, localeTo, storeId, }: {
             textFrom: string;
             textTo: string;
         };
-    }[];
+    }>;
     id: number;
     pageName: import("src/types/generated/graphql.frontend.types").Locale_PageName_Enum;
 }[]>;

@@ -18,8 +18,14 @@ export declare class ZonosLinkAuthentication {
      */
     linkAuthenticationChange?: EventEmitter<void>;
     stripe: Stripe | null;
+    isStagingMode: boolean;
+    clientSecret: string;
     el: HTMLZonosLinkAuthenticationElement;
+    watchIsStagingMode(): void;
     watchInitStripe(): void;
+    private setCustomEmailInputToLinkEvent;
+    private handleNormalEmailInput;
+    watchDefaultEmail(): void;
     componentDidLoad(): void;
     render(): any;
 }

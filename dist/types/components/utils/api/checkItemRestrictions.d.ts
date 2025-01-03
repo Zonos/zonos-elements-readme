@@ -3,11 +3,11 @@ export declare const checkItemRestrictions: ({ items, shipFrom, shipTo, }: Check
     action: import("src/types/generated/graphql.internal.types").ItemRestrictionAction | null;
     id: string;
     itemDescription: string | null;
-    itemRestrictions: ({
+    itemRestrictions: Array<{
         hsCode: string;
         id: string;
         note: string;
-        sources: (string | null)[] | null;
+        sources: Array<string | null> | null;
         type: import("src/types/generated/graphql.internal.types").ItemRestrictionType;
-    } | null)[] | null;
+    } | null> | null;
 }[]>;
