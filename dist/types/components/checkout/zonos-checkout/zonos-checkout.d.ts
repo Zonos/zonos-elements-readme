@@ -110,10 +110,12 @@ export declare class ZonosCheckout {
     private formatDate;
     private formatTime;
     appearanceSettingsOverrideChanged(): void;
+    private useShippingDataFromCreateCartId;
     /**
      * Set default address from query param if it's valid
      */
     private useLegacyQueryParams;
+    private applyPrefillAddress;
     overrideStagingModeChanged(): void;
     /**
      * Setup all of the event listeners for the component on first load

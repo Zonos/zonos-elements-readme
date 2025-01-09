@@ -1080,6 +1080,25 @@ type BuildCardDetailParams = {
     countryCode: CountryCode;
     currencyCode: CurrencyCode;
 };
+type PromiseOrValue<T> = T | Promise<T>;
+type PrefillAddress = {
+    customerAddress1: string;
+    customerAddress2?: string;
+    customerCity?: string;
+    /**
+     * If country is not provided, it will try to pull from query params `zCountry` or `country` or `customerCountry` in the URL or fallback to user's selected country
+     */
+    customerCountry?: string;
+    customerEmail: string;
+    customerName: string;
+    customerPhone: string;
+    customerState?: string;
+    customerZip: string;
+};
+type CreateCartIdObject = {
+    cartId: string;
+    shippingData?: PrefillAddress | null;
+};
 type CheckoutConfig = {
     /**
      * Validate address to allow specific character sets
@@ -1191,7 +1210,7 @@ type CheckoutConfig = {
      * The mutation `cartCreate` should be called on the server side
      * @returns string - Cart ID
      */
-    createCartId?: () => Promise<string> | string;
+    createCartId?: () => PromiseOrValue<string | CreateCartIdObject>;
     /**
      * Callback trigger when the checkout is closed
      */
