@@ -29,6 +29,14 @@ export declare class ZonosDialog {
      */
     noHeader: boolean;
     /**
+     * The title of the loading text
+     */
+    loadingTitle?: string;
+    /**
+     * The text that will be shown while loading
+     */
+    loadingText?: string;
+    /**
      * Whether or not to have body padding
      * @default false
      */

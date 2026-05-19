@@ -41,6 +41,7 @@ export type CalculateLandedCostRequest = {
     };
     checkoutSessionId: string;
     contact: {
+        companyName?: string;
         email?: string;
         firstName: string;
         lastName: string;
@@ -56,6 +57,10 @@ export type CalculateLandedCostRequest = {
         key: string;
         value: string;
     }[];
+    /**
+     * Short address code that the some destination countries require for the shipment.
+     */
+    shipToShortAddressCode?: string;
     /**
      * TaxId that the some destination countries require for the shipment.
      */
@@ -91,8 +96,10 @@ export type CartCalculateLandedCostRequest = {
      */
     cartCurrencyCode: CurrencyCode;
     cartId: string;
+    checkoutSessionCountry?: CountryCode;
     checkoutSessionId: string;
     contact: {
+        companyName?: string;
         email?: string;
         firstName: string;
         lastName: string;
@@ -107,6 +114,10 @@ export type CartCalculateLandedCostRequest = {
         key: string;
         value: string;
     }[];
+    /**
+     * Short address code that the some destination countries require for the shipment.
+     */
+    shipToShortAddressCode?: string;
     /**
      * TaxId that the some destination countries require for the shipment.
      */

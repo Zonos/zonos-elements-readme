@@ -11,5 +11,14 @@ export declare class ZonosCartSubtotal {
      * Loading state for apply promo code button
      */
     loading: boolean;
+    private getInclusivePriceType;
+    /**
+     * Render a single merchant-provided message line. Segments come from
+     * [[parseLinkedText]] and are emitted as VNodes (never `innerHTML`) so
+     * untrusted strings can't inject HTML.
+     */
+    private renderMessageLine;
+    private renderCustomMessage;
+    private getCartSubtotalSubtitle;
     render(): any;
 }

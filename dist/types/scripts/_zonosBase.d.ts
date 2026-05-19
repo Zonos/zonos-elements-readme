@@ -1,11 +1,18 @@
 import type { PayPalNamespace } from '@paypal/paypal-js';
 import type { Stripe } from '@stripe/stripe-js';
 import type { AppearanceConfig } from "../components/store/zonosStore";
+import { IframeService } from "../components/utils/iframe/IframeHelpers";
+import type { LoadTimeApiLogInfo } from "../components/utils/logging/prepLoadTimeApiLog";
 import type { NotificationInit } from "../types/index";
-import type { NormalizedTempCart } from "../types/checkout/api/NormalizedTempCart";
+import type { CartCheckoutResult, NormalizedTempCart } from "../types/checkout/api/NormalizedTempCart";
 import { type CheckoutConfig } from "../types/checkout/CheckoutConfig";
 import type { CountryCode, CurrencyCode, PaypalMockResponse } from "../types/generated/graphql.internal.types";
 import type { HelloConfig } from "../types/hello/HelloConfig";
+type TrackEventLog = {
+    checkoutSessionId: string | null;
+    eventCreated: number;
+    eventName: string;
+};
 /**
  * Currency converter function to be used in Hello and Checkout
  * @note don't modify the element directly in this function, otherwise it might cause unexpected behavior like an infinite loop
@@ -163,13 +170,17 @@ export type LoadZonosParamsConfig = {
          */
         countryCode: CountryCode;
         /**
-         * @param currencyCode Updated currency code
+         * @param currencyCode Updated currency code (null if the selected country is not in shipping zone as hello won't do currency conversion for non-shipping zone countries)
          */
-        currencyCode: CurrencyCode;
+        currencyCode: CurrencyCode | null;
+        /**
+         * @param isShippableCountry Flag to indicate if the selected country is in shipping zone
+         */
+        isShippableCountry: boolean;
     }) => void;
 };
 export type LoadZonosParams = LoadZonosParamsConfig & {
-    storeId: number;
+    storeId?: number;
     /**
      * If cart id is provided in the url with query param zCartUUID, you don't need to provide zonosApiKey
      */
@@ -183,20 +194,60 @@ export interface Zonos {
     cartData: NormalizedTempCart | null;
     cartId: string | null;
     /**
+     * Cart settings from `getCartCheckout`
+     */
+    cartSettings: CartCheckoutResult['settings'] | null;
+    /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
      */
     debug?: boolean;
     domain: string;
     doneInit: boolean;
+    /**
+     * Facebook Pixel ID (numeric string). Set from cart metadata or custom script.
+     * When in iframe, used to tell parent's analyticsRelay to inject and configure the FB Pixel.
+     */
+    facebookPixelId: string | null;
+    /**
+     * True when FB Pixel is enabled and ready (either not in iframe, or parent relay has confirmed fbq ready).
+     */
+    facebookPixelReady: boolean;
+    /**
+     * Google Analytics 4 measurement ID (e.g. G-XXXXXXXXXX). Set from cart metadata or custom script.
+     * When in iframe, used to tell parent's analyticsRelay to inject and configure GA.
+     */
+    googleAnalyticId: string | null;
+    /**
+     * True when GA is enabled and ready (either not in iframe, or parent relay has confirmed gtag ready).
+     */
+    googleAnalyticReady: boolean;
+    /**
+     * Log type for iframe, print out console or not
+     */
+    iframeLogType: string | null;
     isBigCommerce: boolean;
+    /**
+     * This will be set to true when it's called form collect
+     */
+    isCollect: boolean;
+    /**
+     * This will be set to true when it's called form invoice
+     */
+    isInvoice: boolean;
     /**
      * This will be set to true when it's called form legacy checkout
      */
     isLegacyCheckout: boolean;
     isNpm: boolean;
+    loadTimeApiInfoList: LoadTimeApiLogInfo[];
+    logIntervalId: NodeJS.Timeout | null;
     /** Flag if already alerted when preview domain is defined and it's connecting production environment */
     modeAlerted: boolean;
+    /**
+     * Override the default behavior of using the custom address form
+     */
+    overrideUseCustomAddressForm: boolean;
     paypal: PayPalNamespace | null;
     /**
      * Version release timestamp
@@ -208,15 +259,27 @@ export interface Zonos {
      * @default false
      */
     showBaseForeign: boolean;
-    storeId: number;
+    /**
+     * The time that loadZonos.js started to load
+     */
+    startLoadTime: number;
+    storeId?: number;
     /** Stripe instance */
     stripe: Stripe;
+    /**
+     * Logs of tracking events
+     */
+    trackEventLogs: TrackEventLog[];
     version: string;
     zonosApiKey?: string;
     /**
      * Flag to send tracking event to api for conversion testing, since we don't send tracking event to api when in debug/development mode
      */
     zonosConversionTest?: boolean;
+    /**
+     * Zonos mode
+     */
+    zonosMode: 'production' | 'test' | null;
     zonosQaUrl: string | null;
     zonosQaUrlApi: string | null;
     displayCurrency: () => void;
@@ -226,41 +289,71 @@ export interface Zonos {
     openHelloDialog: (state?: boolean) => void;
     setupGoogleFont: (fontFamily: string) => void;
     showNotification: (props: NotificationInit) => void;
+    /**
+     * Trigger the checkout international button, always trigger Checkout even user are not in shipping zone
+     */
+    triggerCheckoutInternational: () => void;
     updateOrganizationName: (organizationName: string) => void;
 }
 export declare abstract class Zonos {
     static zonosApiKey?: string;
     static stripe: Stripe;
-    static storeId: number;
+    static storeId?: number;
     static doneInit: boolean;
+    static cartSettings: CartCheckoutResult['settings'] | null;
     static debug: boolean;
     static zonosConversionTest: boolean;
     static _paypalMockResponse: PaypalMockResponse | null;
+    static iframeLogType: string | null;
     static isBigCommerce: boolean;
     static releaseDate: string;
     static isLegacyCheckout: boolean;
+    static googleAnalyticId: string | null;
+    static googleAnalyticReady: boolean;
+    static facebookPixelId: string | null;
+    static facebookPixelReady: boolean;
+    static startLoadTime: number;
     static domain: string;
     static showBaseForeign: boolean;
+    static overrideUseCustomAddressForm: boolean;
+    static isCollect: boolean;
+    static isInvoice: boolean;
     /**
      * By default, the package will load from npm
      */
     static isNpm: boolean;
     static zonosQaUrl: string | null;
     static zonosQaUrlApi: string | null;
+    static trackEventLogs: TrackEventLog[];
     static version: string;
     static modeAlerted: boolean;
     static cartData: NormalizedTempCart | null;
     static paypal: PayPalNamespace | null;
+    static zonosMode: 'production' | 'test' | null;
+    static IframeService: typeof IframeService;
     static getCurrentTimestamp: () => number;
     static cartId: string | null;
     private static zonosController;
+    static loadTimeApiInfoList: LoadTimeApiLogInfo[];
+    static logIntervalId: NodeJS.Timeout | null;
     static init: (params: LoadZonosParams) => Promise<void>;
+    /**
+     * Inject the hidden international checkout button to trigger checkout regardless of shipping zones
+     */
+    private static injectCheckoutInternationalButton;
     private static injectCustomScriptForHostedCheckout;
     static displayCurrency: () => void;
+    static triggerCheckoutInternational: () => Promise<void>;
     static openHelloDialog: (value?: boolean) => void;
     static showNotification: (notification: NotificationInit) => void;
     static updateOrganizationName: (organizationName: string) => void;
     private static disablePlaceOrderButtons;
+    /**
+     * Zonos elements and its dependencies are using the native browser functions.
+     * This function will restore the native browser functions that are overridden by the merchant's polyfills.
+     * If the URL parameter `useMerchantPolyfill=1` is present, keep the merchant's polyfills instead of restoring native browser functions. This allows testing checkout compatibility with merchant polyfills.
+     */
+    private static restoreNativeBrowserFunctions;
     private static injectController;
     private static injectScript;
     /**
@@ -274,3 +367,4 @@ export declare abstract class Zonos {
     static setupGoogleFont: (fontFamily: string) => void;
     static injectSupportGoogleFont: (fontUrl: string) => void;
 }
+export { IframeService } from 'src/components/utils/iframe/IframeHelpers';

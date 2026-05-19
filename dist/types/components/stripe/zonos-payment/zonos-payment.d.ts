@@ -7,7 +7,10 @@ export declare class ZonosPayment {
     stripe: Stripe | null;
     stripeElements: StripeElements | null;
     el: HTMLZonosPaymentElement;
-    watchInitStripe(): void;
+    isPaymentInfoFilled: boolean;
+    private trackingSent;
+    watchIsPaymentInfoFilled(): void;
+    watchInitStripe(): Promise<void>;
     componentDidLoad(): void;
     render(): any;
 }

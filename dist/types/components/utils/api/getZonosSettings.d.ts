@@ -1,10 +1,10 @@
-import type { ZonosSettingsQuery } from "../../../types/generated/graphql.internal.types";
+import type { ZonosSettings } from "../../../types/utils/ZonosSettings";
 export declare const getZonosSettings: () => Promise<{
     errors: import("../../..").JsonError[];
     json: null;
     zonosMode: "production" | "test" | null;
 } | {
     errors: never[];
-    json: ZonosSettingsQuery | null;
+    json: ZonosSettings | null;
     zonosMode: "production" | "test" | null;
 }>;

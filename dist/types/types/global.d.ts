@@ -1,5 +1,6 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-import type { StripeConstructor } from '@stripe/stripe-js';
+/// <reference types="google.maps" />
+import type { StripeConstructor, StripeElements } from '@stripe/stripe-js';
 
 /** Need to use relative path so that this declaration file can be correctly bundled */
 import type { CustomEventMap } from '../components/utils/createCustomEvent';
@@ -23,6 +24,10 @@ declare global {
      */
     bcConfig?: unknown;
     /**
+     * In bigcommerce domestic checkout page, some merchants might use Stripe address element for address population.
+     */
+    bcStripeElements?: StripeElements;
+    /**
      * This flag would be set to true if zonosQaUrl is present in the query params and preview script loadZonos.js is injected to DOM
      */
     isZonosPreview?: boolean;
@@ -30,6 +35,14 @@ declare global {
      * A flag to determine if the current page is a BigCommerce page
      */
     stencilBootstrap?: unknown;
+    /**
+     * Currency selector to perform blur currency on init
+     */
+    zonosBlurCurrencyOnInitCurrencySelector?: string;
+    /**
+     * Interval id to perform blur currency on init
+     */
+    zonosBlurCurrencyOnInitIntervalId?: NodeJS.Timeout;
   }
 
   namespace NodeJS {
@@ -37,3 +50,5 @@ declare global {
     interface ProcessEnv extends Env {}
   }
 }
+
+export {};

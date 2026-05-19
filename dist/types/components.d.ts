@@ -5,12 +5,13 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "./stencil-public-runtime";
-import { ContactOption, PaymentIntent, Stripe } from "@stripe/stripe-js";
+import { ContactOption, PaymentIntent, Stripe, StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 import { EnteredInfo, TranslatedAddressObject } from "./types/checkout/TranslatedText";
+import { EventPayloadMap, IframeSuggestionsResponsePayload } from "./components/utils/iframe/IframeHelpers";
 import { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-address-update-dialog/zonos-address-update-dialog";
 import { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
 import { BannerIntent } from "./components/common/zonos-banner/zonos-banner";
-import { CheckoutSessionDetailsFragment, CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.internal.types";
+import { CheckoutSessionDetailsFragment, CountryCode, ElementsUiStyle, ElementsUiTheme, HelloDesktopLocation, HelloMobileLocation } from "./types/generated/graphql.internal.types";
 import { Color as Color1 } from "./types/index";
 import { FontWeight, Size, Type } from "./types/styles/Text";
 import { AppearanceConfig } from "./components/store/zonosStore";
@@ -18,20 +19,25 @@ import { StripeStoreContactOption } from "./components/store/checkout/stripe";
 import { TabItem, TabItems } from "./components/store/checkout/cart";
 import { LoadZonosParamsConfig } from "./scripts/_zonosBase";
 import { NotificationInit } from "./components/common/zonos-notification/zonos-notification";
+import { CustomAddressErrors } from "./types/checkout/form/CustomAddressErrors";
+import { GridSpacing } from "./types/styles/GridSpacing";
 import { ICountryJson } from "./types/ICountryJson";
 import { RestrictedItem } from "./types/hello/RestrictedItem";
 import { AppearanceConfig as AppearanceConfig1 } from "./components.d";
 import { RestStateType } from "./components/utils/restStateType";
 import { ShippingRichRadioItem } from "./components/common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 import { SpinnerColor } from "./components/common/zonos-spinner/zonos-spinner";
+import { GenericZonosSettings } from "./types/utils/ZonosSettings";
+import { SelectOption } from "./components/common/zonos-stripe-select/zonos-stripe-select";
 import { ToggleItem } from "./types/common-ui/Toggle";
-import { GridSpacing } from "./types/styles/GridSpacing";
-export { ContactOption, PaymentIntent, Stripe } from "@stripe/stripe-js";
+import { VirtualScrollRenderItem } from "./types/common-ui/VirtualScroll";
+export { ContactOption, PaymentIntent, Stripe, StripeAddressElementChangeEvent } from "@stripe/stripe-js";
 export { EnteredInfo, TranslatedAddressObject } from "./types/checkout/TranslatedText";
+export { EventPayloadMap, IframeSuggestionsResponsePayload } from "./components/utils/iframe/IframeHelpers";
 export { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-address-update-dialog/zonos-address-update-dialog";
 export { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
 export { BannerIntent } from "./components/common/zonos-banner/zonos-banner";
-export { CheckoutSessionDetailsFragment, CountryCode, ElementsUiStyle, ElementsUiTheme, HelloMobileLocation } from "./types/generated/graphql.internal.types";
+export { CheckoutSessionDetailsFragment, CountryCode, ElementsUiStyle, ElementsUiTheme, HelloDesktopLocation, HelloMobileLocation } from "./types/generated/graphql.internal.types";
 export { Color as Color1 } from "./types/index";
 export { FontWeight, Size, Type } from "./types/styles/Text";
 export { AppearanceConfig } from "./components/store/zonosStore";
@@ -39,20 +45,32 @@ export { StripeStoreContactOption } from "./components/store/checkout/stripe";
 export { TabItem, TabItems } from "./components/store/checkout/cart";
 export { LoadZonosParamsConfig } from "./scripts/_zonosBase";
 export { NotificationInit } from "./components/common/zonos-notification/zonos-notification";
+export { CustomAddressErrors } from "./types/checkout/form/CustomAddressErrors";
+export { GridSpacing } from "./types/styles/GridSpacing";
 export { ICountryJson } from "./types/ICountryJson";
 export { RestrictedItem } from "./types/hello/RestrictedItem";
 export { AppearanceConfig as AppearanceConfig1 } from "./components.d";
 export { RestStateType } from "./components/utils/restStateType";
 export { ShippingRichRadioItem } from "./components/common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 export { SpinnerColor } from "./components/common/zonos-spinner/zonos-spinner";
+export { GenericZonosSettings } from "./types/utils/ZonosSettings";
+export { SelectOption } from "./components/common/zonos-stripe-select/zonos-stripe-select";
 export { ToggleItem } from "./types/common-ui/Toggle";
-export { GridSpacing } from "./types/styles/GridSpacing";
+export { VirtualScrollRenderItem } from "./types/common-ui/VirtualScroll";
 export namespace Components {
     interface ZonosAddress {
         /**
           * Default address for stripe
          */
-        "defaultAddress": ContactOption | null;
+        "defaultAddress": ContactOption[];
+        /**
+          * Error message for short address code input
+         */
+        "shortAddressCodeErrorMessage": string;
+        /**
+          * Error message for tax id input
+         */
+        "taxIdErrorMessage": string;
         /**
           * The title text for the address element
          */
@@ -85,6 +103,16 @@ export namespace Components {
           * Translated address
          */
         "translatedAddress": TranslatedAddressObject;
+    }
+    interface ZonosAddressSuggestions {
+        /**
+          * Suggestions to display
+         */
+        "suggestions": IframeSuggestionsResponsePayload['suggestions'];
+        /**
+          * Type of the address suggestions
+         */
+        "type": 'billing' | 'shipping';
     }
     interface ZonosAddressUpdateDialog {
         /**
@@ -184,6 +212,10 @@ export namespace Components {
           * The color of the button **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never });
+        /**
+          * Whether or not the button text color is bold
+         */
+        "bold": boolean;
         /**
           * The border style of the button
           * @default ROUNDED
@@ -356,11 +388,16 @@ export namespace Components {
         /**
           * Default address to use for the checkout (preview mode)
          */
-        "defaultAddress": StripeStoreContactOption | null;
+        "defaultAddress": | StripeStoreContactOption[]
+    | StripeStoreContactOption;
         /**
           * Force dialog to be open
          */
         "forceDialogOpen": boolean;
+        /**
+          * Hidden mode to hide the checkout modal in preview mode
+         */
+        "hiddenMode": boolean;
         /**
           * Setup all of the event listeners for the component on first load
          */
@@ -385,6 +422,10 @@ export namespace Components {
           * For storybook to set to finish step, this is to trigger in the story for zonos-checkout-finish
          */
         "setToFinishStep": (forcePaymentStatus?: PaymentIntent["status"]) => Promise<void>;
+        /**
+          * Trigger the checkout international button
+         */
+        "triggerCheckoutInternational": () => Promise<void>;
     }
     interface ZonosCheckoutFinish {
         /**
@@ -463,6 +504,102 @@ export namespace Components {
           * Collapsed state of the element
          */
         "collapsed": boolean;
+    }
+    interface ZonosCollect {
+        /**
+          * Flag to determine if the checkout is on mobile
+         */
+        "mobile": boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet": boolean;
+    }
+    interface ZonosCollectCartItems {
+    }
+    interface ZonosCollectFinish {
+        /**
+          * The border radius style of the dialog
+         */
+        "borderRadius": ElementsUiStyle;
+        /**
+          * The confirmation id for the collect order
+         */
+        "confirmationId": string | null;
+        /**
+          * Override the notification message and title, bypass checking stripe payment status
+         */
+        "overrideNotification"?: {
+    messages: string[];
+    title: string;
+    type: 'success' | 'error';
+  };
+        /**
+          * Force status to test the UI for storybook
+         */
+        "storybookForceStatus"?: PaymentIntent['status'];
+    }
+    interface ZonosCollectFooter {
+        /**
+          * Theme to change the color of the logo
+         */
+        "dataTheme"?: ElementsUiTheme;
+        /**
+          * Override mobile mode
+         */
+        "mobile": boolean;
+        /**
+          * Override tablet mode
+         */
+        "tablet": boolean;
+    }
+    interface ZonosCollectOrderDetails {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed": boolean;
+        /**
+          * The landed cost id that is used to fetch the shipping address
+         */
+        "landedCostId": string;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile": boolean;
+    }
+    interface ZonosCollectPayment {
+        /**
+          * Whether or not the continue button is loading
+         */
+        "continueLoading": boolean;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Submit button main color
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
+    }
+    interface ZonosCollectReview {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed": boolean;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile": boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet": boolean;
+    }
+    interface ZonosCollectSubtotal {
     }
     interface ZonosComponent {
         /**
@@ -544,6 +681,14 @@ export namespace Components {
          */
         "initCheckoutElement": (stripe: Stripe) => Promise<void>;
         /**
+          * Method to initialize Collect element
+         */
+        "initCollectElement": (stripe: Stripe) => Promise<void>;
+        /**
+          * Method to initialize Collect element
+         */
+        "initInvoiceElement": (stripe: Stripe) => Promise<void>;
+        /**
           * Override the setting
           * @param config config that need to override the default setting
          */
@@ -594,6 +739,28 @@ export namespace Components {
     }
     interface ZonosCurrencyToggle {
     }
+    interface ZonosCustomAddress {
+        /**
+          * Default address for stripe
+         */
+        "defaultAddress": ContactOption[];
+        /**
+          * Error message for short address code input
+         */
+        "shortAddressCodeErrorMessage": string;
+        /**
+          * Error message for tax id input
+         */
+        "taxIdErrorMessage": string;
+        /**
+          * The title text for the address element
+         */
+        "titleText": string;
+        /**
+          * The type of address element to render
+         */
+        "type": 'billing' | 'shipping';
+    }
     interface ZonosCustomMessage {
         /**
           * The custom message icon
@@ -612,11 +779,15 @@ export namespace Components {
         /**
           * Default address to use for the checkout (preview mode)
          */
-        "defaultAddress": StripeStoreContactOption | null;
+        "defaultAddress": StripeStoreContactOption[];
         /**
           * Whether or not the dialog is open
          */
         "isMobile": boolean;
+        /**
+          * Whether to override custom address form to be always visible
+         */
+        "shouldUseCustomAddressFormOverride": boolean;
         /**
           * Submit button main color
          */
@@ -644,6 +815,14 @@ export namespace Components {
           * Load loading spinner for the dialog or not
          */
         "isLoading": boolean;
+        /**
+          * The text that will be shown while loading
+         */
+        "loadingText"?: string;
+        /**
+          * The title of the loading text
+         */
+        "loadingTitle"?: string;
         /**
           * The min height of the dialog
          */
@@ -698,6 +877,13 @@ export namespace Components {
          */
         "theme": ElementsUiTheme;
     }
+    interface ZonosHStack {
+        /**
+          * The spacing between elements in the stack
+          * @default 24
+         */
+        "spacing": GridSpacing;
+    }
     interface ZonosHello {
         /**
           * Force left animation instead of detecting which side has more space
@@ -718,6 +904,10 @@ export namespace Components {
           * @returns string
          */
         "convertAndFormat": (value: number) => Promise<string>;
+        /**
+          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocation` and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
+         */
+        "desktopLocationOverride"?: HelloDesktopLocation;
         /**
           * This method will trigger the currency conversion and display the converted value
           * @returns void
@@ -837,6 +1027,110 @@ export namespace Components {
          */
         "isError": boolean;
     }
+    interface ZonosInvoice {
+        /**
+          * Flag to determine if the checkout is on mobile
+         */
+        "mobile": boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet": boolean;
+    }
+    interface ZonosInvoiceCartItems {
+        /**
+          * Whether the component is mobile
+         */
+        "isMobile": boolean;
+    }
+    interface ZonosInvoiceFinish {
+        /**
+          * The border radius style of the dialog
+         */
+        "borderRadius": ElementsUiStyle;
+        /**
+          * The confirmation id for the invoice order
+         */
+        "confirmationId": string | null;
+        /**
+          * Override the notification message and title, bypass checking stripe payment status
+         */
+        "overrideNotification"?: {
+    messages: string[];
+    title: string;
+    type: 'success' | 'error';
+  };
+        /**
+          * Force status to test the UI for storybook
+         */
+        "storybookForceStatus"?: PaymentIntent['status'];
+    }
+    interface ZonosInvoiceFooter {
+        /**
+          * Theme to change the color of the logo
+         */
+        "dataTheme"?: ElementsUiTheme;
+        /**
+          * Override mobile mode
+         */
+        "mobile": boolean;
+        /**
+          * Override tablet mode
+         */
+        "tablet": boolean;
+    }
+    interface ZonosInvoiceOrderDetails {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed": boolean;
+        /**
+          * The landed cost id that is used to fetch the shipping address
+         */
+        "landedCostId": string;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile": boolean;
+    }
+    interface ZonosInvoicePayment {
+        /**
+          * Whether or not the continue button is loading
+         */
+        "continueLoading": boolean;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Submit button main color
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
+    }
+    interface ZonosInvoiceReview {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed": boolean;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile": boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet": boolean;
+    }
+    interface ZonosInvoiceSubtotal {
+        /**
+          * Whether the component is mobile
+         */
+        "isMobile": boolean;
+    }
     interface ZonosLanguageSelect {
         /**
           * Function to close the language select
@@ -875,6 +1169,27 @@ export namespace Components {
           * The title text for the authentication element
          */
         "titleText": string;
+    }
+    interface ZonosLoadingOverlay {
+        /**
+          * Whether or not the overlay is open
+          * @default false
+         */
+        "open": boolean;
+        /**
+          * Spinner size (optional, default 40)
+         */
+        "size": number;
+        /**
+          * Spinner color (optional)
+         */
+        "spinnerColor"?: | 'primary'
+    | 'info'
+    | 'success'
+    | 'danger'
+    | 'warning'
+    | 'black'
+    | 'white';
     }
     interface ZonosLogo {
         /**
@@ -941,6 +1256,10 @@ export namespace Components {
          */
         "continueLoading": boolean;
         /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "isMobile": boolean;
+        /**
           * Submit button main color
          */
         "submitBtnColor"?: string;
@@ -959,6 +1278,10 @@ export namespace Components {
          */
         "borderStyle"?: ElementsUiStyle;
         /**
+          * Whether or not the radio item is in mobile mode
+         */
+        "isMobile": boolean;
+        /**
           * List of items to display
          */
         "items": ShippingRichRadioItem[];
@@ -972,6 +1295,22 @@ export namespace Components {
          */
         "theme"?: ElementsUiTheme;
     }
+    interface ZonosSkeleton {
+        /**
+          * Callback for when the skeleton is dismissed. Also determines if dismiss icon shown.
+         */
+        "dismissHandler"?: () => void;
+        /**
+          * The height of the skeleton
+          * @default '14px'
+         */
+        "skeletonHeight"?: string;
+        /**
+          * The width of the skeleton
+          * @default '100%'
+         */
+        "skeletonWidth": string;
+    }
     interface ZonosSpinner {
         /**
           * The size of the spinner
@@ -983,10 +1322,24 @@ export namespace Components {
          */
         "spinnerColor"?: SpinnerColor;
     }
+    interface ZonosStoreCredit {
+        /**
+          * Whether the component is enabled
+         */
+        "enabled": boolean;
+    }
     /**
      * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
      */
     interface ZonosStripeInput {
+        /**
+          * Autocomplete attribute for the input
+         */
+        "autoComplete"?: string;
+        /**
+          * Error message of the input
+         */
+        "error"?: string;
         /**
           * Input label
          */
@@ -1008,6 +1361,10 @@ export namespace Components {
          */
         "isError": boolean;
         /**
+          * Name of the input
+         */
+        "name"?: string;
+        /**
           * Primary color to override primary color from appearance primary color in setting.
          */
         "overridePrimaryColor"?: string;
@@ -1016,7 +1373,115 @@ export namespace Components {
          */
         "overrideSecondaryColor"?: string;
         /**
+          * Whether the input is required
+         */
+        "required"?: boolean;
+        /**
           * The value of the input.
+         */
+        "value": string;
+    }
+    interface ZonosStripePhoneInput {
+        /**
+          * The autoComplete attribute for the phone input
+         */
+        "autoComplete": string;
+        /**
+          * The country code of the phone input
+         */
+        "countryCode": CountryCode | null;
+        /**
+          * Available country options for the select dropdown
+         */
+        "countryOptions": GenericZonosSettings['countryFields'] | null;
+        /**
+          * Whether the input is disabled
+         */
+        "disabled": boolean;
+        /**
+          * Error message to display
+         */
+        "error"?: string;
+        /**
+          * Label text for the input
+         */
+        "inputLabel"?: string;
+        /**
+          * Current value of the phone input
+         */
+        "inputValue"?: string;
+        /**
+          * Minimum width of the phone input
+         */
+        "minWidth"?: string;
+        /**
+          * Override the primary color
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Override the secondary color
+         */
+        "overrideSecondaryColor"?: string;
+    }
+    interface ZonosStripeSelect {
+        /**
+          * The autoComplete attribute for the select.
+         */
+        "autoComplete": string;
+        /**
+          * Error message of the select
+         */
+        "error": string;
+        /**
+          * Whether the select can be cleared
+         */
+        "isClearable": boolean;
+        /**
+          * Disables the select
+         */
+        "isDisabled": boolean;
+        /**
+          * Error state of the select
+         */
+        "isError": boolean;
+        /**
+          * Minimum width of the select
+         */
+        "minWidth"?: string;
+        /**
+          * Name of the select
+         */
+        "name"?: string;
+        /**
+          * Options for the select. Must be set using a query selector.
+         */
+        "options": SelectOption[];
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Secondary color to override secondary color from appearance secondary color in setting
+         */
+        "overrideSecondaryColor"?: string;
+        /**
+          * Whether the select is required
+         */
+        "required"?: boolean;
+        /**
+          * Select label
+         */
+        "selectLabel": string;
+        /**
+          * Placeholder for the select
+         */
+        "selectPlaceholder": string;
+        /**
+          * Selected value of the select
+         */
+        "selectedValue": string;
+        /**
+          * The value of the select.
          */
         "value": string;
     }
@@ -1066,34 +1531,33 @@ export namespace Components {
         "spacing": GridSpacing;
     }
     /**
-     * The idea is from
+     * Virtual scroll component for efficiently rendering large lists
+     * The idea is from:
      * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
      * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
      */
     interface ZonosVirtualScroll {
         /**
-          * Height that is used as a fallback if height is not provided
+          * Buffer size in pixels for pre-rendering items outside viewport
+          * @default 100
+         */
+        "buffer": number;
+        /**
+          * Fallback height used when specific item height is not provided
          */
         "fallbackItemHeight": number;
         /**
-          * Heights list of each item
+          * Array of heights for each item in pixels
          */
         "itemHeights": number[];
         /**
-          * Width of each item
+          * Width of each item in pixels
          */
         "itemWidth"?: number;
         /**
-          * Render item
+          * Function to render each item in the virtual scroll
          */
-        "renderItem": (
-    itemIndex: number,
-  ) =>
-    | HTMLElement
-    | Promise<HTMLElement>
-    | HTMLElement[]
-    | Promise<HTMLElement[]>
-    | Promise<HTMLElement>[];
+        "renderItem": VirtualScrollRenderItem;
     }
 }
 export interface ZonosAddressCustomEvent<T> extends CustomEvent<T> {
@@ -1103,6 +1567,10 @@ export interface ZonosAddressCustomEvent<T> extends CustomEvent<T> {
 export interface ZonosAddressFormCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressFormElement;
+}
+export interface ZonosAddressSuggestionsCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosAddressSuggestionsElement;
 }
 export interface ZonosAddressUpdateDialogCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1120,6 +1588,18 @@ export interface ZonosCheckoutPaymentCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosCheckoutPaymentElement;
 }
+export interface ZonosCollectFinishCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosCollectFinishElement;
+}
+export interface ZonosCollectOrderDetailsCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosCollectOrderDetailsElement;
+}
+export interface ZonosCollectPaymentCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosCollectPaymentElement;
+}
 export interface ZonosConfirmDialogCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosConfirmDialogElement;
@@ -1127,6 +1607,10 @@ export interface ZonosConfirmDialogCustomEvent<T> extends CustomEvent<T> {
 export interface ZonosControllerCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosControllerElement;
+}
+export interface ZonosCustomAddressCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosCustomAddressElement;
 }
 export interface ZonosCustomerInfoCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1143,6 +1627,18 @@ export interface ZonosHelloDialogCustomEvent<T> extends CustomEvent<T> {
 export interface ZonosInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosInputElement;
+}
+export interface ZonosInvoiceFinishCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosInvoiceFinishElement;
+}
+export interface ZonosInvoiceOrderDetailsCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosInvoiceOrderDetailsElement;
+}
+export interface ZonosInvoicePaymentCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosInvoicePaymentElement;
 }
 export interface ZonosLinkAuthenticationCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1164,6 +1660,14 @@ export interface ZonosStripeInputCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosStripeInputElement;
 }
+export interface ZonosStripePhoneInputCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosStripePhoneInputElement;
+}
+export interface ZonosStripeSelectCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosStripeSelectElement;
+}
 export interface ZonosToggleCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosToggleElement;
@@ -1171,6 +1675,7 @@ export interface ZonosToggleCustomEvent<T> extends CustomEvent<T> {
 declare global {
     interface HTMLZonosAddressElementEventMap {
         "invalidCharacters": boolean;
+        "taxIdChanged": string;
     }
     interface HTMLZonosAddressElement extends Components.ZonosAddress, HTMLStencilElement {
         addEventListener<K extends keyof HTMLZonosAddressElementEventMap>(type: K, listener: (this: HTMLZonosAddressElement, ev: ZonosAddressCustomEvent<HTMLZonosAddressElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1208,6 +1713,23 @@ declare global {
     var HTMLZonosAddressFormElement: {
         prototype: HTMLZonosAddressFormElement;
         new (): HTMLZonosAddressFormElement;
+    };
+    interface HTMLZonosAddressSuggestionsElementEventMap {
+        "suggestionSelected": EventPayloadMap['placeSelected'];
+    }
+    interface HTMLZonosAddressSuggestionsElement extends Components.ZonosAddressSuggestions, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosAddressSuggestionsElementEventMap>(type: K, listener: (this: HTMLZonosAddressSuggestionsElement, ev: ZonosAddressSuggestionsCustomEvent<HTMLZonosAddressSuggestionsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosAddressSuggestionsElementEventMap>(type: K, listener: (this: HTMLZonosAddressSuggestionsElement, ev: ZonosAddressSuggestionsCustomEvent<HTMLZonosAddressSuggestionsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosAddressSuggestionsElement: {
+        prototype: HTMLZonosAddressSuggestionsElement;
+        new (): HTMLZonosAddressSuggestionsElement;
     };
     interface HTMLZonosAddressUpdateDialogElementEventMap {
         "closeUpdateDialog": void;
@@ -1346,6 +1868,89 @@ declare global {
         prototype: HTMLZonosCollapseElement;
         new (): HTMLZonosCollapseElement;
     };
+    interface HTMLZonosCollectElement extends Components.ZonosCollect, HTMLStencilElement {
+    }
+    var HTMLZonosCollectElement: {
+        prototype: HTMLZonosCollectElement;
+        new (): HTMLZonosCollectElement;
+    };
+    interface HTMLZonosCollectCartItemsElement extends Components.ZonosCollectCartItems, HTMLStencilElement {
+    }
+    var HTMLZonosCollectCartItemsElement: {
+        prototype: HTMLZonosCollectCartItemsElement;
+        new (): HTMLZonosCollectCartItemsElement;
+    };
+    interface HTMLZonosCollectFinishElementEventMap {
+        "closeClick": void;
+    }
+    interface HTMLZonosCollectFinishElement extends Components.ZonosCollectFinish, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosCollectFinishElementEventMap>(type: K, listener: (this: HTMLZonosCollectFinishElement, ev: ZonosCollectFinishCustomEvent<HTMLZonosCollectFinishElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosCollectFinishElementEventMap>(type: K, listener: (this: HTMLZonosCollectFinishElement, ev: ZonosCollectFinishCustomEvent<HTMLZonosCollectFinishElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosCollectFinishElement: {
+        prototype: HTMLZonosCollectFinishElement;
+        new (): HTMLZonosCollectFinishElement;
+    };
+    interface HTMLZonosCollectFooterElement extends Components.ZonosCollectFooter, HTMLStencilElement {
+    }
+    var HTMLZonosCollectFooterElement: {
+        prototype: HTMLZonosCollectFooterElement;
+        new (): HTMLZonosCollectFooterElement;
+    };
+    interface HTMLZonosCollectOrderDetailsElementEventMap {
+        "collapseClicked": boolean;
+    }
+    interface HTMLZonosCollectOrderDetailsElement extends Components.ZonosCollectOrderDetails, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosCollectOrderDetailsElementEventMap>(type: K, listener: (this: HTMLZonosCollectOrderDetailsElement, ev: ZonosCollectOrderDetailsCustomEvent<HTMLZonosCollectOrderDetailsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosCollectOrderDetailsElementEventMap>(type: K, listener: (this: HTMLZonosCollectOrderDetailsElement, ev: ZonosCollectOrderDetailsCustomEvent<HTMLZonosCollectOrderDetailsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosCollectOrderDetailsElement: {
+        prototype: HTMLZonosCollectOrderDetailsElement;
+        new (): HTMLZonosCollectOrderDetailsElement;
+    };
+    interface HTMLZonosCollectPaymentElementEventMap {
+        "continueClicked": void;
+        "paypalSessionFailed": void;
+        "paypalSessionDone": string;
+    }
+    interface HTMLZonosCollectPaymentElement extends Components.ZonosCollectPayment, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosCollectPaymentElementEventMap>(type: K, listener: (this: HTMLZonosCollectPaymentElement, ev: ZonosCollectPaymentCustomEvent<HTMLZonosCollectPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosCollectPaymentElementEventMap>(type: K, listener: (this: HTMLZonosCollectPaymentElement, ev: ZonosCollectPaymentCustomEvent<HTMLZonosCollectPaymentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosCollectPaymentElement: {
+        prototype: HTMLZonosCollectPaymentElement;
+        new (): HTMLZonosCollectPaymentElement;
+    };
+    interface HTMLZonosCollectReviewElement extends Components.ZonosCollectReview, HTMLStencilElement {
+    }
+    var HTMLZonosCollectReviewElement: {
+        prototype: HTMLZonosCollectReviewElement;
+        new (): HTMLZonosCollectReviewElement;
+    };
+    interface HTMLZonosCollectSubtotalElement extends Components.ZonosCollectSubtotal, HTMLStencilElement {
+    }
+    var HTMLZonosCollectSubtotalElement: {
+        prototype: HTMLZonosCollectSubtotalElement;
+        new (): HTMLZonosCollectSubtotalElement;
+    };
     interface HTMLZonosComponentElement extends Components.ZonosComponent, HTMLStencilElement {
     }
     var HTMLZonosComponentElement: {
@@ -1406,6 +2011,28 @@ declare global {
         prototype: HTMLZonosCurrencyToggleElement;
         new (): HTMLZonosCurrencyToggleElement;
     };
+    interface HTMLZonosCustomAddressElementEventMap {
+        "invalidCharacters": boolean;
+        "addressChange": {
+    errors: CustomAddressErrors;
+    type: 'billing' | 'shipping';
+    value: StripeAddressElementChangeEvent;
+  };
+    }
+    interface HTMLZonosCustomAddressElement extends Components.ZonosCustomAddress, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosCustomAddressElementEventMap>(type: K, listener: (this: HTMLZonosCustomAddressElement, ev: ZonosCustomAddressCustomEvent<HTMLZonosCustomAddressElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosCustomAddressElementEventMap>(type: K, listener: (this: HTMLZonosCustomAddressElement, ev: ZonosCustomAddressCustomEvent<HTMLZonosCustomAddressElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosCustomAddressElement: {
+        prototype: HTMLZonosCustomAddressElement;
+        new (): HTMLZonosCustomAddressElement;
+    };
     interface HTMLZonosCustomMessageElement extends Components.ZonosCustomMessage, HTMLStencilElement {
     }
     var HTMLZonosCustomMessageElement: {
@@ -1413,7 +2040,16 @@ declare global {
         new (): HTMLZonosCustomMessageElement;
     };
     interface HTMLZonosCustomerInfoElementEventMap {
-        "continueClicked": void;
+        "continueClicked": {
+    billingAddress: StripeAddressElementChangeEvent | null;
+    sameAsBilling: boolean;
+    shippingAddress: StripeAddressElementChangeEvent | null;
+  };
+        "testContinueClicked": {
+    billingAddress: StripeAddressElementChangeEvent | null;
+    sameAsBilling: boolean;
+    shippingAddress: StripeAddressElementChangeEvent | null;
+  };
     }
     interface HTMLZonosCustomerInfoElement extends Components.ZonosCustomerInfo, HTMLStencilElement {
         addEventListener<K extends keyof HTMLZonosCustomerInfoElementEventMap>(type: K, listener: (this: HTMLZonosCustomerInfoElement, ev: ZonosCustomerInfoCustomEvent<HTMLZonosCustomerInfoElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -1451,6 +2087,12 @@ declare global {
     var HTMLZonosEmptyStatePaymentElement: {
         prototype: HTMLZonosEmptyStatePaymentElement;
         new (): HTMLZonosEmptyStatePaymentElement;
+    };
+    interface HTMLZonosHStackElement extends Components.ZonosHStack, HTMLStencilElement {
+    }
+    var HTMLZonosHStackElement: {
+        prototype: HTMLZonosHStackElement;
+        new (): HTMLZonosHStackElement;
     };
     interface HTMLZonosHelloElement extends Components.ZonosHello, HTMLStencilElement {
     }
@@ -1504,6 +2146,89 @@ declare global {
         prototype: HTMLZonosInputElement;
         new (): HTMLZonosInputElement;
     };
+    interface HTMLZonosInvoiceElement extends Components.ZonosInvoice, HTMLStencilElement {
+    }
+    var HTMLZonosInvoiceElement: {
+        prototype: HTMLZonosInvoiceElement;
+        new (): HTMLZonosInvoiceElement;
+    };
+    interface HTMLZonosInvoiceCartItemsElement extends Components.ZonosInvoiceCartItems, HTMLStencilElement {
+    }
+    var HTMLZonosInvoiceCartItemsElement: {
+        prototype: HTMLZonosInvoiceCartItemsElement;
+        new (): HTMLZonosInvoiceCartItemsElement;
+    };
+    interface HTMLZonosInvoiceFinishElementEventMap {
+        "closeClick": void;
+    }
+    interface HTMLZonosInvoiceFinishElement extends Components.ZonosInvoiceFinish, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosInvoiceFinishElementEventMap>(type: K, listener: (this: HTMLZonosInvoiceFinishElement, ev: ZonosInvoiceFinishCustomEvent<HTMLZonosInvoiceFinishElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosInvoiceFinishElementEventMap>(type: K, listener: (this: HTMLZonosInvoiceFinishElement, ev: ZonosInvoiceFinishCustomEvent<HTMLZonosInvoiceFinishElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosInvoiceFinishElement: {
+        prototype: HTMLZonosInvoiceFinishElement;
+        new (): HTMLZonosInvoiceFinishElement;
+    };
+    interface HTMLZonosInvoiceFooterElement extends Components.ZonosInvoiceFooter, HTMLStencilElement {
+    }
+    var HTMLZonosInvoiceFooterElement: {
+        prototype: HTMLZonosInvoiceFooterElement;
+        new (): HTMLZonosInvoiceFooterElement;
+    };
+    interface HTMLZonosInvoiceOrderDetailsElementEventMap {
+        "collapseClicked": boolean;
+    }
+    interface HTMLZonosInvoiceOrderDetailsElement extends Components.ZonosInvoiceOrderDetails, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosInvoiceOrderDetailsElementEventMap>(type: K, listener: (this: HTMLZonosInvoiceOrderDetailsElement, ev: ZonosInvoiceOrderDetailsCustomEvent<HTMLZonosInvoiceOrderDetailsElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosInvoiceOrderDetailsElementEventMap>(type: K, listener: (this: HTMLZonosInvoiceOrderDetailsElement, ev: ZonosInvoiceOrderDetailsCustomEvent<HTMLZonosInvoiceOrderDetailsElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosInvoiceOrderDetailsElement: {
+        prototype: HTMLZonosInvoiceOrderDetailsElement;
+        new (): HTMLZonosInvoiceOrderDetailsElement;
+    };
+    interface HTMLZonosInvoicePaymentElementEventMap {
+        "continueClicked": void;
+        "paypalSessionFailed": void;
+        "paypalSessionDone": string;
+    }
+    interface HTMLZonosInvoicePaymentElement extends Components.ZonosInvoicePayment, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosInvoicePaymentElementEventMap>(type: K, listener: (this: HTMLZonosInvoicePaymentElement, ev: ZonosInvoicePaymentCustomEvent<HTMLZonosInvoicePaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosInvoicePaymentElementEventMap>(type: K, listener: (this: HTMLZonosInvoicePaymentElement, ev: ZonosInvoicePaymentCustomEvent<HTMLZonosInvoicePaymentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosInvoicePaymentElement: {
+        prototype: HTMLZonosInvoicePaymentElement;
+        new (): HTMLZonosInvoicePaymentElement;
+    };
+    interface HTMLZonosInvoiceReviewElement extends Components.ZonosInvoiceReview, HTMLStencilElement {
+    }
+    var HTMLZonosInvoiceReviewElement: {
+        prototype: HTMLZonosInvoiceReviewElement;
+        new (): HTMLZonosInvoiceReviewElement;
+    };
+    interface HTMLZonosInvoiceSubtotalElement extends Components.ZonosInvoiceSubtotal, HTMLStencilElement {
+    }
+    var HTMLZonosInvoiceSubtotalElement: {
+        prototype: HTMLZonosInvoiceSubtotalElement;
+        new (): HTMLZonosInvoiceSubtotalElement;
+    };
     interface HTMLZonosLanguageSelectElement extends Components.ZonosLanguageSelect, HTMLStencilElement {
     }
     var HTMLZonosLanguageSelectElement: {
@@ -1532,6 +2257,12 @@ declare global {
     var HTMLZonosLinkAuthenticationElement: {
         prototype: HTMLZonosLinkAuthenticationElement;
         new (): HTMLZonosLinkAuthenticationElement;
+    };
+    interface HTMLZonosLoadingOverlayElement extends Components.ZonosLoadingOverlay, HTMLStencilElement {
+    }
+    var HTMLZonosLoadingOverlayElement: {
+        prototype: HTMLZonosLoadingOverlayElement;
+        new (): HTMLZonosLoadingOverlayElement;
     };
     interface HTMLZonosLogoElement extends Components.ZonosLogo, HTMLStencilElement {
     }
@@ -1621,11 +2352,23 @@ declare global {
         prototype: HTMLZonosShippingRichRadioElement;
         new (): HTMLZonosShippingRichRadioElement;
     };
+    interface HTMLZonosSkeletonElement extends Components.ZonosSkeleton, HTMLStencilElement {
+    }
+    var HTMLZonosSkeletonElement: {
+        prototype: HTMLZonosSkeletonElement;
+        new (): HTMLZonosSkeletonElement;
+    };
     interface HTMLZonosSpinnerElement extends Components.ZonosSpinner, HTMLStencilElement {
     }
     var HTMLZonosSpinnerElement: {
         prototype: HTMLZonosSpinnerElement;
         new (): HTMLZonosSpinnerElement;
+    };
+    interface HTMLZonosStoreCreditElement extends Components.ZonosStoreCredit, HTMLStencilElement {
+    }
+    var HTMLZonosStoreCreditElement: {
+        prototype: HTMLZonosStoreCreditElement;
+        new (): HTMLZonosStoreCreditElement;
     };
     interface HTMLZonosStripeInputElementEventMap {
         "inputChange": string;
@@ -1646,6 +2389,46 @@ declare global {
     var HTMLZonosStripeInputElement: {
         prototype: HTMLZonosStripeInputElement;
         new (): HTMLZonosStripeInputElement;
+    };
+    interface HTMLZonosStripePhoneInputElementEventMap {
+        "inputValueChange": {
+    countryCode: CountryCode | null;
+    isEmpty: boolean;
+    phoneNumber: string;
+    valid: boolean;
+    wrongFormat: boolean;
+  };
+    }
+    interface HTMLZonosStripePhoneInputElement extends Components.ZonosStripePhoneInput, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosStripePhoneInputElementEventMap>(type: K, listener: (this: HTMLZonosStripePhoneInputElement, ev: ZonosStripePhoneInputCustomEvent<HTMLZonosStripePhoneInputElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosStripePhoneInputElementEventMap>(type: K, listener: (this: HTMLZonosStripePhoneInputElement, ev: ZonosStripePhoneInputCustomEvent<HTMLZonosStripePhoneInputElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosStripePhoneInputElement: {
+        prototype: HTMLZonosStripePhoneInputElement;
+        new (): HTMLZonosStripePhoneInputElement;
+    };
+    interface HTMLZonosStripeSelectElementEventMap {
+        "selectChange": string;
+    }
+    interface HTMLZonosStripeSelectElement extends Components.ZonosStripeSelect, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosStripeSelectElementEventMap>(type: K, listener: (this: HTMLZonosStripeSelectElement, ev: ZonosStripeSelectCustomEvent<HTMLZonosStripeSelectElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosStripeSelectElementEventMap>(type: K, listener: (this: HTMLZonosStripeSelectElement, ev: ZonosStripeSelectCustomEvent<HTMLZonosStripeSelectElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosStripeSelectElement: {
+        prototype: HTMLZonosStripeSelectElement;
+        new (): HTMLZonosStripeSelectElement;
     };
     interface HTMLZonosTextElement extends Components.ZonosText, HTMLStencilElement {
     }
@@ -1683,7 +2466,8 @@ declare global {
         new (): HTMLZonosVStackElement;
     };
     /**
-     * The idea is from
+     * Virtual scroll component for efficiently rendering large lists
+     * The idea is from:
      * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
      * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
      */
@@ -1697,6 +2481,7 @@ declare global {
         "zonos-address": HTMLZonosAddressElement;
         "zonos-address-display": HTMLZonosAddressDisplayElement;
         "zonos-address-form": HTMLZonosAddressFormElement;
+        "zonos-address-suggestions": HTMLZonosAddressSuggestionsElement;
         "zonos-address-update-dialog": HTMLZonosAddressUpdateDialogElement;
         "zonos-badge": HTMLZonosBadgeElement;
         "zonos-banner": HTMLZonosBannerElement;
@@ -1712,24 +2497,43 @@ declare global {
         "zonos-checkout-payment": HTMLZonosCheckoutPaymentElement;
         "zonos-checkout-progress-tabs": HTMLZonosCheckoutProgressTabsElement;
         "zonos-collapse": HTMLZonosCollapseElement;
+        "zonos-collect": HTMLZonosCollectElement;
+        "zonos-collect-cart-items": HTMLZonosCollectCartItemsElement;
+        "zonos-collect-finish": HTMLZonosCollectFinishElement;
+        "zonos-collect-footer": HTMLZonosCollectFooterElement;
+        "zonos-collect-order-details": HTMLZonosCollectOrderDetailsElement;
+        "zonos-collect-payment": HTMLZonosCollectPaymentElement;
+        "zonos-collect-review": HTMLZonosCollectReviewElement;
+        "zonos-collect-subtotal": HTMLZonosCollectSubtotalElement;
         "zonos-component": HTMLZonosComponentElement;
         "zonos-confirm-dialog": HTMLZonosConfirmDialogElement;
         "zonos-controller": HTMLZonosControllerElement;
         "zonos-country-flag": HTMLZonosCountryFlagElement;
         "zonos-country-select": HTMLZonosCountrySelectElement;
         "zonos-currency-toggle": HTMLZonosCurrencyToggleElement;
+        "zonos-custom-address": HTMLZonosCustomAddressElement;
         "zonos-custom-message": HTMLZonosCustomMessageElement;
         "zonos-customer-info": HTMLZonosCustomerInfoElement;
         "zonos-dialog": HTMLZonosDialogElement;
         "zonos-empty-state-payment": HTMLZonosEmptyStatePaymentElement;
+        "zonos-h-stack": HTMLZonosHStackElement;
         "zonos-hello": HTMLZonosHelloElement;
         "zonos-hello-dialog": HTMLZonosHelloDialogElement;
         "zonos-hello-dialog-footer": HTMLZonosHelloDialogFooterElement;
         "zonos-icon": HTMLZonosIconElement;
         "zonos-input": HTMLZonosInputElement;
+        "zonos-invoice": HTMLZonosInvoiceElement;
+        "zonos-invoice-cart-items": HTMLZonosInvoiceCartItemsElement;
+        "zonos-invoice-finish": HTMLZonosInvoiceFinishElement;
+        "zonos-invoice-footer": HTMLZonosInvoiceFooterElement;
+        "zonos-invoice-order-details": HTMLZonosInvoiceOrderDetailsElement;
+        "zonos-invoice-payment": HTMLZonosInvoicePaymentElement;
+        "zonos-invoice-review": HTMLZonosInvoiceReviewElement;
+        "zonos-invoice-subtotal": HTMLZonosInvoiceSubtotalElement;
         "zonos-language-select": HTMLZonosLanguageSelectElement;
         "zonos-link": HTMLZonosLinkElement;
         "zonos-link-authentication": HTMLZonosLinkAuthenticationElement;
+        "zonos-loading-overlay": HTMLZonosLoadingOverlayElement;
         "zonos-logo": HTMLZonosLogoElement;
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
@@ -1739,8 +2543,12 @@ declare global {
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
         "zonos-shipping": HTMLZonosShippingElement;
         "zonos-shipping-rich-radio": HTMLZonosShippingRichRadioElement;
+        "zonos-skeleton": HTMLZonosSkeletonElement;
         "zonos-spinner": HTMLZonosSpinnerElement;
+        "zonos-store-credit": HTMLZonosStoreCreditElement;
         "zonos-stripe-input": HTMLZonosStripeInputElement;
+        "zonos-stripe-phone-input": HTMLZonosStripePhoneInputElement;
+        "zonos-stripe-select": HTMLZonosStripeSelectElement;
         "zonos-text": HTMLZonosTextElement;
         "zonos-toggle": HTMLZonosToggleElement;
         "zonos-tooltip": HTMLZonosTooltipElement;
@@ -1753,11 +2561,23 @@ declare namespace LocalJSX {
         /**
           * Default address for stripe
          */
-        "defaultAddress"?: ContactOption | null;
+        "defaultAddress"?: ContactOption[];
         /**
           * Event to emit when address is not containing allowed character sets
          */
         "onInvalidCharacters"?: (event: ZonosAddressCustomEvent<boolean>) => void;
+        /**
+          * Event to emit when tax id is changed
+         */
+        "onTaxIdChanged"?: (event: ZonosAddressCustomEvent<string>) => void;
+        /**
+          * Error message for short address code input
+         */
+        "shortAddressCodeErrorMessage"?: string;
+        /**
+          * Error message for tax id input
+         */
+        "taxIdErrorMessage"?: string;
         /**
           * The title text for the address element
          */
@@ -1794,6 +2614,20 @@ declare namespace LocalJSX {
           * Translated address
          */
         "translatedAddress": TranslatedAddressObject;
+    }
+    interface ZonosAddressSuggestions {
+        /**
+          * Event emitted when a suggestion is selected
+         */
+        "onSuggestionSelected"?: (event: ZonosAddressSuggestionsCustomEvent<EventPayloadMap['placeSelected']>) => void;
+        /**
+          * Suggestions to display
+         */
+        "suggestions"?: IframeSuggestionsResponsePayload['suggestions'];
+        /**
+          * Type of the address suggestions
+         */
+        "type": 'billing' | 'shipping';
     }
     interface ZonosAddressUpdateDialog {
         /**
@@ -1901,6 +2735,10 @@ declare namespace LocalJSX {
           * The color of the button **NOTE**: If the button `variant` is set to 'standard', backgroundColor will be disregarded
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never });
+        /**
+          * Whether or not the button text color is bold
+         */
+        "bold"?: boolean;
         /**
           * The border style of the button
           * @default ROUNDED
@@ -2073,11 +2911,16 @@ declare namespace LocalJSX {
         /**
           * Default address to use for the checkout (preview mode)
          */
-        "defaultAddress"?: StripeStoreContactOption | null;
+        "defaultAddress"?: | StripeStoreContactOption[]
+    | StripeStoreContactOption;
         /**
           * Force dialog to be open
          */
         "forceDialogOpen"?: boolean;
+        /**
+          * Hidden mode to hide the checkout modal in preview mode
+         */
+        "hiddenMode"?: boolean;
         /**
           * Flag to determine if the checkout is on mobile
          */
@@ -2176,6 +3019,122 @@ declare namespace LocalJSX {
           * Collapsed state of the element
          */
         "collapsed"?: boolean;
+    }
+    interface ZonosCollect {
+        /**
+          * Flag to determine if the checkout is on mobile
+         */
+        "mobile"?: boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet"?: boolean;
+    }
+    interface ZonosCollectCartItems {
+    }
+    interface ZonosCollectFinish {
+        /**
+          * The border radius style of the dialog
+         */
+        "borderRadius"?: ElementsUiStyle;
+        /**
+          * The confirmation id for the collect order
+         */
+        "confirmationId"?: string | null;
+        /**
+          * Event to emit when the continue button is clicked
+         */
+        "onCloseClick"?: (event: ZonosCollectFinishCustomEvent<void>) => void;
+        /**
+          * Override the notification message and title, bypass checking stripe payment status
+         */
+        "overrideNotification"?: {
+    messages: string[];
+    title: string;
+    type: 'success' | 'error';
+  };
+        /**
+          * Force status to test the UI for storybook
+         */
+        "storybookForceStatus"?: PaymentIntent['status'];
+    }
+    interface ZonosCollectFooter {
+        /**
+          * Theme to change the color of the logo
+         */
+        "dataTheme"?: ElementsUiTheme;
+        /**
+          * Override mobile mode
+         */
+        "mobile"?: boolean;
+        /**
+          * Override tablet mode
+         */
+        "tablet"?: boolean;
+    }
+    interface ZonosCollectOrderDetails {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed": boolean;
+        /**
+          * The landed cost id that is used to fetch the shipping address
+         */
+        "landedCostId"?: string;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile"?: boolean;
+        /**
+          * Emits the collapsed state of the zonos-collapse component
+         */
+        "onCollapseClicked"?: (event: ZonosCollectOrderDetailsCustomEvent<boolean>) => void;
+    }
+    interface ZonosCollectPayment {
+        /**
+          * Whether or not the continue button is loading
+         */
+        "continueLoading"?: boolean;
+        /**
+          * Event to emit when the continue button is clicked
+         */
+        "onContinueClicked"?: (event: ZonosCollectPaymentCustomEvent<void>) => void;
+        /**
+          * Event to emit when the paypal session is done
+         */
+        "onPaypalSessionDone"?: (event: ZonosCollectPaymentCustomEvent<string>) => void;
+        /**
+          * Event to emit when the paypal session failed
+         */
+        "onPaypalSessionFailed"?: (event: ZonosCollectPaymentCustomEvent<void>) => void;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Submit button main color
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
+    }
+    interface ZonosCollectReview {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed"?: boolean;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile"?: boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet"?: boolean;
+    }
+    interface ZonosCollectSubtotal {
     }
     interface ZonosComponent {
         /**
@@ -2290,6 +3249,40 @@ declare namespace LocalJSX {
     }
     interface ZonosCurrencyToggle {
     }
+    interface ZonosCustomAddress {
+        /**
+          * Default address for stripe
+         */
+        "defaultAddress"?: ContactOption[];
+        /**
+          * Event to emit when address is changed
+         */
+        "onAddressChange"?: (event: ZonosCustomAddressCustomEvent<{
+    errors: CustomAddressErrors;
+    type: 'billing' | 'shipping';
+    value: StripeAddressElementChangeEvent;
+  }>) => void;
+        /**
+          * Event to emit when address is not containing allowed character sets
+         */
+        "onInvalidCharacters"?: (event: ZonosCustomAddressCustomEvent<boolean>) => void;
+        /**
+          * Error message for short address code input
+         */
+        "shortAddressCodeErrorMessage"?: string;
+        /**
+          * Error message for tax id input
+         */
+        "taxIdErrorMessage"?: string;
+        /**
+          * The title text for the address element
+         */
+        "titleText": string;
+        /**
+          * The type of address element to render
+         */
+        "type": 'billing' | 'shipping';
+    }
     interface ZonosCustomMessage {
         /**
           * The custom message icon
@@ -2308,7 +3301,7 @@ declare namespace LocalJSX {
         /**
           * Default address to use for the checkout (preview mode)
          */
-        "defaultAddress"?: StripeStoreContactOption | null;
+        "defaultAddress"?: StripeStoreContactOption[];
         /**
           * Whether or not the dialog is open
          */
@@ -2316,7 +3309,23 @@ declare namespace LocalJSX {
         /**
           * Event to emit when the continue button is clicked
          */
-        "onContinueClicked"?: (event: ZonosCustomerInfoCustomEvent<void>) => void;
+        "onContinueClicked"?: (event: ZonosCustomerInfoCustomEvent<{
+    billingAddress: StripeAddressElementChangeEvent | null;
+    sameAsBilling: boolean;
+    shippingAddress: StripeAddressElementChangeEvent | null;
+  }>) => void;
+        /**
+          * Trigger continue button click even though fields're not validated for testing purposes
+         */
+        "onTestContinueClicked"?: (event: ZonosCustomerInfoCustomEvent<{
+    billingAddress: StripeAddressElementChangeEvent | null;
+    sameAsBilling: boolean;
+    shippingAddress: StripeAddressElementChangeEvent | null;
+  }>) => void;
+        /**
+          * Whether to override custom address form to be always visible
+         */
+        "shouldUseCustomAddressFormOverride"?: boolean;
         /**
           * Submit button main color
          */
@@ -2344,6 +3353,14 @@ declare namespace LocalJSX {
           * Load loading spinner for the dialog or not
          */
         "isLoading"?: boolean;
+        /**
+          * The text that will be shown while loading
+         */
+        "loadingText"?: string;
+        /**
+          * The title of the loading text
+         */
+        "loadingTitle"?: string;
         /**
           * The min height of the dialog
          */
@@ -2402,6 +3419,13 @@ declare namespace LocalJSX {
          */
         "theme"?: ElementsUiTheme;
     }
+    interface ZonosHStack {
+        /**
+          * The spacing between elements in the stack
+          * @default 24
+         */
+        "spacing"?: GridSpacing;
+    }
     interface ZonosHello {
         /**
           * Force left animation instead of detecting which side has more space
@@ -2412,6 +3436,10 @@ declare namespace LocalJSX {
           * Override the appearance settings
          */
         "appearanceSettingsOverride"?: Partial<AppearanceConfig>;
+        /**
+          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocation` and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
+         */
+        "desktopLocationOverride"?: HelloDesktopLocation;
         /**
           * Force mobile styling instead of media query and use the passed location value
           * @default false
@@ -2520,6 +3548,130 @@ declare namespace LocalJSX {
          */
         "onInputChange"?: (event: ZonosInputCustomEvent<string>) => void;
     }
+    interface ZonosInvoice {
+        /**
+          * Flag to determine if the checkout is on mobile
+         */
+        "mobile"?: boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet"?: boolean;
+    }
+    interface ZonosInvoiceCartItems {
+        /**
+          * Whether the component is mobile
+         */
+        "isMobile"?: boolean;
+    }
+    interface ZonosInvoiceFinish {
+        /**
+          * The border radius style of the dialog
+         */
+        "borderRadius"?: ElementsUiStyle;
+        /**
+          * The confirmation id for the invoice order
+         */
+        "confirmationId"?: string | null;
+        /**
+          * Event to emit when the continue button is clicked
+         */
+        "onCloseClick"?: (event: ZonosInvoiceFinishCustomEvent<void>) => void;
+        /**
+          * Override the notification message and title, bypass checking stripe payment status
+         */
+        "overrideNotification"?: {
+    messages: string[];
+    title: string;
+    type: 'success' | 'error';
+  };
+        /**
+          * Force status to test the UI for storybook
+         */
+        "storybookForceStatus"?: PaymentIntent['status'];
+    }
+    interface ZonosInvoiceFooter {
+        /**
+          * Theme to change the color of the logo
+         */
+        "dataTheme"?: ElementsUiTheme;
+        /**
+          * Override mobile mode
+         */
+        "mobile"?: boolean;
+        /**
+          * Override tablet mode
+         */
+        "tablet"?: boolean;
+    }
+    interface ZonosInvoiceOrderDetails {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed": boolean;
+        /**
+          * The landed cost id that is used to fetch the shipping address
+         */
+        "landedCostId"?: string;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile"?: boolean;
+        /**
+          * Emits the collapsed state of the zonos-collapse component
+         */
+        "onCollapseClicked"?: (event: ZonosInvoiceOrderDetailsCustomEvent<boolean>) => void;
+    }
+    interface ZonosInvoicePayment {
+        /**
+          * Whether or not the continue button is loading
+         */
+        "continueLoading"?: boolean;
+        /**
+          * Event to emit when the continue button is clicked
+         */
+        "onContinueClicked"?: (event: ZonosInvoicePaymentCustomEvent<void>) => void;
+        /**
+          * Event to emit when the paypal session is done
+         */
+        "onPaypalSessionDone"?: (event: ZonosInvoicePaymentCustomEvent<string>) => void;
+        /**
+          * Event to emit when the paypal session failed
+         */
+        "onPaypalSessionFailed"?: (event: ZonosInvoicePaymentCustomEvent<void>) => void;
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Submit button main color
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
+    }
+    interface ZonosInvoiceReview {
+        /**
+          * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+         */
+        "collapsed"?: boolean;
+        /**
+          * Whether or not the component is being rendered with mobile styles
+         */
+        "mobile"?: boolean;
+        /**
+          * Whether or not the component is being rendered with tablet styles
+         */
+        "tablet"?: boolean;
+    }
+    interface ZonosInvoiceSubtotal {
+        /**
+          * Whether the component is mobile
+         */
+        "isMobile"?: boolean;
+    }
     interface ZonosLanguageSelect {
         /**
           * Function to close the language select
@@ -2562,6 +3714,27 @@ declare namespace LocalJSX {
           * The title text for the authentication element
          */
         "titleText": string;
+    }
+    interface ZonosLoadingOverlay {
+        /**
+          * Whether or not the overlay is open
+          * @default false
+         */
+        "open"?: boolean;
+        /**
+          * Spinner size (optional, default 40)
+         */
+        "size"?: number;
+        /**
+          * Spinner color (optional)
+         */
+        "spinnerColor"?: | 'primary'
+    | 'info'
+    | 'success'
+    | 'danger'
+    | 'warning'
+    | 'black'
+    | 'white';
     }
     interface ZonosLogo {
         /**
@@ -2632,6 +3805,10 @@ declare namespace LocalJSX {
          */
         "continueLoading"?: boolean;
         /**
+          * Whether or not the checkout is in mobile mode
+         */
+        "isMobile": boolean;
+        /**
           * Event to emit when the continue button is clicked
          */
         "onContinueClicked"?: (event: ZonosShippingCustomEvent<void>) => void;
@@ -2654,6 +3831,10 @@ declare namespace LocalJSX {
          */
         "borderStyle"?: ElementsUiStyle;
         /**
+          * Whether or not the radio item is in mobile mode
+         */
+        "isMobile": boolean;
+        /**
           * List of items to display
          */
         "items": ShippingRichRadioItem[];
@@ -2671,6 +3852,22 @@ declare namespace LocalJSX {
          */
         "theme"?: ElementsUiTheme;
     }
+    interface ZonosSkeleton {
+        /**
+          * Callback for when the skeleton is dismissed. Also determines if dismiss icon shown.
+         */
+        "dismissHandler"?: () => void;
+        /**
+          * The height of the skeleton
+          * @default '14px'
+         */
+        "skeletonHeight"?: string;
+        /**
+          * The width of the skeleton
+          * @default '100%'
+         */
+        "skeletonWidth"?: string;
+    }
     interface ZonosSpinner {
         /**
           * The size of the spinner
@@ -2682,10 +3879,24 @@ declare namespace LocalJSX {
          */
         "spinnerColor"?: SpinnerColor;
     }
+    interface ZonosStoreCredit {
+        /**
+          * Whether the component is enabled
+         */
+        "enabled"?: boolean;
+    }
     /**
      * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
      */
     interface ZonosStripeInput {
+        /**
+          * Autocomplete attribute for the input
+         */
+        "autoComplete"?: string;
+        /**
+          * Error message of the input
+         */
+        "error"?: string;
         /**
           * Input label
          */
@@ -2707,6 +3918,10 @@ declare namespace LocalJSX {
          */
         "isError"?: boolean;
         /**
+          * Name of the input
+         */
+        "name"?: string;
+        /**
           * Event to emit when input value changes
          */
         "onInputChange"?: (event: ZonosStripeInputCustomEvent<string>) => void;
@@ -2719,7 +3934,129 @@ declare namespace LocalJSX {
          */
         "overrideSecondaryColor"?: string;
         /**
+          * Whether the input is required
+         */
+        "required"?: boolean;
+        /**
           * The value of the input.
+         */
+        "value"?: string;
+    }
+    interface ZonosStripePhoneInput {
+        /**
+          * The autoComplete attribute for the phone input
+         */
+        "autoComplete"?: string;
+        /**
+          * The country code of the phone input
+         */
+        "countryCode"?: CountryCode | null;
+        /**
+          * Available country options for the select dropdown
+         */
+        "countryOptions"?: GenericZonosSettings['countryFields'] | null;
+        /**
+          * Whether the input is disabled
+         */
+        "disabled"?: boolean;
+        /**
+          * Error message to display
+         */
+        "error"?: string;
+        /**
+          * Label text for the input
+         */
+        "inputLabel"?: string;
+        /**
+          * Current value of the phone input
+         */
+        "inputValue"?: string;
+        /**
+          * Minimum width of the phone input
+         */
+        "minWidth"?: string;
+        /**
+          * Emitted when the country or phone number changes
+         */
+        "onInputValueChange"?: (event: ZonosStripePhoneInputCustomEvent<{
+    countryCode: CountryCode | null;
+    isEmpty: boolean;
+    phoneNumber: string;
+    valid: boolean;
+    wrongFormat: boolean;
+  }>) => void;
+        /**
+          * Override the primary color
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Override the secondary color
+         */
+        "overrideSecondaryColor"?: string;
+    }
+    interface ZonosStripeSelect {
+        /**
+          * The autoComplete attribute for the select.
+         */
+        "autoComplete"?: string;
+        /**
+          * Error message of the select
+         */
+        "error"?: string;
+        /**
+          * Whether the select can be cleared
+         */
+        "isClearable"?: boolean;
+        /**
+          * Disables the select
+         */
+        "isDisabled"?: boolean;
+        /**
+          * Error state of the select
+         */
+        "isError"?: boolean;
+        /**
+          * Minimum width of the select
+         */
+        "minWidth"?: string;
+        /**
+          * Name of the select
+         */
+        "name"?: string;
+        /**
+          * Event to emit when select value changes
+         */
+        "onSelectChange"?: (event: ZonosStripeSelectCustomEvent<string>) => void;
+        /**
+          * Options for the select. Must be set using a query selector.
+         */
+        "options"?: SelectOption[];
+        /**
+          * Primary color to override primary color from appearance primary color in setting.
+         */
+        "overridePrimaryColor"?: string;
+        /**
+          * Secondary color to override secondary color from appearance secondary color in setting
+         */
+        "overrideSecondaryColor"?: string;
+        /**
+          * Whether the select is required
+         */
+        "required"?: boolean;
+        /**
+          * Select label
+         */
+        "selectLabel": string;
+        /**
+          * Placeholder for the select
+         */
+        "selectPlaceholder"?: string;
+        /**
+          * Selected value of the select
+         */
+        "selectedValue"?: string;
+        /**
+          * The value of the select.
          */
         "value"?: string;
     }
@@ -2773,39 +4110,39 @@ declare namespace LocalJSX {
         "spacing"?: GridSpacing;
     }
     /**
-     * The idea is from
+     * Virtual scroll component for efficiently rendering large lists
+     * The idea is from:
      * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
      * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
      */
     interface ZonosVirtualScroll {
         /**
-          * Height that is used as a fallback if height is not provided
+          * Buffer size in pixels for pre-rendering items outside viewport
+          * @default 100
+         */
+        "buffer"?: number;
+        /**
+          * Fallback height used when specific item height is not provided
          */
         "fallbackItemHeight": number;
         /**
-          * Heights list of each item
+          * Array of heights for each item in pixels
          */
         "itemHeights": number[];
         /**
-          * Width of each item
+          * Width of each item in pixels
          */
         "itemWidth"?: number;
         /**
-          * Render item
+          * Function to render each item in the virtual scroll
          */
-        "renderItem": (
-    itemIndex: number,
-  ) =>
-    | HTMLElement
-    | Promise<HTMLElement>
-    | HTMLElement[]
-    | Promise<HTMLElement[]>
-    | Promise<HTMLElement>[];
+        "renderItem": VirtualScrollRenderItem;
     }
     interface IntrinsicElements {
         "zonos-address": ZonosAddress;
         "zonos-address-display": ZonosAddressDisplay;
         "zonos-address-form": ZonosAddressForm;
+        "zonos-address-suggestions": ZonosAddressSuggestions;
         "zonos-address-update-dialog": ZonosAddressUpdateDialog;
         "zonos-badge": ZonosBadge;
         "zonos-banner": ZonosBanner;
@@ -2821,24 +4158,43 @@ declare namespace LocalJSX {
         "zonos-checkout-payment": ZonosCheckoutPayment;
         "zonos-checkout-progress-tabs": ZonosCheckoutProgressTabs;
         "zonos-collapse": ZonosCollapse;
+        "zonos-collect": ZonosCollect;
+        "zonos-collect-cart-items": ZonosCollectCartItems;
+        "zonos-collect-finish": ZonosCollectFinish;
+        "zonos-collect-footer": ZonosCollectFooter;
+        "zonos-collect-order-details": ZonosCollectOrderDetails;
+        "zonos-collect-payment": ZonosCollectPayment;
+        "zonos-collect-review": ZonosCollectReview;
+        "zonos-collect-subtotal": ZonosCollectSubtotal;
         "zonos-component": ZonosComponent;
         "zonos-confirm-dialog": ZonosConfirmDialog;
         "zonos-controller": ZonosController;
         "zonos-country-flag": ZonosCountryFlag;
         "zonos-country-select": ZonosCountrySelect;
         "zonos-currency-toggle": ZonosCurrencyToggle;
+        "zonos-custom-address": ZonosCustomAddress;
         "zonos-custom-message": ZonosCustomMessage;
         "zonos-customer-info": ZonosCustomerInfo;
         "zonos-dialog": ZonosDialog;
         "zonos-empty-state-payment": ZonosEmptyStatePayment;
+        "zonos-h-stack": ZonosHStack;
         "zonos-hello": ZonosHello;
         "zonos-hello-dialog": ZonosHelloDialog;
         "zonos-hello-dialog-footer": ZonosHelloDialogFooter;
         "zonos-icon": ZonosIcon;
         "zonos-input": ZonosInput;
+        "zonos-invoice": ZonosInvoice;
+        "zonos-invoice-cart-items": ZonosInvoiceCartItems;
+        "zonos-invoice-finish": ZonosInvoiceFinish;
+        "zonos-invoice-footer": ZonosInvoiceFooter;
+        "zonos-invoice-order-details": ZonosInvoiceOrderDetails;
+        "zonos-invoice-payment": ZonosInvoicePayment;
+        "zonos-invoice-review": ZonosInvoiceReview;
+        "zonos-invoice-subtotal": ZonosInvoiceSubtotal;
         "zonos-language-select": ZonosLanguageSelect;
         "zonos-link": ZonosLink;
         "zonos-link-authentication": ZonosLinkAuthentication;
+        "zonos-loading-overlay": ZonosLoadingOverlay;
         "zonos-logo": ZonosLogo;
         "zonos-notification": ZonosNotification;
         "zonos-payment": ZonosPayment;
@@ -2848,8 +4204,12 @@ declare namespace LocalJSX {
         "zonos-select-dialog-header": ZonosSelectDialogHeader;
         "zonos-shipping": ZonosShipping;
         "zonos-shipping-rich-radio": ZonosShippingRichRadio;
+        "zonos-skeleton": ZonosSkeleton;
         "zonos-spinner": ZonosSpinner;
+        "zonos-store-credit": ZonosStoreCredit;
         "zonos-stripe-input": ZonosStripeInput;
+        "zonos-stripe-phone-input": ZonosStripePhoneInput;
+        "zonos-stripe-select": ZonosStripeSelect;
         "zonos-text": ZonosText;
         "zonos-toggle": ZonosToggle;
         "zonos-tooltip": ZonosTooltip;
@@ -2864,6 +4224,7 @@ declare module "@stencil/core" {
             "zonos-address": LocalJSX.ZonosAddress & JSXBase.HTMLAttributes<HTMLZonosAddressElement>;
             "zonos-address-display": LocalJSX.ZonosAddressDisplay & JSXBase.HTMLAttributes<HTMLZonosAddressDisplayElement>;
             "zonos-address-form": LocalJSX.ZonosAddressForm & JSXBase.HTMLAttributes<HTMLZonosAddressFormElement>;
+            "zonos-address-suggestions": LocalJSX.ZonosAddressSuggestions & JSXBase.HTMLAttributes<HTMLZonosAddressSuggestionsElement>;
             "zonos-address-update-dialog": LocalJSX.ZonosAddressUpdateDialog & JSXBase.HTMLAttributes<HTMLZonosAddressUpdateDialogElement>;
             "zonos-badge": LocalJSX.ZonosBadge & JSXBase.HTMLAttributes<HTMLZonosBadgeElement>;
             "zonos-banner": LocalJSX.ZonosBanner & JSXBase.HTMLAttributes<HTMLZonosBannerElement>;
@@ -2879,24 +4240,43 @@ declare module "@stencil/core" {
             "zonos-checkout-payment": LocalJSX.ZonosCheckoutPayment & JSXBase.HTMLAttributes<HTMLZonosCheckoutPaymentElement>;
             "zonos-checkout-progress-tabs": LocalJSX.ZonosCheckoutProgressTabs & JSXBase.HTMLAttributes<HTMLZonosCheckoutProgressTabsElement>;
             "zonos-collapse": LocalJSX.ZonosCollapse & JSXBase.HTMLAttributes<HTMLZonosCollapseElement>;
+            "zonos-collect": LocalJSX.ZonosCollect & JSXBase.HTMLAttributes<HTMLZonosCollectElement>;
+            "zonos-collect-cart-items": LocalJSX.ZonosCollectCartItems & JSXBase.HTMLAttributes<HTMLZonosCollectCartItemsElement>;
+            "zonos-collect-finish": LocalJSX.ZonosCollectFinish & JSXBase.HTMLAttributes<HTMLZonosCollectFinishElement>;
+            "zonos-collect-footer": LocalJSX.ZonosCollectFooter & JSXBase.HTMLAttributes<HTMLZonosCollectFooterElement>;
+            "zonos-collect-order-details": LocalJSX.ZonosCollectOrderDetails & JSXBase.HTMLAttributes<HTMLZonosCollectOrderDetailsElement>;
+            "zonos-collect-payment": LocalJSX.ZonosCollectPayment & JSXBase.HTMLAttributes<HTMLZonosCollectPaymentElement>;
+            "zonos-collect-review": LocalJSX.ZonosCollectReview & JSXBase.HTMLAttributes<HTMLZonosCollectReviewElement>;
+            "zonos-collect-subtotal": LocalJSX.ZonosCollectSubtotal & JSXBase.HTMLAttributes<HTMLZonosCollectSubtotalElement>;
             "zonos-component": LocalJSX.ZonosComponent & JSXBase.HTMLAttributes<HTMLZonosComponentElement>;
             "zonos-confirm-dialog": LocalJSX.ZonosConfirmDialog & JSXBase.HTMLAttributes<HTMLZonosConfirmDialogElement>;
             "zonos-controller": LocalJSX.ZonosController & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
             "zonos-country-flag": LocalJSX.ZonosCountryFlag & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
             "zonos-country-select": LocalJSX.ZonosCountrySelect & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
             "zonos-currency-toggle": LocalJSX.ZonosCurrencyToggle & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
+            "zonos-custom-address": LocalJSX.ZonosCustomAddress & JSXBase.HTMLAttributes<HTMLZonosCustomAddressElement>;
             "zonos-custom-message": LocalJSX.ZonosCustomMessage & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
             "zonos-customer-info": LocalJSX.ZonosCustomerInfo & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
             "zonos-dialog": LocalJSX.ZonosDialog & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
             "zonos-empty-state-payment": LocalJSX.ZonosEmptyStatePayment & JSXBase.HTMLAttributes<HTMLZonosEmptyStatePaymentElement>;
+            "zonos-h-stack": LocalJSX.ZonosHStack & JSXBase.HTMLAttributes<HTMLZonosHStackElement>;
             "zonos-hello": LocalJSX.ZonosHello & JSXBase.HTMLAttributes<HTMLZonosHelloElement>;
             "zonos-hello-dialog": LocalJSX.ZonosHelloDialog & JSXBase.HTMLAttributes<HTMLZonosHelloDialogElement>;
             "zonos-hello-dialog-footer": LocalJSX.ZonosHelloDialogFooter & JSXBase.HTMLAttributes<HTMLZonosHelloDialogFooterElement>;
             "zonos-icon": LocalJSX.ZonosIcon & JSXBase.HTMLAttributes<HTMLZonosIconElement>;
             "zonos-input": LocalJSX.ZonosInput & JSXBase.HTMLAttributes<HTMLZonosInputElement>;
+            "zonos-invoice": LocalJSX.ZonosInvoice & JSXBase.HTMLAttributes<HTMLZonosInvoiceElement>;
+            "zonos-invoice-cart-items": LocalJSX.ZonosInvoiceCartItems & JSXBase.HTMLAttributes<HTMLZonosInvoiceCartItemsElement>;
+            "zonos-invoice-finish": LocalJSX.ZonosInvoiceFinish & JSXBase.HTMLAttributes<HTMLZonosInvoiceFinishElement>;
+            "zonos-invoice-footer": LocalJSX.ZonosInvoiceFooter & JSXBase.HTMLAttributes<HTMLZonosInvoiceFooterElement>;
+            "zonos-invoice-order-details": LocalJSX.ZonosInvoiceOrderDetails & JSXBase.HTMLAttributes<HTMLZonosInvoiceOrderDetailsElement>;
+            "zonos-invoice-payment": LocalJSX.ZonosInvoicePayment & JSXBase.HTMLAttributes<HTMLZonosInvoicePaymentElement>;
+            "zonos-invoice-review": LocalJSX.ZonosInvoiceReview & JSXBase.HTMLAttributes<HTMLZonosInvoiceReviewElement>;
+            "zonos-invoice-subtotal": LocalJSX.ZonosInvoiceSubtotal & JSXBase.HTMLAttributes<HTMLZonosInvoiceSubtotalElement>;
             "zonos-language-select": LocalJSX.ZonosLanguageSelect & JSXBase.HTMLAttributes<HTMLZonosLanguageSelectElement>;
             "zonos-link": LocalJSX.ZonosLink & JSXBase.HTMLAttributes<HTMLZonosLinkElement>;
             "zonos-link-authentication": LocalJSX.ZonosLinkAuthentication & JSXBase.HTMLAttributes<HTMLZonosLinkAuthenticationElement>;
+            "zonos-loading-overlay": LocalJSX.ZonosLoadingOverlay & JSXBase.HTMLAttributes<HTMLZonosLoadingOverlayElement>;
             "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
             "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
             "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
@@ -2906,17 +4286,22 @@ declare module "@stencil/core" {
             "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
             "zonos-shipping": LocalJSX.ZonosShipping & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
             "zonos-shipping-rich-radio": LocalJSX.ZonosShippingRichRadio & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
+            "zonos-skeleton": LocalJSX.ZonosSkeleton & JSXBase.HTMLAttributes<HTMLZonosSkeletonElement>;
             "zonos-spinner": LocalJSX.ZonosSpinner & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
+            "zonos-store-credit": LocalJSX.ZonosStoreCredit & JSXBase.HTMLAttributes<HTMLZonosStoreCreditElement>;
             /**
              * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
              */
             "zonos-stripe-input": LocalJSX.ZonosStripeInput & JSXBase.HTMLAttributes<HTMLZonosStripeInputElement>;
+            "zonos-stripe-phone-input": LocalJSX.ZonosStripePhoneInput & JSXBase.HTMLAttributes<HTMLZonosStripePhoneInputElement>;
+            "zonos-stripe-select": LocalJSX.ZonosStripeSelect & JSXBase.HTMLAttributes<HTMLZonosStripeSelectElement>;
             "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
             "zonos-toggle": LocalJSX.ZonosToggle & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
             "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
             "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
             /**
-             * The idea is from
+             * Virtual scroll component for efficiently rendering large lists
+             * The idea is from:
              * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
              * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
              */

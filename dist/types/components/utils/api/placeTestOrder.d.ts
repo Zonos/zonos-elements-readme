@@ -3,5 +3,5 @@ export declare const placeTestOrder: () => Promise<{
     json: null;
 } | {
     errors: never[];
-    json: import("../../../types/generated/graphql.internal.types").OrderCreateMutation;
+    json: import("../../../types/generated/graphql.internal.types").CheckoutSessionOrderCreateMutation;
 }>;

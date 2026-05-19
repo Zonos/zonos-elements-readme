@@ -49,17 +49,26 @@ export declare class ZonosHelloDialog {
      * Store has tax id setup in Zonos settings
      */
     private hasTaxId;
-    private hasInclusivePrices;
+    /**
+     * Selected country is configured as a domestic country for the merchant,
+     * meaning the order ships within the merchant's origin country and no
+     * duty will be assessed on it.
+     */
+    private isDomesticCountry;
     /**
      * Some countries don't have threshold. So we need to show generic message for them
      */
     private isNoThresholdCountry;
     private getDutyMessage;
     private getTaxMessage;
+    private getEuDutyTaxMessage;
     private getUkDutyTaxMessage;
     private getAustraliaDutyTaxMessage;
     private getNewZealandDutyTaxMessge;
+    private getNorwayDutyTaxMessage;
+    private getSingaporeDutyTaxMessage;
     private getInclusivePriceMessage;
+    private renderHelloMessage;
     /**
      * Get additional duty tax message if selected country has tax id
      */

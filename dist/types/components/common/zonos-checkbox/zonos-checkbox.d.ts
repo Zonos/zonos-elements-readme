@@ -3,6 +3,7 @@ import type { ElementsUiStyle } from "../../../types/generated/graphql.internal.
 import type { CheckboxColorPrefix } from "../../../types/styles/Color";
 import type { Size } from "../../../types/styles/Text";
 export declare class ZonosCheckbox {
+    private inputId;
     /**
      * background color of the checkbox
      */

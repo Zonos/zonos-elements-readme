@@ -1,7 +1,8 @@
 import { type CountryLandedCost } from "../../utils/api/getCountryLandedCost";
 import { type TargetFormat } from "../../utils/api/getExchangeRate";
+import type { InclusivePriceConfigurationResponse } from "../../../types/index";
 import type { Locale_ElementsSupportedLocationCode_Enum, Locale_PageName_Enum } from "../../../types/generated/graphql.frontend.types";
-import type { CountryCode, CurrencyCode, InclusivePriceSettingFieldsFragment } from "../../../types/generated/graphql.internal.types";
+import type { CountryCode, CurrencyCode } from "../../../types/generated/graphql.internal.types";
 import type { ICountryJson } from "../../../types/ICountryJson";
 export type ExchangeRateForUse = {
     rate: number;
@@ -13,7 +14,14 @@ type LocalizationStore = {
     exchangeRate: ExchangeRateForUse | null;
     exchangeRateTimeout?: NodeJS.Timeout;
     helloCountryList: ICountryJson | null;
-    inclusivePricing: InclusivePriceSettingFieldsFragment | null;
+    /**
+     * Inclusive pricing configurations for the current country
+     */
+    inclusivePricingConfigurations: InclusivePriceConfigurationResponse;
+    /**
+     * Whether the inclusive pricing configurations are being fetched
+     */
+    inclusivePricingIsFetching: boolean;
     isDisabledCountry: boolean;
     isShippableCountry: boolean;
     localizationLoaded: boolean;
@@ -27,9 +35,12 @@ type ILocaleMessageForUse = {
     message?: string;
     pageName: Locale_PageName_Enum;
 };
-declare const localizationDispose: () => void, localizationStoreOnUpdate: import("@stencil/store/dist/types").OnChangeHandler<LocalizationStore>, localizationStore: LocalizationStore;
+declare const localizationDispose: () => void, localizationStoreOnChange: import("@stencil/store/dist/types").OnChangeHandler<LocalizationStore>, localizationStore: LocalizationStore;
 export declare const getFallbackDefaultCountryCode: (allowedCountries: CountryCode[]) => CountryCode;
-declare const localizationStoreUpdateSelectedCountryCode: (newSelectedCountryCode: CountryCode | null) => void;
+declare const localizationStoreUpdateSelectedCountryCode: ({ isInitializing, newSelectedCountryCode, }: {
+    isInitializing?: boolean;
+    newSelectedCountryCode: CountryCode | null;
+}) => void;
 declare const localizationStoreUpdateSelectedLocale: (newSelectedLocale: Locale_ElementsSupportedLocationCode_Enum) => void;
 declare const initLocalizationStore: () => Promise<void>;
-export { initLocalizationStore, localizationDispose, localizationStore, localizationStoreOnUpdate, localizationStoreUpdateSelectedCountryCode, localizationStoreUpdateSelectedLocale, };
+export { initLocalizationStore, localizationDispose, localizationStore, localizationStoreOnChange, localizationStoreUpdateSelectedCountryCode, localizationStoreUpdateSelectedLocale, };

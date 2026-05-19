@@ -1,7 +1,13 @@
-import type { OrderCreateMutation } from "../../generated/graphql.internal.types";
+import type { CheckoutSessionOrderCreateMutation } from "../../generated/graphql.internal.types";
 export type PlaceTestOrderRequest = {
-    billToPartyId: string;
+    /**
+     * @deprecated this will be removed in the future
+     */
+    billToPartyId?: string;
     checkoutSessionId: string;
-    shipToPartyId: string;
+    /**
+     * @deprecated this will be removed in the future
+     */
+    shipToPartyId?: string;
 };
-export type PlaceTestOrderResponse = OrderCreateMutation;
+export type PlaceTestOrderResponse = CheckoutSessionOrderCreateMutation;

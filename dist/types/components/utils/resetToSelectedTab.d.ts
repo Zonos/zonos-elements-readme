@@ -6,7 +6,7 @@ export declare const resetToSelectedTab: ({ selectedTab, tabList, }: {
     selectedTab: TabItem["value"];
     tabList: TabItems;
 }) => {
-    "customer-info": TabItem;
     shipping: TabItem;
+    "customer-info": TabItem;
     payment: TabItem;
 };

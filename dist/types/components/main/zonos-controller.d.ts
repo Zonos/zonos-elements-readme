@@ -30,6 +30,14 @@ export declare class ZonosController {
      */
     initCheckoutElement(stripe: Stripe): Promise<void>;
     /**
+     * Method to initialize Collect element
+     */
+    initCollectElement(stripe: Stripe): Promise<void>;
+    /**
+     * Method to initialize Collect element
+     */
+    initInvoiceElement(stripe: Stripe): Promise<void>;
+    /**
      * Init zonos notification
      */
     private initZonosNotification;
@@ -43,6 +51,8 @@ export declare class ZonosController {
      */
     private initHistoryListener;
     private injectCustomHTML;
+    private initGooglePlacesService;
+    private buildBaseConfig;
     componentWillLoad(): Promise<void>;
     /**
      * Show notification

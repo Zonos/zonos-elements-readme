@@ -1,15 +1,24 @@
 import { type AppearanceConfig } from "../../store/zonosStore";
-import type { HelloMobileLocation } from "../../../types/generated/graphql.internal.types";
+import type { HelloDesktopLocation, HelloMobileLocation } from "../../../types/generated/graphql.internal.types";
 import type { Product } from "../../../types/hello/Product";
 import type { RestrictedItem } from "../../../types/hello/RestrictedItem";
 import type { ICountryJson } from "../../../types/ICountryJson";
 export declare class ZonosHello {
+    helloElement: HTMLZonosHelloElement;
     private helloRef?;
+    private observerWatcher?;
     /**
      * Force mobile styling instead of media query and use the passed location value
      * @default false
      */
     mobileLocationOverride?: HelloMobileLocation;
+    /**
+     * Override the configured desktop floating location. Takes precedence over
+     * `helloSettings.desktopLocation` and also drives the peek-message animation
+     * direction, so consumers no longer need `animateFromLeftOverride` for
+     * desktop positioning.
+     */
+    desktopLocationOverride?: HelloDesktopLocation;
     /**
      * Force left animation instead of detecting which side has more space
      * @default false
@@ -44,6 +53,7 @@ export declare class ZonosHello {
      * Determine if the window is mobile
      */
     isMobile: boolean;
+    showDialogHandler(showDialog: boolean): void;
     /**
      * Get the country list the hello widget's country select is using
      */
@@ -60,6 +70,7 @@ export declare class ZonosHello {
     private watchPriceChange;
     private updateHelloOnPageChange;
     componentWillLoad(): void;
+    disconnectedCallback(): void;
     /**
      * This method will trigger the currency conversion and display the converted value
      * @returns void

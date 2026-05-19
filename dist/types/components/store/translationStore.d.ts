@@ -3,7 +3,7 @@ import type { Locale_ElementsSupportedLocationCode_Enum } from "../../types/gene
 type TranslationStore = {
     translatedChunks: typeof stringsBase;
 };
-declare const translationStore: TranslationStore;
+declare const translationStoreOnChange: import("@stencil/store/dist/types").OnChangeHandler<TranslationStore>, translationStore: TranslationStore;
 export { translationStore };
 export declare const translationStoreUpdateLanguage: (language: Locale_ElementsSupportedLocationCode_Enum | {
     _placeholder?: never;
@@ -22,7 +22,7 @@ type ExtractVariables<S extends string> = S extends `${infer _Start}[${infer Var
  * type Params = TranslateParams<'[percentage] GST due on any order above [threshold].'>
  * // Params = ['[percentage] GST due on any order above [threshold].', variables: { percentage: string, threshold: string }]
  */
-type TranslateParams<T extends string> = ExtractVariables<T> extends never ? [T, variables?: never] : [T, variables: Record<ExtractVariables<T>, string>];
+type TranslateParams<T extends string> = ExtractVariables<T> extends never ? [T, variables?: never] : [T, variables: Record<ExtractVariables<T>, string | number>];
 export type ITranslationKey = keyof typeof stringsBase;
 /**
  * Translate a string with variables if variable pattern is present in the string
@@ -33,3 +33,4 @@ export type ITranslationKey = keyof typeof stringsBase;
  * translate('Above de minimis threshold for')
  */
 export declare const translate: <T extends keyof typeof stringsBase>(...[key, replacement]: TranslateParams<T>) => string;
+export { translationStoreOnChange };
