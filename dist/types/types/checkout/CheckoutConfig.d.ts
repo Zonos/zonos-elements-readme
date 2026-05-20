@@ -1,7 +1,9 @@
 import type { CartItem } from "../../components/store/checkout/cart";
+import type { ITranslationKey } from "../../components/store/translationStore";
 import type { BuildLandedCostParams, BuildLandedCostResponse } from "../../components/utils/api/triggerBuildLandedCost";
-import type { AnalyticsProviderStatus, AnalyticsProviderType, CheckoutSubscriptionStatus, CheckoutSuccessBehavior, CheckoutVisibilityStatus, CountryCode, CurrencyCode, ExternalPaymentMethodStatus, ExternalPaymentMethodType, ExternalServiceTokenType, GetOrderQuery, Mode, NotificationActiveStatus } from "../generated/graphql.internal.types";
+import type { AllowedSettlementCurrencies, AnalyticsProviderStatus, AnalyticsProviderType, CheckoutSubscriptionStatus, CheckoutSuccessBehavior, CheckoutVisibilityStatus, CountryCode, CurrencyCode, ExternalPaymentMethodStatus, ExternalPaymentMethodType, ExternalServiceTokenType, GetOrderQuery, Mode, NotificationActiveStatus } from "../generated/graphql.internal.types";
 export declare const checkoutHiddenBtnSelector = "zonos--checkout-hidden-button";
+export declare const checkoutHiddenInternationalBtnSelector = "zonos--checkout-hidden-international-button";
 export declare const domesticRedirectedBtnSelector = "zonos--domestic-redirected-checkout-button";
 export type ZonosOrder = GetOrderQuery['order'];
 export type { BuildLandedCostParams, BuildLandedCostResponse };
@@ -19,13 +21,32 @@ export type PrefillAddress = {
      */
     customerCountry?: string;
     customerEmail: string;
-    customerName: string;
+    /**
+     * Will use this value to prefill the first name field in the checkout form instead of `customerName`
+     */
+    customerFirstName: string;
+    /**
+     * Will use this value to prefill the last name field in the checkout form instead of `customerName`
+     */
+    customerLastName: string;
+    /**
+     * Will use this value to prefill if customerFirstName and customerLastName are not provided
+     * @deprecated Use `customerFirstName` and `customerLastName` since Checkout uses 2 inputs for first and last name, there is not a good way to split the name into first and last name for some countries.
+     */
+    customerName?: string;
     customerPhone: string;
     customerState?: string;
     customerZip: string;
 };
 export type CreateCartIdObject = {
     cartId: string;
+    /**
+     * Optional informational message rendered as a single info banner under the
+     * Order total in Checkout. Each item in the array appears on a new line of
+     * the same banner. Markdown links (`[text](url)`) are rendered as `<a>` tags.
+     */
+    customMessage?: string[];
+    customerAuthenticationToken?: string;
     shippingData?: PrefillAddress | null;
 };
 export type CheckoutConfig = {
@@ -34,15 +55,41 @@ export type CheckoutConfig = {
      * @default ALL
      */
     allowedCharacterSets?: 'ALL' | 'LATIN';
+    /**
+     * Enable settlement currencies to pay in USD
+     * @default LOCAL
+     */
+    allowedSettlementCurrencies: AllowedSettlementCurrencies;
+    /**
+     * Always trigger International Checkout with this selector regardless of shipping zone
+     */
+    alwaysTriggerInternationalCheckoutSelector?: string | null;
     analyticsProviders: Array<{
         status: AnalyticsProviderStatus;
         type: AnalyticsProviderType;
     }>;
     /**
-     * Duration (in minutes) for which the cart remains valid for checkout in hosted checkout.
-     * @default 60 (1 hour)
+     * BigCommerce-specific identifiers forwarded by the Zonos loader script.
+     * Consumed by runtime code that needs to hit the demo-app proxy on behalf
+     * of a specific BigCommerce store (e.g. the `/checkouts/settings`
+     * force-login check).
      */
-    cartExpiration?: number;
+    bigCommerceConfig?: {
+        storeHash: string;
+    };
+    /**
+     * Time that payment will be captured after the order is placed. Can't be overridden in Zonos.init
+     */
+    captureDelay?: number;
+    /**
+     * @default DISABLED - when false, company fields would not show up in the checkout form
+     */
+    companyFieldsStatus: 'ENABLED' | 'DISABLED';
+    /**
+     * Duration (in seconds) for which the cart remains valid for checkout in hosted checkout.
+     * @default 3_600 (1 hour)
+     */
+    defaultCartExpiration?: number;
     /**
      * @default false - when false, the place order button will be disabled until the script is loaded
      * @note if set to true, the place order button will not be enabled or disabled
@@ -80,6 +127,9 @@ export type CheckoutConfig = {
         };
     };
     organization: string;
+    /**
+     * Place order button selector that only trigger International Checkout when shopper is in merchant's shipping zones
+     */
     placeOrderButtonSelector: string | null;
     /**
      * @param subscriptionStatus subscription status for checkout, checkout only available if subscription status is ENABLED and visibility status is ENABLED
@@ -103,6 +153,13 @@ export type CheckoutConfig = {
      * @note Default text supports translation automatically, but any custom text will not be translated.
      */
     successPageTitleText?: string;
+    /**
+     * The URL to redirect to after a successful checkout.
+     *
+     * - When `successBehavior` is `REDIRECT_TO_SUCCESS_PAGE`, Checkout polls for the Zonos order and then redirects, appending `zOrderNumber` (and `orderId` for legacy).
+     * - When `successBehavior` is `CLOSE_MODAL` and this URL is provided, Checkout redirects immediately after payment without waiting for the order, appending `zonosCheckoutSessionId`.
+     *   In this flow Checkout does not poll for the order, so `onOrderSuccess` is **not** invoked as part of the redirect. The merchant should use `zonosCheckoutSessionId` on their success page (via the `checkoutSession` GraphQL query) to fetch the order details.
+     */
     successRedirectUrl: string;
     visibilityStatus: CheckoutVisibilityStatus;
     /**
@@ -168,6 +225,15 @@ export type CheckoutConfig = {
      */
     onInventoryCheck?: (params: {
         items: CartItem[];
+    }, helpers?: {
+        /**
+         * The URL for the Zonos API.
+         */
+        zonosApiRoute: string;
+        /**
+         * Utility function to translate strings.
+         */
+        translate: (key: ITranslationKey) => string;
     }) => Promise<string | null>;
     /**
      * Callback trigger when payment succeeds

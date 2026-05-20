@@ -3,6 +3,10 @@ import type { Color } from "../../../types/styles/Color";
 export declare class ZonosButton {
     ele: HTMLZonosButtonElement;
     /**
+     * Inherited attributes from the host element
+     */
+    private inheritedAttributes;
+    /**
      * The color of the button text and svg
      */
     buttonColor?: Color | (string & {
@@ -77,6 +81,10 @@ export declare class ZonosButton {
      * @default 'center'
      */
     justifyContent: 'center' | 'flex-end' | 'flex-start';
+    /**
+     * Whether or not the button text color is bold
+     */
+    bold: boolean;
     /**
      * The theme of the button
      */

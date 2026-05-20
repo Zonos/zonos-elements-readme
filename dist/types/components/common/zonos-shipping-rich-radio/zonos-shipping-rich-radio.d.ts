@@ -13,6 +13,7 @@ export type ShippingRichRadioItem = {
     value: string | number;
 };
 export declare class ZonosShippingRichRadio {
+    ele: HTMLZonosShippingRichRadioElement;
     /**
      * List of items to display
      */
@@ -31,6 +32,10 @@ export declare class ZonosShippingRichRadio {
      * Theme of the radio item
      */
     theme?: ElementsUiTheme;
+    /**
+     * Whether or not the radio item is in mobile mode
+     */
+    isMobile: boolean;
     /**
      * Selected item
      * @default {null|firstItem}

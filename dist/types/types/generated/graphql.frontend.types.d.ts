@@ -74,21 +74,28 @@ export declare const cursorOrdering: {
 };
 export type Cursor_Ordering = (typeof cursorOrdering)[keyof typeof cursorOrdering];
 export declare const errorProjectNameEnum: {
+    readonly Account: "account";
+    readonly Conductor: "conductor";
     readonly Dashboard: "dashboard";
+    readonly DashboardExpo: "dashboard_expo";
     readonly Elements: "elements";
     readonly ZonosCom: "zonos_com";
 };
 export declare const featureAspectKeyEnum: {
+    readonly AdminRulesWrite: "admin_rules_write";
+    readonly AirwallexBeta: "airwallex_beta";
     readonly Checkout_2_0: "checkout_2_0";
     readonly ClassifyBulk: "classify_bulk";
     readonly ClassifyBulkExportViewConfidenceScore: "classify_bulk_export_view_confidence_score";
     readonly ClassifySingleRequest: "classify_single_request";
     readonly ComConsolidation: "com_consolidation";
     readonly DashboardCheckout_2Settings: "dashboard_checkout_2_settings";
+    readonly DashboardChurnedNotification: "dashboard_churned_notification";
     readonly DashboardHello_2Settings: "dashboard_hello_2_settings";
     readonly DashboardNewLabelUi: "dashboard_new_label_ui";
     readonly DashboardOrderApprove: "dashboard_order_approve";
     readonly DashboardOrderApproveNoCapture: "dashboard_order_approve_no_capture";
+    readonly DashboardViewportInvoices: "dashboard_viewport_invoices";
     readonly Dashboard_909Settings: "dashboard_909_settings";
     readonly DocsSearchOpenAiQa: "docs_search_open_ai_qa";
     readonly ExploreFrontendMutation: "explore_frontend_mutation";
@@ -98,19 +105,26 @@ export declare const featureAspectKeyEnum: {
     readonly LocaleMessage: "locale_message";
     readonly NewCheckoutBeta: "new_checkout_beta";
     readonly NewPayoutReport: "new_payout_report";
+    readonly NewRefundsUx: "new_refunds_ux";
+    readonly OnboardingBeta: "onboarding_beta";
     readonly PageAuditor: "page_auditor";
     readonly PromptExplorer: "prompt_explorer";
     readonly RulesUiCreate: "rules_ui_create";
+    readonly SearchDgsBeta: "search_dgs_beta";
     readonly SupportTicketSystem: "support_ticket_system";
     readonly TeamAuditor: "team_auditor";
 };
 export type Feature_AspectKey_Enum = (typeof featureAspectKeyEnum)[keyof typeof featureAspectKeyEnum];
 export declare const featureAudienceNameEnum: {
     readonly AccountsReceivable: "accounts_receivable";
+    readonly AdminRulesEditor: "admin_rules_editor";
+    readonly AirwallexBetaMerchant: "airwallex_beta_merchant";
     readonly CheckoutSales: "checkout_sales";
     readonly ClassifyBulkMerchant: "classify_bulk_merchant";
     readonly ClassifyBulkMerchantExportConfidenceScore: "classify_bulk_merchant_export_confidence_score";
     readonly CustomerSuccess: "customer_success";
+    readonly DashboardAuTop_100VerifiedAccounts: "dashboard_au_top_100_verified_accounts";
+    readonly DashboardChurnedNotificationMerchant: "dashboard_churned_notification_merchant";
     readonly DashboardLabelBetaMerchant: "dashboard_label_beta_merchant";
     readonly Designer: "designer";
     readonly DocsContributor: "docs_contributor";
@@ -124,11 +138,14 @@ export declare const featureAudienceNameEnum: {
     readonly ItHead: "it_head";
     readonly NewCheckoutMerchant: "new_checkout_merchant";
     readonly NewPayoutReportMerchant: "new_payout_report_merchant";
+    readonly NewRefundsUxMerchant: "new_refunds_ux_merchant";
     readonly Onboarding: "onboarding";
+    readonly OnboardingBetaMerchant: "onboarding_beta_merchant";
     readonly PrincipalEngineer: "principal_engineer";
     readonly ProServeHead: "pro_serve_head";
     readonly ProductManager: "product_manager";
     readonly RulesUiCreateMerchant: "rules_ui_create_merchant";
+    readonly SearchDgsBetaMerchant: "search_dgs_beta_merchant";
     readonly SupportTicketMerchants: "support_ticket_merchants";
     readonly TechLead: "tech_lead";
 };
@@ -525,6 +542,7 @@ export declare const promptBulkJobProjectLabelEnum: {
     readonly ZonosComDynamicTranslate: "zonos_com_dynamic_translate";
     readonly ZonosComInlineTranslate: "zonos_com_inline_translate";
     readonly ZonosComMdxTranslate: "zonos_com_mdx_translate";
+    readonly ZonosPrepayInlineTranslate: "zonos_prepay_inline_translate";
 };
 export type Prompt_BulkJobProjectLabel_Enum = (typeof promptBulkJobProjectLabelEnum)[keyof typeof promptBulkJobProjectLabelEnum];
 export declare const promptBulkJobStatusEnum: {
@@ -533,6 +551,160 @@ export declare const promptBulkJobStatusEnum: {
     readonly Queued: "queued";
 };
 export type Prompt_BulkJobStatus_Enum = (typeof promptBulkJobStatusEnum)[keyof typeof promptBulkJobStatusEnum];
+export type AnalyticConversionEventQuery = {
+    cartCreate: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    customerInfoCompleted: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    customerInfoFilled: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    orderCompleted: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    paymentInfoCompleted: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    paymentInfoFilled: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    quoteReceived: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    shippingInfoCompleted: {
+        aggregate: {
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            count: number;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+};
+export type ConversionEventFragmentFragment = {
+    aggregate: {
+        avg: {
+            checkoutStepSeconds: number | null;
+        } | null;
+        count: number;
+        max: {
+            checkoutStepSeconds: number | null;
+        } | null;
+        min: {
+            checkoutStepSeconds: number | null;
+        } | null;
+    } | null;
+};
+export type MetricAllApiPathsQuery = {
+    usage_scriptLoadEvent: Array<{
+        href: string;
+    }>;
+};
+export type MetricApiPathSpeedQuery = {
+    usage_scriptLoadEvent_aggregate: {
+        aggregate: {
+            avg: {
+                loadTimeClientMiddleware: number | null;
+                loadTimeInternal: number | null;
+            } | null;
+            count: number;
+            max: {
+                createdAt: string | null;
+                loadTimeClientMiddleware: number | null;
+                loadTimeInternal: number | null;
+            } | null;
+            min: {
+                createdAt: string | null;
+                loadTimeClientMiddleware: number | null;
+                loadTimeInternal: number | null;
+            } | null;
+        } | null;
+    };
+};
 export type FailToGetQuoteErrorsQuery = {
     error_event_aggregate: {
         aggregate: {
@@ -589,6 +761,14 @@ export type InsertConversionEventMutation = {
         id: number;
     } | null;
 };
+export type CreateBulkLoadEventMutation = {
+    insert_usage_apiLoadEvent: {
+        affected_rows: number;
+        returning: Array<{
+            id: number;
+        }>;
+    } | null;
+};
 export type CreateErrorEventMutation = {
     insert_error_event: {
         returning: Array<{
@@ -599,6 +779,14 @@ export type CreateErrorEventMutation = {
     } | null;
 };
 export type CreateScriptLoadEventMutation = {
+    insert_usage_scriptLoadEvent: {
+        affected_rows: number;
+        returning: Array<{
+            id: number;
+        }>;
+    } | null;
+};
+export type CreateBulkScriptLoadEventMutation = {
     insert_usage_scriptLoadEvent: {
         affected_rows: number;
         returning: Array<{
@@ -709,8 +897,10 @@ export type GetBigCommerceSettingsQuery = {
         dimensionUnits: string;
         domain: string;
         id: number;
+        inventoryCheckEnabled: boolean;
         reserveOrderEnabled: boolean;
         storeHash: string;
+        testModeEnabled: boolean;
         user: string;
         weightUnits: string;
         zonosCredentialToken: string | null;
@@ -784,12 +974,21 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     allSettings(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<AllSettingsQuery>;
+    analyticConversionEvent(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<AnalyticConversionEventQuery>;
     cleanupTestErrors(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CleanupTestErrorsMutation>;
     cleanupTestZonosElementSetting(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CleanupTestZonosElementSettingMutation>;
+    createBulkLoadEvent(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateBulkLoadEventMutation>;
+    createBulkScriptLoadEvent(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateBulkScriptLoadEventMutation>;
     createErrorEvent(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateErrorEventMutation>;
@@ -850,6 +1049,12 @@ export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionW
     localeCountryMessages(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<LocaleCountryMessagesQuery>;
+    metricAllApiPaths(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<MetricAllApiPathsQuery>;
+    metricApiPathSpeed(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<MetricApiPathSpeedQuery>;
     storeVersionSetting(variables?: {
         [x: string]: never;
     }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreVersionSettingQuery>;

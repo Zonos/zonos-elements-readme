@@ -6,6 +6,7 @@ export declare class ZonosCountrySelect {
     handleOnClose: () => void;
     inputValue: string;
     ele: HTMLZonosCountrySelectElement;
+    private inputRef;
     private countrySelected;
     private handleInputChange;
     componentDidRender(): void;

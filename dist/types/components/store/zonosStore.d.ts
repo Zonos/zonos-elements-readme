@@ -1,7 +1,10 @@
+import type { CheckoutAddressService } from "../utils/iframe/CheckoutAddressService";
 import type { CurrencyConverter, LoadZonosParamsConfig } from "../../scripts/_zonosBase";
+import type { TestKey } from "../../types/index";
 import type { CheckoutConfig } from "../../types/checkout/CheckoutConfig";
-import type { CountryCode, ElementsUiStyle, ElementsUiTheme, ZonosAttribution, ZonosSettingsQuery } from "../../types/generated/graphql.internal.types";
+import type { CountryCode, ElementsUiStyle, ElementsUiTheme, ZonosAttribution } from "../../types/generated/graphql.internal.types";
 import type { HelloConfig } from "../../types/hello/HelloConfig";
+import type { GenericZonosSettings, ZonosSettings } from "../../types/utils/ZonosSettings";
 export type AppearanceConfig = {
     colorPrimary?: string;
     colorSecondary?: string;
@@ -23,6 +26,10 @@ export type AppearanceConfig = {
 export type Page = 'home' | 'productList' | 'productDetail' | 'cart';
 export type ZonosConfig = {
     appearance: AppearanceConfig;
+    /**
+     * Service for managing address selection and validation
+     */
+    checkoutAddressService: CheckoutAddressService | null;
     checkoutSettings: CheckoutConfig;
     currencyConverter?: CurrencyConverter;
     currentHelloPage: Page | '';
@@ -30,9 +37,14 @@ export type ZonosConfig = {
      * List of countries that are disabled in the checkout, will also be disabled for hello
      */
     disabledCountries: CountryCode[];
+    /**
+     * Enabled test keys, selectedVariant will be null if we have not yet selected a variant for the test. (pull from settings)
+     */
+    enabledVariantTestKeys: TestKey[];
+    genericSettings?: GenericZonosSettings;
     helloSettings: HelloConfig;
     /**
-     * Callback to be called when the country is changed
+     * Callback to be called when the country is changed (Currency code will default to null if the country is not in shipping zone)
      */
     onCountryChange?: LoadZonosParamsConfig['onCountryChange'];
     onlineStoreSettings: {
@@ -61,7 +73,7 @@ type ZonosStore = ZonosConfig & {
      */
     zonosApiKey: string;
 };
-declare const zonosStoreDispose: () => void, zonosStore: ZonosStore;
+declare const zonosStoreDispose: () => void, zonosStoreOnChange: import("@stencil/store/dist/types").OnChangeHandler<ZonosStore>, zonosStore: ZonosStore;
 /**
  * Get theme from media query if theme is SYSTEM, otherwise return the theme
  */
@@ -71,7 +83,7 @@ declare const getZonosStoreTheme: (theme: ElementsUiTheme) => Exclude<ElementsUi
  */
 declare const zonosStoreInitSetting: ({ overrideSettings, zonosSettings, }: {
     overrideSettings?: LoadZonosParamsConfig;
-    zonosSettings: ZonosSettingsQuery | null;
+    zonosSettings: ZonosSettings | null;
 }) => void;
 declare const zonosStoreFontFamily: () => string;
-export { getZonosStoreTheme, zonosStore, zonosStoreDispose, zonosStoreFontFamily, zonosStoreInitSetting, };
+export { getZonosStoreTheme, zonosStore, zonosStoreDispose, zonosStoreFontFamily, zonosStoreInitSetting, zonosStoreOnChange, };

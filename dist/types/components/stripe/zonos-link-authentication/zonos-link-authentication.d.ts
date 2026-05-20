@@ -1,6 +1,7 @@
 import { type EventEmitter } from '../../../stencil-public-runtime';
 import type { Stripe } from '@stripe/stripe-js';
 export declare class ZonosLinkAuthentication {
+    private storeUnsubscribeList;
     /**
      * The title text for the authentication element
      */
@@ -20,12 +21,14 @@ export declare class ZonosLinkAuthentication {
     stripe: Stripe | null;
     isStagingMode: boolean;
     clientSecret: string;
+    retriesInitializeLink: number;
     el: HTMLZonosLinkAuthenticationElement;
     watchIsStagingMode(): void;
-    watchInitStripe(): void;
+    watchInitStripe(): Promise<void>;
     private setCustomEmailInputToLinkEvent;
     private handleNormalEmailInput;
-    watchDefaultEmail(): void;
+    watchDefaultEmail(newDefaultEmail: string | null, oldDefaultEmail: string | null): void;
+    disconnectedCallback(): void;
     componentDidLoad(): void;
     render(): any;
 }

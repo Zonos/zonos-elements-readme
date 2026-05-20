@@ -1,6 +1,7 @@
 import { type EventEmitter } from '../../../../stencil-public-runtime';
 import type { ShippingRichRadioItem } from "../../../common/zonos-shipping-rich-radio/zonos-shipping-rich-radio";
 export declare class ZonosShipping {
+    private storeUnsubscribeList;
     /**
      * Whether or not the continue button is loading
      */
@@ -13,6 +14,10 @@ export declare class ZonosShipping {
      * Whether or not the checkout is in mobile mode
      */
     submitBtnType?: HTMLZonosButtonElement['variant'];
+    /**
+     * Whether or not the checkout is in mobile mode
+     */
+    isMobile: boolean;
     /**
      * Event to emit when the continue button is clicked
      */
@@ -33,6 +38,7 @@ export declare class ZonosShipping {
     serviceLevelsOther: ShippingRichRadioItem[];
     serviceLevelsAll: ShippingRichRadioItem[];
     displayBaseCurrency: boolean;
+    shippingData: ShippingRichRadioItem[];
     private handleRadioSelected;
     private handleValidate;
     private isOutdatedShippingData;
@@ -44,6 +50,7 @@ export declare class ZonosShipping {
     private initServiceLevels;
     private isCurrencyToggled;
     private preselectFirstShippingMethod;
+    disconnectedCallback(): void;
     componentWillLoad(): void;
     render(): any;
 }

@@ -13,7 +13,9 @@ export type BuildLandedCostParams = {
 export type BuildLandedCostResponse = (CalculateLandedCostMutation & {
     errors: ApiError[];
 }) | null;
-type BuildLandedCost = (props: BuildLandedCostParams) => Promise<BuildLandedCostResponse>;
+type BuildLandedCost = (props: BuildLandedCostParams, helpers?: {
+    promoCode?: string;
+}) => Promise<BuildLandedCostResponse>;
 export declare const triggerBuildLandedCost: (buildLandedCost: BuildLandedCost) => Promise<CalculateLandedCostMutation & {
     errors: ApiError[];
 }>;
