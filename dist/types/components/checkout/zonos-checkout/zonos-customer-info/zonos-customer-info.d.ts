@@ -1,6 +1,7 @@
 import { type EventEmitter } from '../../../../stencil-public-runtime';
 import type { StripeAddressElementChangeEvent } from '@stripe/stripe-js';
 import { type StripeStoreContactOption } from "../../../store/checkout/stripe";
+import type { MissingShippingField } from "../../../utils/checkout/getMissingRequiredShippingFields";
 import { containsNonLatinChars } from "../../../utils/containsNonLatinChars";
 import type { CountryCode } from "../../../../types/generated/graphql.internal.types";
 import type { InputFieldLabel } from "../../../../types/InputFieldLabel";
@@ -58,6 +59,10 @@ export declare class ZonosCustomerInfo {
      */
     isValidatingAddress: boolean;
     /**
+     * Which tax id control the current error belongs on
+     */
+    taxIdErrorField: 'type' | 'value' | '';
+    /**
      * Whether or not the tax id input is invalid
      */
     taxIdErrorMessage: string;
@@ -77,6 +82,15 @@ export declare class ZonosCustomerInfo {
      * Handler for the dialog close button
      */
     openAddressValidationDialog: boolean;
+    /**
+     * Whether the "complete your shipping address" dialog is open. Shown when Stripe reports
+     * the address complete but Zonos still needs fields Link didn't provide (e.g. last name).
+     */
+    openCompletionDialog: boolean;
+    /**
+     * Zonos-required shipping fields still missing from the selected Stripe address
+     */
+    missingShippingFields: MissingShippingField[];
     /**
      * Handler for the email error state
      */
@@ -104,6 +118,12 @@ export declare class ZonosCustomerInfo {
      * handler for continue button click
      */
     private continueClickHandler;
+    /**
+     * Continue past the customer step once the address is validated and complete. Runs the
+     * non-Latin character check (which may open the translate dialog) before emitting.
+     */
+    private continueAfterValidation;
+    private completionSubmitHandler;
     /**
      * Validate the custom address form, turn the flag showError to false if the form is valid, or vice versa
      */

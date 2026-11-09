@@ -159,8 +159,14 @@ declare global {
   }
 }
 
+type MissingShippingFieldKey = 'lastName' | 'postal_code' | 'state';
+type MissingShippingField = {
+    key: MissingShippingFieldKey;
+};
+
 declare const adjustmentSource: {
     readonly ApiRequest: "API_REQUEST";
+    readonly Discount: "DISCOUNT";
     readonly PromoCode: "PROMO_CODE";
 };
 type AdjustmentSource = (typeof adjustmentSource)[keyof typeof adjustmentSource];
@@ -219,6 +225,7 @@ declare const cartType: {
     readonly InvoiceCollect: "INVOICE_COLLECT";
     readonly LabelCollect: "LABEL_COLLECT";
     readonly PrepayCollect: "PREPAY_COLLECT";
+    readonly Quote: "QUOTE";
 };
 type CartType = (typeof cartType)[keyof typeof cartType];
 declare const checkoutCompanyFieldsStatus: {
@@ -226,6 +233,12 @@ declare const checkoutCompanyFieldsStatus: {
     readonly Enabled: "ENABLED";
 };
 type CheckoutCompanyFieldsStatus = (typeof checkoutCompanyFieldsStatus)[keyof typeof checkoutCompanyFieldsStatus];
+declare const checkoutPaymentProcessorType: {
+    readonly Airwallex: "AIRWALLEX";
+    readonly Paypal: "PAYPAL";
+    readonly Stripe: "STRIPE";
+};
+type CheckoutPaymentProcessorType = (typeof checkoutPaymentProcessorType)[keyof typeof checkoutPaymentProcessorType];
 declare const checkoutSubscriptionStatus: {
     readonly Active: "ACTIVE";
     readonly Inactive: "INACTIVE";
@@ -489,6 +502,7 @@ declare const countryCode: {
     readonly Vu: "VU";
     readonly Wf: "WF";
     readonly Ws: "WS";
+    readonly Xk: "XK";
     readonly Ye: "YE";
     readonly Yt: "YT";
     readonly Za: "ZA";
@@ -679,6 +693,12 @@ declare const deMinimisType: {
     readonly Tax: "TAX";
 };
 type DeMinimisType = (typeof deMinimisType)[keyof typeof deMinimisType];
+declare const deliveryType: {
+    readonly Consolidated: "CONSOLIDATED";
+    readonly Courier: "COURIER";
+    readonly Postal: "POSTAL";
+};
+type DeliveryType = (typeof deliveryType)[keyof typeof deliveryType];
 declare const elementsUiStyle: {
     readonly Rounded: "ROUNDED";
     readonly Sharp: "SHARP";
@@ -776,8 +796,11 @@ declare const incotermCode: {
 type IncotermCode = (typeof incotermCode)[keyof typeof incotermCode];
 declare const itemMeasurementType: {
     readonly AlcoholByVolume: "ALCOHOL_BY_VOLUME";
+    readonly Area: "AREA";
+    readonly Count: "COUNT";
     readonly Height: "HEIGHT";
     readonly Length: "LENGTH";
+    readonly TotalWeight: "TOTAL_WEIGHT";
     readonly Volume: "VOLUME";
     readonly Weight: "WEIGHT";
     readonly Width: "WIDTH";
@@ -807,8 +830,11 @@ declare const itemType: {
 type ItemType = (typeof itemType)[keyof typeof itemType];
 declare const itemUnitOfMeasure: {
     readonly Centimeter: "CENTIMETER";
+    readonly Dozen: "DOZEN";
+    readonly Each: "EACH";
     readonly Foot: "FOOT";
     readonly Gram: "GRAM";
+    readonly Gross: "GROSS";
     readonly Inch: "INCH";
     readonly Kilogram: "KILOGRAM";
     readonly Liter: "LITER";
@@ -816,8 +842,12 @@ declare const itemUnitOfMeasure: {
     readonly Milliliter: "MILLILITER";
     readonly Millimeter: "MILLIMETER";
     readonly Ounce: "OUNCE";
+    readonly Pair: "PAIR";
     readonly Percentage: "PERCENTAGE";
+    readonly PolarizationDegree: "POLARIZATION_DEGREE";
     readonly Pound: "POUND";
+    readonly ProofLiter: "PROOF_LITER";
+    readonly SquareMeter: "SQUARE_METER";
     readonly Yard: "YARD";
 };
 type ItemUnitOfMeasure = (typeof itemUnitOfMeasure)[keyof typeof itemUnitOfMeasure];
@@ -831,11 +861,16 @@ declare const landedCostAdjustmentType: {
 type LandedCostAdjustmentType = (typeof landedCostAdjustmentType)[keyof typeof landedCostAdjustmentType];
 declare const landedCostGuaranteeCode: {
     readonly CollectRemittance: "COLLECT_REMITTANCE";
+    readonly Guaranteed: "GUARANTEED";
+    readonly GuaranteedImport: "GUARANTEED_IMPORT";
+    readonly GuaranteedRemit: "GUARANTEED_REMIT";
     readonly InclusivePrice: "INCLUSIVE_PRICE";
     readonly NotApplicable: "NOT_APPLICABLE";
     readonly PostalDdp: "POSTAL_DDP";
     readonly PostalDdpInclusivePrice: "POSTAL_DDP_INCLUSIVE_PRICE";
     readonly Zonos: "ZONOS";
+    readonly ZonosImport: "ZONOS_IMPORT";
+    readonly ZonosRemit: "ZONOS_REMIT";
 };
 type LandedCostGuaranteeCode = (typeof landedCostGuaranteeCode)[keyof typeof landedCostGuaranteeCode];
 declare const landedCostGuaranteeType: {
@@ -885,6 +920,7 @@ declare const partyType: {
     readonly Origin: "ORIGIN";
     readonly Payee: "PAYEE";
     readonly Payor: "PAYOR";
+    readonly PortOfEntry: "PORT_OF_ENTRY";
     readonly UltimateConsignee: "ULTIMATE_CONSIGNEE";
 };
 type PartyType = (typeof partyType)[keyof typeof partyType];
@@ -922,81 +958,87 @@ declare const zonosAttribution: {
 };
 type ZonosAttribution = (typeof zonosAttribution)[keyof typeof zonosAttribution];
 type CalculateLandedCostMutation = {
+    partyCreateWorkflow: Array<{
+        type: PartyType | null;
+        id: string;
+        organization: string;
+    }>;
+    itemCreateWorkflow: Array<{
+        id: string;
+        amount: number;
+        name: string | null;
+        description: string | null;
+        imageUrl: string | null;
+        quantity: number;
+        sku: string | null;
+        productId: string;
+        reverseAmountDetail: Array<{
+            inclusivePriceConfigurationId: string | null;
+        }> | null;
+        restriction: {
+            reason: string;
+            action: RestrictedItemAction;
+        } | null;
+        attributes: Array<{
+            key: string | null;
+            value: string | null;
+        } | null> | null;
+    }>;
     cartonizeWorkflow: Array<{
         id: string;
+        type: PackagingType;
         items: Array<{
             item: {
                 id: string;
             };
         }> | null;
-        type: PackagingType;
     } | null> | null;
-    checkoutSessionWorkflow: Array<{
-        landedCostId: string;
-        subtotals: {
-            adjustments: number;
-            duties: number;
-            exchangeRate: {
-                id: string;
-                rate: number;
-                sourceCurrencyCode: CurrencyCode;
-                targetCurrencyCode: CurrencyCode;
-                type: ExchangeRateType;
-            };
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            presentmentCurrencyCode: CurrencyCode;
-            shipping: number;
-            taxes: number;
-            total: number;
-        };
-    }> | null;
-    itemCreateWorkflow: Array<{
-        amount: number;
-        attributes: Array<{
-            key: string | null;
-            value: string | null;
-        } | null> | null;
-        description: string | null;
+    shipmentRatingCalculateWorkflow: Array<{
         id: string;
-        imageUrl: string | null;
-        name: string | null;
-        productId: string;
-        quantity: number;
-        restriction: {
-            action: RestrictedItemAction;
-            reason: string;
+        displayName: string;
+        currencyCode: CurrencyCode;
+        amount: number;
+        shippingProfile: {
+            serviceLevel: {
+                deliveryType: DeliveryType | null;
+                code: string;
+            };
+            transitTime: {
+                min: number | null;
+                max: number | null;
+                guaranteedDelivery: string | null;
+                type: TransitTypeCode | null;
+            } | null;
         } | null;
-        reverseAmountDetail: Array<{
-            inclusivePriceConfigurationId: string | null;
-        }> | null;
-        sku: string | null;
     }>;
     landedCostCalculateWorkflow: Array<{
+        id: string;
+        method: IncotermCode;
+        rootId: string;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
         amountSubtotals: {
-            discounts: number | null;
-            items: number;
             landedCostTotal: number;
+            items: number;
             shipping: number;
+            discounts: number | null;
         } | null;
-        appliedAdjustments: Array<{
-            adjustment: {
-                name: string | null;
-                source: AdjustmentSource | null;
-            } | null;
+        shipmentRating: {
+            id: string;
+        };
+        remittance: Array<{
             amount: number;
-            item: {
-                amount: number;
-            } | null;
-            type: LandedCostAdjustmentType | null;
-        }> | null;
+            description: string;
+        }>;
         deMinimis: Array<{
-            formula: string;
+            type: DeMinimisType;
+            threshold: DeMinimisThreshold;
             method: IncotermCode;
             note: string;
-            threshold: DeMinimisThreshold;
-            type: DeMinimisType;
+            formula: string;
+        }>;
+        taxes: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
         }>;
         duties: Array<{
             amount: number;
@@ -1006,128 +1048,72 @@ type CalculateLandedCostMutation = {
             amount: number;
             currencyCode: CurrencyCode;
         }>;
-        id: string;
-        landedCostGuaranteeCode: LandedCostGuaranteeCode;
-        method: IncotermCode;
-        remittance: Array<{
+        appliedAdjustments: Array<{
             amount: number;
-            description: string;
-        }>;
-        rootId: string;
-        shipmentRating: {
-            id: string;
-        };
-        taxes: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-        }>;
-    } | null> | null;
-    partyCreateWorkflow: Array<{
-        id: string;
-        organization: string;
-        type: PartyType | null;
-    }>;
-    shipmentRatingCalculateWorkflow: Array<{
-        amount: number;
-        currencyCode: CurrencyCode;
-        displayName: string;
-        id: string;
-        shippingProfile: {
-            serviceLevel: {
-                code: string;
-            };
-            transitTime: {
-                guaranteedDelivery: string | null;
-                max: number | null;
-                min: number | null;
-                type: TransitTypeCode | null;
+            type: LandedCostAdjustmentType | null;
+            adjustment: {
+                source: AdjustmentSource | null;
+                name: string | null;
             } | null;
-        } | null;
-    }>;
+            item: {
+                amount: number;
+            } | null;
+        }> | null;
+    } | null> | null;
+    checkoutSessionWorkflow: Array<{
+        landedCostId: string;
+        subtotals: {
+            items: number;
+            shipping: number;
+            duties: number;
+            taxes: number;
+            adjustments: number;
+            fees: number;
+            landedCostTotal: number;
+            presentmentCurrencyCode: CurrencyCode;
+            total: number;
+            exchangeRate: {
+                id: string;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                rate: number;
+                type: ExchangeRateType;
+            };
+        };
+    }> | null;
 };
 type CheckItemRestrictionsMutation = {
     itemRestrictionApply: {
         id: string;
         items: Array<{
-            action: ItemRestrictionAction | null;
             id: string;
+            action: ItemRestrictionAction | null;
             itemDescription: string | null;
             itemRestrictions: Array<{
                 hsCode: string;
                 id: string;
                 note: string;
-                sources: Array<string | null> | null;
                 type: ItemRestrictionType;
+                sources: Array<string | null> | null;
             } | null> | null;
         } | null>;
     };
 };
 type LandedCostSettingsQuery = {
     landedCostSettings: {
-        defaultNativeCurrency: CurrencyCode | null;
         landedCostGuarantee: LandedCostGuaranteeType | null;
+        defaultNativeCurrency: CurrencyCode | null;
     } | null;
 };
 type CartCheckoutWorkflowQuery = {
     cartCheckoutWorkflow: {
-        appearanceSettings: {
-            colorPrimary: string;
-            colorSecondary: string;
-            createdAt: string;
-            createdBy: string;
-            fontFamily: string;
-            id: string;
-            logoUrl: string;
-            mode: Mode;
-            organization: string;
-            style: ElementsUiStyle;
-            theme: ElementsUiTheme;
-            updatedAt: string;
-            updatedBy: string;
-            zonosAttribution: ZonosAttribution | null;
-        };
+        credentialTokenId: string;
+        organizationId: string;
         cart: {
-            adjustments: Array<{
-                amount: number;
-                currencyCode: CurrencyCode;
-                description: string | null;
-                productId: string | null;
-                sku: string | null;
-                type: CartAdjustmentType;
-            }>;
+            id: string;
+            type: CartType | null;
             createdAt: string;
             expiresAt: string | null;
-            id: string;
-            items: Array<{
-                amount: number;
-                attributes: Array<{
-                    key: string | null;
-                    value: string | null;
-                } | null> | null;
-                countryOfOrigin: CountryCode | null;
-                currencyCode: CurrencyCode;
-                description: string | null;
-                id: string;
-                imageUrl: string | null;
-                itemType: ItemType | null;
-                measurements: Array<{
-                    type: ItemMeasurementType;
-                    unitOfMeasure: ItemUnitOfMeasure;
-                    value: number;
-                } | null> | null;
-                metadata: Array<{
-                    key: string | null;
-                    value: string | null;
-                } | null> | null;
-                name: string | null;
-                productId: string;
-                quantity: number;
-                sku: string | null;
-            }>;
-            metadata: Array<{
-                key: string;
-                value: string;
-            }>;
             organization: {
                 id: string;
                 name: string;
@@ -1139,29 +1125,161 @@ type CartCheckoutWorkflowQuery = {
                 checkoutSessionId: string | null;
                 landedCostId: string | null;
             } | null;
-            type: CartType | null;
+            adjustments: Array<{
+                amount: number;
+                currencyCode: CurrencyCode;
+                description: string | null;
+                productId: string | null;
+                sku: string | null;
+                type: CartAdjustmentType;
+            }>;
+            items: Array<{
+                id: string;
+                amount: number;
+                name: string | null;
+                description: string | null;
+                countryOfOrigin: CountryCode | null;
+                currencyCode: CurrencyCode;
+                itemType: ItemType | null;
+                imageUrl: string | null;
+                quantity: number;
+                sku: string | null;
+                productId: string;
+                measurements: Array<{
+                    type: ItemMeasurementType;
+                    unitOfMeasure: ItemUnitOfMeasure;
+                    value: number;
+                } | null> | null;
+                metadata: Array<{
+                    key: string | null;
+                    value: string | null;
+                } | null> | null;
+                attributes: Array<{
+                    key: string | null;
+                    value: string | null;
+                } | null> | null;
+            }>;
+            metadata: Array<{
+                key: string;
+                value: string;
+            }>;
         };
-        checkoutSettings: {
-            allowedCharacterSets: AllowedCharacterSets;
-            allowedSettlementCurrencies: AllowedSettlementCurrencies;
-            successBehavior: CheckoutSuccessBehavior;
-            captureDelay: number;
-            companyFieldsStatus: CheckoutCompanyFieldsStatus;
+        shippingZones: Array<{
+            countryCodes: Array<CountryCode> | null;
+        } | null> | null;
+        helloSettings: {
+            desktopLocation: HelloDesktopLocation;
+            allowedDomains: Array<string>;
+            anchorElementSelector: string;
+            cartUrlPattern: string | null;
+            currencyBehavior: HelloCurrencyBehavior;
+            currencyElementSelector: string;
+            excludedUrlPatterns: Array<string>;
+            countryOverrideBehavior: HelloCountryOverrideBehavior;
+            widgetSize: number | null;
+            id: string;
             createdAt: string;
             createdBy: string;
-            customHTML: string;
-            defaultCartExpiration: number;
-            disabledCountries: Array<CountryCode> | null;
-            externalPaymentMethods: Array<{
-                status: ExternalPaymentMethodStatus;
-                type: ExternalPaymentMethodType;
-            }> | null;
-            externalServiceTokens: Array<{
-                token: string;
-                type: ExternalServiceTokenType;
-            }>;
+            mobileLocation: HelloMobileLocation;
+            mode: Mode;
+            organization: string;
+            updatedAt: string;
+            updatedBy: string;
+            homepageUrlPattern: string | null;
+            productDetailUrlPattern: string | null;
+            productListUrlPattern: string | null;
+            peekMessageDelay: number;
+            peekMessageBehavior: HelloPeekMessageBehavior;
+            restrictionBehavior: HelloRestrictionBehavior;
+            dutyTaxEstimationBehavior: HelloEstimateBehavior;
+            productAddToCartElementSelector: string | null;
+            productDescriptionElementSelector: string | null;
+            productPriceElementSelector: string | null;
+            productTitleElementSelector: string | null;
+            visibilityStatus: HelloVisibilityStatus;
+            desktopLocationOverride: {
+                anchor: HelloDesktopLocation;
+                horizontalOffset: number;
+                verticalOffset: number;
+            } | null;
+            countryDisplayRules: {
+                countrySelector: {
+                    behavior: HelloCountryDisplayBehavior;
+                    excludedCountries: Array<CountryCode>;
+                    includedCountries: Array<CountryCode>;
+                };
+                widgetVisibility: {
+                    behavior: HelloCountryDisplayBehavior;
+                    excludedCountries: Array<CountryCode>;
+                    includedCountries: Array<CountryCode>;
+                };
+            };
+            mobileLocationOverride: {
+                anchor: HelloDesktopLocation;
+                horizontalOffset: number;
+                verticalOffset: number;
+            } | null;
+        };
+        appearanceSettings: {
+            colorPrimary: string;
+            colorSecondary: string;
+            fontFamily: string;
+            logoUrl: string;
+            style: ElementsUiStyle;
+            supportedLocales: Array<string> | null;
+            theme: ElementsUiTheme;
+            zonosAttribution: ZonosAttribution | null;
+            createdAt: string;
+            createdBy: string;
             id: string;
             mode: Mode;
+            organization: string;
+            updatedAt: string;
+            updatedBy: string;
+        };
+        checkoutSettings: {
+            disabledCountries: Array<CountryCode> | null;
+            allowedCharacterSets: AllowedCharacterSets;
+            captureDelay: number;
+            defaultCartExpiration: number;
+            companyFieldsStatus: CheckoutCompanyFieldsStatus;
+            domesticElementSelector: string | null;
+            allowedSettlementCurrencies: AllowedSettlementCurrencies;
+            successBehavior: CheckoutSuccessBehavior;
+            customHTML: string;
+            mode: Mode;
+            successRedirectUrl: string;
+            placeOrderButtonSelector: string | null;
+            createdAt: string;
+            createdBy: string;
+            updatedAt: string;
+            updatedBy: string;
+            id: string;
+            organization: string;
+            subscriptionStatus: CheckoutSubscriptionStatus;
+            visibilityStatus: CheckoutVisibilityStatus;
+            merchantPolicyLinks: {
+                termsAndConditions: {
+                    link: string | null;
+                } | null;
+                privacyPolicy: {
+                    link: string | null;
+                } | null;
+                refundPolicy: {
+                    link: string | null;
+                } | null;
+                shippingPolicy: {
+                    link: string | null;
+                } | null;
+                warrantyPolicy: {
+                    link: string | null;
+                } | null;
+                euWithdrawalPolicy: {
+                    maximumReturnShippingEstimate: number | null;
+                    currencyCode: CurrencyCode;
+                    status: NotificationActiveStatus | null;
+                } | null;
+            };
             orderNotifications: {
                 abandonedCart: {
                     delay: number;
@@ -1180,16 +1298,18 @@ type CartCheckoutWorkflowQuery = {
                     sendCopiesTo: Array<string>;
                 };
             };
-            organization: string;
-            placeOrderButtonSelector: string | null;
-            subscriptionStatus: CheckoutSubscriptionStatus;
-            successRedirectUrl: string;
+            externalPaymentMethods: Array<{
+                status: ExternalPaymentMethodStatus;
+                type: ExternalPaymentMethodType;
+            }> | null;
             analyticsProviders: Array<{
                 status: AnalyticsProviderStatus;
                 type: AnalyticsProviderType;
             }>;
-            updatedAt: string;
-            updatedBy: string;
+            externalServiceTokens: Array<{
+                token: string;
+                type: ExternalServiceTokenType;
+            }>;
             varianceTestRegistrations: Array<{
                 testKey: string;
                 varianceAllocation: Array<{
@@ -1197,116 +1317,95 @@ type CartCheckoutWorkflowQuery = {
                     variantKey: string;
                 }>;
             }> | null;
-            visibilityStatus: CheckoutVisibilityStatus;
-        };
-        credentialTokenId: string;
-        helloSettings: {
-            allowedDomains: Array<string>;
-            anchorElementSelector: string;
-            cartUrlPattern: string | null;
-            countryDisplayRules: {
-                countrySelector: {
-                    behavior: HelloCountryDisplayBehavior;
-                    excludedCountries: Array<CountryCode>;
-                    includedCountries: Array<CountryCode>;
-                };
-                widgetVisibility: {
-                    behavior: HelloCountryDisplayBehavior;
-                    excludedCountries: Array<CountryCode>;
-                    includedCountries: Array<CountryCode>;
+            plugins: {
+                bigcommerce: {
+                    allowBypassQuery: boolean;
                 };
             };
-            countryOverrideBehavior: HelloCountryOverrideBehavior;
-            createdAt: string;
-            createdBy: string;
-            currencyBehavior: HelloCurrencyBehavior;
-            currencyElementSelector: string;
-            desktopLocation: HelloDesktopLocation;
-            dutyTaxEstimationBehavior: HelloEstimateBehavior;
-            excludedUrlPatterns: Array<string>;
-            updatedBy: string;
-            id: string;
-            mobileLocation: HelloMobileLocation;
-            mode: Mode;
-            organization: string;
-            peekMessageBehavior: HelloPeekMessageBehavior;
-            peekMessageDelay: number;
-            productListUrlPattern: string | null;
-            productDetailUrlPattern: string | null;
-            homepageUrlPattern: string | null;
-            productDescriptionElementSelector: string | null;
-            productPriceElementSelector: string | null;
-            productTitleElementSelector: string | null;
-            restrictionBehavior: HelloRestrictionBehavior;
-            updatedAt: string;
-            productAddToCartElementSelector: string | null;
-            visibilityStatus: HelloVisibilityStatus;
-            widgetSize: number | null;
-        };
-        landedCostSettings: {
-            defaultNativeCurrency: CurrencyCode | null;
-            landedCostGuarantee: LandedCostGuaranteeType | null;
         };
         onlineStoreSettings: {
             allowedDomains: Array<string>;
             url: string;
         };
-        organizationId: string;
-        shippingZones: Array<{
-            countryCodes: Array<CountryCode> | null;
-        } | null> | null;
+        landedCostSettings: {
+            landedCostGuarantee: LandedCostGuaranteeType | null;
+            defaultNativeCurrency: CurrencyCode | null;
+        };
     };
 };
 type CheckoutSessionDetailsFragment = {
-    cartId: string | null;
+    id: string;
     clientSecret: string;
+    customerSessionClientSecret: string | null;
+    cartId: string | null;
     completedAt: string | null;
+    paymentProcessor: CheckoutPaymentProcessorType | null;
+    organizationId: string;
+    order: {
+        id: string;
+    } | null;
+    references: {
+        inclusivePriceConfigurationId: string | null;
+    } | null;
     customerProfile: {
+        name: string | null;
         email: string | null;
+        storeCreditBalance: number | null;
         locations: Array<{
+            name: string | null;
+            email: string | null;
+            phone: string | null;
             administrativeArea: string;
             countryCode: CountryCode;
-            email: string | null;
             line1: string;
             line2: string | null;
-            name: string | null;
-            phone: string | null;
             locality: string;
             postalCode: string;
         }> | null;
-        name: string | null;
-        storeCreditBalance: number | null;
     } | null;
-    customerSessionClientSecret: string | null;
-    id: string;
+    varianceTestResults: Array<{
+        selectedVariantKey: string;
+        testKey: string;
+    }> | null;
+    subtotals: {
+        items: number;
+        shipping: number;
+        duties: number;
+        adjustments: number;
+        taxes: number;
+        fees: number;
+        landedCostTotal: number;
+        presentmentCurrencyCode: CurrencyCode;
+        storeCredit: number;
+        total: number;
+        exchangeRate: {
+            id: string;
+            sourceCurrencyCode: CurrencyCode;
+            targetCurrencyCode: CurrencyCode;
+            rate: number;
+            type: ExchangeRateType;
+        };
+    };
     landedCost: {
-        amountSubtotals: {
-            discounts: number | null;
-            duties: number;
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            shipping: number;
-            taxes: number;
-        } | null;
-        appliedAdjustments: Array<{
-            adjustment: {
-                name: string | null;
-                source: AdjustmentSource | null;
-            } | null;
-            amount: number;
-            type: LandedCostAdjustmentType | null;
-            item: {
-                amount: number;
-            } | null;
-        }> | null;
+        id: string;
+        method: IncotermCode;
+        rootId: string;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
         currencyCode: CurrencyCode;
+        remittance: Array<{
+            amount: number;
+            description: string;
+        }>;
         deMinimis: Array<{
             type: DeMinimisType;
             threshold: DeMinimisThreshold;
             method: IncotermCode;
             note: string;
             formula: string;
+        }>;
+        taxes: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
         }>;
         duties: Array<{
             amount: number;
@@ -1316,72 +1415,85 @@ type CheckoutSessionDetailsFragment = {
             amount: number;
             currencyCode: CurrencyCode;
         }>;
-        landedCostGuaranteeCode: LandedCostGuaranteeCode;
-        id: string;
-        method: IncotermCode;
-        remittance: Array<{
+        appliedAdjustments: Array<{
             amount: number;
-            description: string;
-        }>;
-        rootId: string;
+            type: LandedCostAdjustmentType | null;
+            adjustment: {
+                source: AdjustmentSource | null;
+                name: string | null;
+            } | null;
+            item: {
+                amount: number;
+            } | null;
+        }> | null;
         shipmentRating: {
-            amount: number;
-            currencyCode: CurrencyCode;
-            displayName: string;
             id: string;
+            displayName: string;
+            currencyCode: CurrencyCode;
+            amount: number;
             shippingProfile: {
                 serviceLevel: {
+                    deliveryType: DeliveryType | null;
                     code: string;
                 };
                 transitTime: {
-                    guaranteedDelivery: string | null;
-                    max: number | null;
                     min: number | null;
+                    max: number | null;
+                    guaranteedDelivery: string | null;
                     type: TransitTypeCode | null;
                 } | null;
             } | null;
         };
-        taxes: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-        }>;
+        amountSubtotals: {
+            duties: number;
+            discounts: number | null;
+            fees: number;
+            taxes: number;
+            items: number;
+            shipping: number;
+            landedCostTotal: number;
+        } | null;
     } | null;
     metadata: Array<{
         key: string;
         value: string;
     } | null> | null;
-    organizationId: string;
-    references: {
-        inclusivePriceConfigurationId: string | null;
-    } | null;
-    subtotals: {
-        adjustments: number;
-        duties: number;
-        exchangeRate: {
-            id: string;
-            rate: number;
-            sourceCurrencyCode: CurrencyCode;
-            targetCurrencyCode: CurrencyCode;
-            type: ExchangeRateType;
-        };
-        fees: number;
-        items: number;
-        landedCostTotal: number;
-        presentmentCurrencyCode: CurrencyCode;
-        shipping: number;
-        storeCredit: number;
-        taxes: number;
-        total: number;
-    };
-    varianceTestResults: Array<{
-        selectedVariantKey: string;
-        testKey: string;
-    }> | null;
 };
 type HelloSettingFragment = {
+    desktopLocation: HelloDesktopLocation;
     allowedDomains: Array<string>;
     anchorElementSelector: string;
     cartUrlPattern: string | null;
+    currencyBehavior: HelloCurrencyBehavior;
+    currencyElementSelector: string;
+    excludedUrlPatterns: Array<string>;
+    countryOverrideBehavior: HelloCountryOverrideBehavior;
+    widgetSize: number | null;
+    id: string;
+    createdAt: string;
+    createdBy: string;
+    mobileLocation: HelloMobileLocation;
+    mode: Mode;
+    organization: string;
+    updatedAt: string;
+    updatedBy: string;
+    homepageUrlPattern: string | null;
+    productDetailUrlPattern: string | null;
+    productListUrlPattern: string | null;
+    peekMessageDelay: number;
+    peekMessageBehavior: HelloPeekMessageBehavior;
+    restrictionBehavior: HelloRestrictionBehavior;
+    dutyTaxEstimationBehavior: HelloEstimateBehavior;
+    productAddToCartElementSelector: string | null;
+    productDescriptionElementSelector: string | null;
+    productPriceElementSelector: string | null;
+    productTitleElementSelector: string | null;
+    visibilityStatus: HelloVisibilityStatus;
+    desktopLocationOverride: {
+        anchor: HelloDesktopLocation;
+        horizontalOffset: number;
+        verticalOffset: number;
+    } | null;
     countryDisplayRules: {
         countrySelector: {
             behavior: HelloCountryDisplayBehavior;
@@ -1394,51 +1506,31 @@ type HelloSettingFragment = {
             includedCountries: Array<CountryCode>;
         };
     };
-    countryOverrideBehavior: HelloCountryOverrideBehavior;
-    createdAt: string;
-    createdBy: string;
-    currencyBehavior: HelloCurrencyBehavior;
-    currencyElementSelector: string;
-    desktopLocation: HelloDesktopLocation;
-    dutyTaxEstimationBehavior: HelloEstimateBehavior;
-    excludedUrlPatterns: Array<string>;
-    homepageUrlPattern: string | null;
-    id: string;
-    mobileLocation: HelloMobileLocation;
-    mode: Mode;
-    organization: string;
-    peekMessageBehavior: HelloPeekMessageBehavior;
-    peekMessageDelay: number;
-    productDetailUrlPattern: string | null;
-    productDescriptionElementSelector: string | null;
-    productAddToCartElementSelector: string | null;
-    productListUrlPattern: string | null;
-    productPriceElementSelector: string | null;
-    productTitleElementSelector: string | null;
-    restrictionBehavior: HelloRestrictionBehavior;
-    updatedAt: string;
-    updatedBy: string;
-    visibilityStatus: HelloVisibilityStatus;
-    widgetSize: number | null;
+    mobileLocationOverride: {
+        anchor: HelloDesktopLocation;
+        horizontalOffset: number;
+        verticalOffset: number;
+    } | null;
 };
 type GetOrderQuery = {
     order: {
         accountOrderNumber: string | null;
+        createdAt: string;
+        updatedAt: string;
+        trackingNumbers: Array<string | null> | null;
+        currencyCode: CurrencyCode;
+        id: string;
+        mode: Mode;
+        status: OrderStatus;
         amountSubtotals: {
-            discounts: number | null;
             duties: number;
             fees: number;
             items: number;
-            shipping: number;
             taxes: number;
+            shipping: number;
             variance: number;
+            discounts: number | null;
         };
-        amountSubtotalsDetails: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-            targets: Array<AmountDetailTarget>;
-            type: AmountDetailSourceType | null;
-        }> | null;
         checkoutSession: {
             subtotals: {
                 exchangeRate: {
@@ -1448,28 +1540,32 @@ type GetOrderQuery = {
                 };
             };
         } | null;
-        createdAt: string;
-        currencyCode: CurrencyCode;
-        id: string;
-        items: Array<{
+        amountSubtotalsDetails: Array<{
             amount: number;
-            attributes: Array<{
-                key: string | null;
-                value: string | null;
-            } | null> | null;
-            countryOfOrigin: CountryCode | null;
+            currencyCode: CurrencyCode;
+            type: AmountDetailSourceType | null;
+            targets: Array<AmountDetailTarget>;
+        }> | null;
+        items: Array<{
             createdAt: string;
+            amount: number;
+            itemType: ItemType | null;
+            parentProductId: string | null;
             description: string | null;
             hsCode: string | null;
-            itemType: ItemType | null;
-            metadata: Array<{
-                key: string | null;
-                value: string | null;
-            } | null> | null;
+            countryOfOrigin: CountryCode | null;
             name: string | null;
             productId: string;
             quantity: number;
             sku: string | null;
+            attributes: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+            metadata: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
         }> | null;
         landedCosts: Array<{
             amountSubtotals: {
@@ -1480,16 +1576,6 @@ type GetOrderQuery = {
                 shipping: number;
                 taxes: number;
             } | null;
-            appliedAdjustments: Array<{
-                adjustment: {
-                    name: string | null;
-                } | null;
-                amount: number;
-                item: {
-                    amount: number;
-                    name: string | null;
-                } | null;
-            }> | null;
             duties: Array<{
                 exchangeRate: {
                     rate: number;
@@ -1498,25 +1584,42 @@ type GetOrderQuery = {
                 } | null;
             }>;
             shipmentRating: {
+                id: string;
                 amount: number;
+                currencyCode: CurrencyCode;
+                displayName: string;
                 serviceLevelCode: string;
                 details: Array<{
                     amount: number;
                     carrierCode: string;
                     type: ShipmentAmountType;
                 }> | null;
-                displayName: string;
-                id: string;
-                currencyCode: CurrencyCode;
             };
+            appliedAdjustments: Array<{
+                amount: number;
+                adjustment: {
+                    name: string | null;
+                } | null;
+                item: {
+                    name: string | null;
+                    amount: number;
+                } | null;
+            }> | null;
         }> | null;
         metadata: Array<{
             key: string;
             value: string;
         } | null> | null;
-        mode: Mode;
         parties: Array<{
             id: string;
+            type: PartyType | null;
+            person: {
+                companyName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+                email: string | null;
+                phone: string | null;
+            } | null;
             location: {
                 administrativeArea: string | null;
                 administrativeAreaCode: string | null;
@@ -1529,18 +1632,6 @@ type GetOrderQuery = {
                 longitude: number | null;
                 postalCode: string | null;
             } | null;
-            person: {
-                companyName: string | null;
-                email: string | null;
-                firstName: string | null;
-                lastName: string | null;
-                phone: string | null;
-            } | null;
-            type: PartyType | null;
-        }> | null;
-        references: Array<{
-            key: string | null;
-            value: string | null;
         }> | null;
         root: {
             exchangeRates: Array<{
@@ -1550,9 +1641,10 @@ type GetOrderQuery = {
                 type: ExchangeRateType;
             }>;
         } | null;
-        status: OrderStatus;
-        trackingNumbers: Array<string | null> | null;
-        updatedAt: string;
+        references: Array<{
+            key: string | null;
+            value: string | null;
+        }> | null;
     } | null;
 };
 
@@ -1575,6 +1667,19 @@ type ValidateAddressFields = Omit<StripeAddressElementChangeEvent['value']['addr
 };
 type TranslatedAddressObject = {
     [key in keyof ValidateAddressFields]?: TranslatedText;
+};
+
+/**
+ * Values captured in the completion dialog for the fields that were missing from the Stripe
+ * Link address. Only the keys that were actually requested (and therefore provided) are present.
+ * When the last name is missing we also capture the first name, so the customer can correct the
+ * whole name at once (Link often stores just a first name in its single name input).
+ */
+type AddressCompletionSubmit = {
+    firstName?: string;
+    lastName?: string;
+    postal_code?: string;
+    state?: string;
 };
 
 type SubmitEventData = {
@@ -1703,6 +1808,37 @@ type CustomAddressErrors = {
     state: string;
 };
 
+declare const taxIdTypeOptions: {
+    readonly MX: readonly [{
+        readonly label: "RFC";
+        readonly placeholder: "XAXX010101000";
+        readonly value: "RFC";
+    }, {
+        readonly label: "CURP";
+        readonly placeholder: "AAAA800101HDFRRR09";
+        readonly value: "CURP";
+    }];
+    readonly PE: readonly [{
+        readonly label: "DNI";
+        readonly placeholder: "12345678";
+        readonly value: "DNI";
+    }, {
+        readonly label: "RUC";
+        readonly placeholder: "20123456789";
+        readonly value: "RUC";
+    }, {
+        readonly label: "Carné de extranjería";
+        readonly placeholder: "001234567";
+        readonly value: "CE";
+    }];
+};
+type TaxIdTypeOption = (typeof taxIdTypeOptions.MX)[number] | (typeof taxIdTypeOptions.PE)[number];
+declare const checkoutTaxIdTypeValueList: readonly ["CE", "CURP", "DNI", "RFC", "RUC"];
+type AssertEveryCheckoutTaxIdType<T extends readonly TaxIdTypeOption['value'][]> = Exclude<TaxIdTypeOption['value'], T[number]> extends never ? T : never;
+/** Every document kind checkout can send. Older clients omit the field. */
+declare const checkoutTaxIdTypeValues: AssertEveryCheckoutTaxIdType<typeof checkoutTaxIdTypeValueList>;
+type CheckoutTaxIdTypeValue = (typeof checkoutTaxIdTypeValues)[number];
+
 type StripeStoreContactOption = {
     address: {
         city: string;
@@ -1753,6 +1889,8 @@ type CartItem = {
     productId?: string;
     quantity: number;
     sku?: string;
+    gtin?: string;
+    manufacturerProductId?: string;
 };
 
 type NotificationInit = {
@@ -1895,6 +2033,15 @@ type GenericZonosSettings = {
      */
     bigcommerceDomesticCheckoutCountrySelector?: string;
     /**
+     * CSS selector for BigCommerce's native currency selector element.
+     * @description When Hello is actively converting prices (user is in a
+     * shipping zone and BC's native currency matches the store's source
+     * currency), matching element(s) are hidden so shoppers don't toggle
+     * BC's selector and conflict with Hello's conversion. Selectors vary
+     * by theme, so this is configured per merchant.
+     */
+    bigcommerceNativeCurrencySelector?: string;
+    /**
      * Whether to blur the currency while initializing Zonos to avoid price flickering.
      */
     blurCurrencyOnInit?: boolean;
@@ -1923,9 +2070,20 @@ type GenericZonosSettings = {
      */
     shouldEnabledCustomAddress?: boolean;
     /**
+     * For Collect: when the carrier does not provide a logo via the landed cost
+     * metadata (`collectLogoUrl`), fall back to the organization's appearance logo.
+     * When disabled (default), no logo is shown unless the carrier provides one.
+     */
+    shouldFallbackToOrganizationLogoForCollect?: boolean;
+    /**
      * Whether or not Canadian shopper has to consent that they are aware of some procedures must happen after checking out otherwise the order will be returned
      */
     shouldFedExShippingConsentForCanadianShopper?: boolean;
+    /**
+     * When true, checkout requires a Peru tax id and lets the shopper pick the document type.
+     * The API sets this from an organization list so stores can be added without a client release.
+     */
+    shouldRequirePeruTaxId?: boolean;
     /**
      * Signed token for Google Places API iframe access.
      */
@@ -1940,6 +2098,15 @@ type GenericZonosSettings = {
      * List of countries that are allowed to use USD denominated cards for settlement.
      */
     usdSettlementCountryEnabled?: CountryCode[];
+    /**
+     * Ship-to countries affected by the EU right-of-withdrawal regulation. When the
+     * buyer's destination is in this list (and the merchant has opted into the EU
+     * withdrawal policy), the withdrawal notice is shown above the Pay button.
+     * Sourced from the API so the affected-country list is controlled centrally
+     * rather than hardcoded in the storefront; an absent/empty list shows it for no
+     * country.
+     */
+    withdrawalCountryEnabled?: CountryCode[];
 };
 
 type SelectOption = {
@@ -1966,14 +2133,22 @@ declare namespace Components {
     interface ZonosAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress": ContactOption[];
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage": string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField": 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage": string;
         /**
@@ -1984,6 +2159,40 @@ declare namespace Components {
           * The type of address element to render
          */
         "type": 'billing' | 'shipping';
+    }
+    interface ZonosAddressCompletionDialog {
+        /**
+          * Whether or not the continue button is loading
+          * @default false
+         */
+        "continueLoading": boolean;
+        /**
+          * Whether or not the dialog is open
+          * @default false
+         */
+        "dialogOpen": boolean;
+        /**
+          * Whether or not the dialog is rendered in mobile mode
+          * @default false
+         */
+        "isMobile": boolean;
+        /**
+          * The Zonos-required fields still missing from the selected address
+          * @default []
+         */
+        "missingFields": MissingShippingField[];
+        /**
+          * The shipping address selected from Stripe, shown read-only for context
+         */
+        "shippingAddress": EnteredInfo;
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosAddressDisplay {
         /**
@@ -2012,6 +2221,7 @@ declare namespace Components {
     interface ZonosAddressSuggestions {
         /**
           * Suggestions to display
+          * @default []
          */
         "suggestions": IframeSuggestionsResponsePayload['suggestions'];
         /**
@@ -2026,6 +2236,7 @@ declare namespace Components {
         "billingAddress": EnteredInfo | null;
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -2034,10 +2245,12 @@ declare namespace Components {
         "dialogLoading": boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "dialogOpen": boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile": boolean;
         /**
@@ -2060,6 +2273,8 @@ declare namespace Components {
           * Translated address fields that GPT has translated
          */
         "translatedShippingAddress": TranslatedAddressObject;
+    }
+    interface ZonosAirwallexPayment {
     }
     interface ZonosBadge {
         /**
@@ -2119,6 +2334,7 @@ declare namespace Components {
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
           * Whether or not the button text color is bold
+          * @default false
          */
         "bold": boolean;
         /**
@@ -2146,6 +2362,7 @@ declare namespace Components {
           * @prop ().
           * @prop decorator is to watch the update of the attribute of the component in the dom. And `disabled` prop is not an only factor to determine the component is disabled. isLoading
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
+          * @default false
          */
         "isDisabled": boolean;
         /**
@@ -2155,6 +2372,7 @@ declare namespace Components {
         "justifyContent": 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
+          * @default false
          */
         "loading": boolean;
         /**
@@ -2164,10 +2382,12 @@ declare namespace Components {
         "noBackground": boolean;
         /**
           * Whether or not the button has a left padding
+          * @default false
          */
         "noPaddingLeft": boolean;
         /**
           * Whether or not the button has a right padding
+          * @default false
          */
         "noPaddingRight": boolean;
         /**
@@ -2193,6 +2413,7 @@ declare namespace Components {
     | 'warning';
         /**
           * Whether or not the button has a box shadow
+          * @default false
          */
         "withBoxShadow": boolean;
     }
@@ -2228,6 +2449,7 @@ declare namespace Components {
         "label"?: HTMLElement;
         /**
           * The spacing to apply between elements in the card
+          * @default '24px'
          */
         "spacing"?: string;
     }
@@ -2236,6 +2458,7 @@ declare namespace Components {
     interface ZonosCartRestrictedItems {
         /**
           * This is to hide the section when the parent collapse on mobile
+          * @default false
          */
         "hide": boolean;
     }
@@ -2252,6 +2475,7 @@ declare namespace Components {
     interface ZonosCheckbox {
         /**
           * background color of the checkbox
+          * @default 'blue'
          */
         "backgroundColor": | CheckboxColorPrefix
     | (string & { _placeholder?: never });
@@ -2262,14 +2486,17 @@ declare namespace Components {
         "borderStyle"?: ElementsUiStyle;
         /**
           * Font size of the checkbox text
+          * @default 'base'
          */
         "fontSize": Size;
         /**
           * Whether or not the checkbox is checked
+          * @default false
          */
         "isChecked": boolean;
         /**
           * Whether or not the checkbox is disabled
+          * @default false
          */
         "isDisabled": boolean;
         /**
@@ -2278,6 +2505,7 @@ declare namespace Components {
         "label"?: string;
         /**
           * Size of the checkbox
+          * @default 12
          */
         "size": 12 | 16 | 24;
     }
@@ -2292,15 +2520,18 @@ declare namespace Components {
         "closeDialogHandler": (props?: { confirmed: boolean; }) => Promise<void>;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress": | StripeStoreContactOption[]
     | StripeStoreContactOption;
         /**
           * Force dialog to be open
+          * @default false
          */
         "forceDialogOpen": boolean;
         /**
           * Hidden mode to hide the checkout modal in preview mode
+          * @default false
          */
         "hiddenMode": boolean;
         /**
@@ -2309,6 +2540,7 @@ declare namespace Components {
         "init": () => Promise<void>;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
@@ -2321,6 +2553,7 @@ declare namespace Components {
         "overrideStagingMode"?: boolean;
         /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
+          * @default false
          */
         "preview": boolean;
         /**
@@ -2335,6 +2568,7 @@ declare namespace Components {
     interface ZonosCheckoutFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius": ElementsUiStyle;
         /**
@@ -2357,16 +2591,19 @@ declare namespace Components {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile": boolean;
     }
     interface ZonosCheckoutPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
           * Whether or not the checkout is in mobile mode
+          * @default false
          */
         "isMobile": boolean;
         /**
@@ -2385,6 +2622,7 @@ declare namespace Components {
     interface ZonosCheckoutProgressTabs {
         /**
           * Background color of the parent that's wrapped around the tab progress bar
+          * @default null
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never }) | null;
         /**
@@ -2397,26 +2635,31 @@ declare namespace Components {
         "setTabSelected": (tabValue: TabItem["value"]) => Promise<void>;
         /**
           * Color of the tab progress bar and label, override the secondary color of the appearance settings
+          * @default null
          */
         "tabColor"?: string | null;
     }
     interface ZonosCollapse {
         /**
           * Collapsed size when collapsed
+          * @default 0
          */
         "collapseSize": number;
         /**
           * Collapsed state of the element
+          * @default false
          */
         "collapsed": boolean;
     }
     interface ZonosCollect {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
@@ -2425,10 +2668,12 @@ declare namespace Components {
     interface ZonosCollectFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius": ElementsUiStyle;
         /**
           * The confirmation id for the collect order
+          * @default null
          */
         "confirmationId": string | null;
         /**
@@ -2451,10 +2696,12 @@ declare namespace Components {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile": boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet": boolean;
     }
@@ -2465,16 +2712,19 @@ declare namespace Components {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId": string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile": boolean;
     }
     interface ZonosCollectPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -2493,14 +2743,17 @@ declare namespace Components {
     interface ZonosCollectReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed": boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
@@ -2509,14 +2762,17 @@ declare namespace Components {
     interface ZonosComponent {
         /**
           * The first name
+          * @default ''
          */
         "first": string;
         /**
           * The last name
+          * @default ''
          */
         "last": string;
         /**
           * The middle name
+          * @default ''
          */
         "middle": string;
     }
@@ -2560,6 +2816,7 @@ declare namespace Components {
         "dialogWidth": number;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile": boolean;
         /**
@@ -2647,14 +2904,22 @@ declare namespace Components {
     interface ZonosCustomAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress": ContactOption[];
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage": string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField": 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage": string;
         /**
@@ -2669,28 +2934,34 @@ declare namespace Components {
     interface ZonosCustomMessage {
         /**
           * The custom message icon
+          * @default ''
          */
         "icon": string;
         /**
           * The custom message text
+          * @default ''
          */
         "message": string;
     }
     interface ZonosCustomerInfo {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress": StripeStoreContactOption[];
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile": boolean;
         /**
           * Whether to override custom address form to be always visible
+          * @default false
          */
         "shouldUseCustomAddressFormOverride": boolean;
         /**
@@ -2710,6 +2981,7 @@ declare namespace Components {
         "borderStyle"?: ElementsUiStyle;
         /**
           * The header text for the dialog
+          * @default ''
          */
         "headerText": string;
         /**
@@ -2718,6 +2990,7 @@ declare namespace Components {
         "height"?: string;
         /**
           * Load loading spinner for the dialog or not
+          * @default true
          */
         "isLoading": boolean;
         /**
@@ -2734,6 +3007,7 @@ declare namespace Components {
         "minHeight"?: string;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
@@ -2779,6 +3053,7 @@ declare namespace Components {
         "emptyStateText": string;
         /**
           * Theme color of the icon
+          * @default 'LIGHT'
          */
         "theme": ElementsUiTheme;
     }
@@ -2810,7 +3085,7 @@ declare namespace Components {
          */
         "convertAndFormat": (value: number) => Promise<string>;
         /**
-          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocation` and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
+          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocationOverride` (HelloPlacement) and `helloSettings.desktopLocation`, and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
          */
         "desktopLocationOverride"?: HelloDesktopLocation;
         /**
@@ -2828,8 +3103,7 @@ declare namespace Components {
          */
         "getCountryList": () => Promise<ICountryJson | null>;
         /**
-          * Force mobile styling instead of media query and use the passed location value
-          * @default false
+          * Override the configured mobile floating location (enum). Takes precedence over `helloSettings.mobileLocationOverride` (HelloPlacement) and `helloSettings.mobileLocation`.
          */
         "mobileLocationOverride"?: HelloMobileLocation;
         /**
@@ -2850,6 +3124,7 @@ declare namespace Components {
         "appearanceSettings"?: Partial<AppearanceConfig>;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isOpen": boolean;
         /**
@@ -2913,48 +3188,58 @@ declare namespace Components {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder": string;
         /**
           * Input size
+          * @default 'md'
          */
         "inputSize": 'sm' | 'md' | 'lg' | 'xl';
         /**
           * Value of the input
+          * @default ''
          */
         "inputValue": string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled": boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError": boolean;
     }
     interface ZonosInvoice {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
     interface ZonosInvoiceCartItems {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile": boolean;
     }
     interface ZonosInvoiceFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius": ElementsUiStyle;
         /**
           * The confirmation id for the invoice order
+          * @default null
          */
         "confirmationId": string | null;
         /**
@@ -2977,10 +3262,12 @@ declare namespace Components {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile": boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet": boolean;
     }
@@ -2991,16 +3278,19 @@ declare namespace Components {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId": string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile": boolean;
     }
     interface ZonosInvoicePayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -3019,20 +3309,24 @@ declare namespace Components {
     interface ZonosInvoiceReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed": boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
     interface ZonosInvoiceSubtotal {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile": boolean;
     }
@@ -3046,6 +3340,7 @@ declare namespace Components {
     interface ZonosLink {
         /**
           * The href for the link
+          * @default ''
          */
         "href": string;
         /**
@@ -3064,10 +3359,12 @@ declare namespace Components {
     interface ZonosLinkAuthentication {
         /**
           * Default email for stripe
+          * @default null
          */
         "defaultEmail": string | null;
         /**
           * Email error text to dispaly
+          * @default false
          */
         "isEmailError": boolean;
         /**
@@ -3083,6 +3380,7 @@ declare namespace Components {
         "open": boolean;
         /**
           * Spinner size (optional, default 40)
+          * @default 40
          */
         "size": number;
         /**
@@ -3099,10 +3397,12 @@ declare namespace Components {
     interface ZonosLogo {
         /**
           * Theme to change the color of the logo
+          * @default 'LIGHT'
          */
         "theme": ElementsUiTheme;
         /**
           * The width of the logo
+          * @default 'auto'
          */
         "width": string;
     }
@@ -3119,6 +3419,8 @@ declare namespace Components {
         "titleText"?: string;
     }
     interface ZonosPaypalPayment {
+    }
+    interface ZonosPolicyConsent {
     }
     interface ZonosRestState {
         /**
@@ -3137,10 +3439,12 @@ declare namespace Components {
     interface ZonosReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed": boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile": boolean;
     }
@@ -3152,12 +3456,14 @@ declare namespace Components {
         "handleOnClose": () => void;
         /**
           * The label for the select dialog
+          * @default ''
          */
         "label": string;
     }
     interface ZonosShipping {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -3230,6 +3536,7 @@ declare namespace Components {
     interface ZonosStoreCredit {
         /**
           * Whether the component is enabled
+          * @default true
          */
         "enabled": boolean;
     }
@@ -3243,6 +3550,7 @@ declare namespace Components {
         "autoComplete"?: string;
         /**
           * Error message of the input
+          * @default ''
          */
         "error"?: string;
         /**
@@ -3251,18 +3559,22 @@ declare namespace Components {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder": string;
         /**
           * Value of the stripeInput
+          * @default ''
          */
         "inputValue": string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled": boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError": boolean;
         /**
@@ -3279,28 +3591,34 @@ declare namespace Components {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the input is required
+          * @default false
          */
         "required"?: boolean;
         /**
           * The value of the input.
+          * @default ''
          */
         "value": string;
     }
     interface ZonosStripePhoneInput {
         /**
           * The autoComplete attribute for the phone input
+          * @default ''
          */
         "autoComplete": string;
         /**
           * The country code of the phone input
+          * @default null
          */
         "countryCode": CountryCode | null;
         /**
           * Available country options for the select dropdown
+          * @default null
          */
         "countryOptions": GenericZonosSettings['countryFields'] | null;
         /**
           * Whether the input is disabled
+          * @default false
          */
         "disabled": boolean;
         /**
@@ -3331,22 +3649,27 @@ declare namespace Components {
     interface ZonosStripeSelect {
         /**
           * The autoComplete attribute for the select.
+          * @default ''
          */
         "autoComplete": string;
         /**
           * Error message of the select
+          * @default ''
          */
         "error": string;
         /**
           * Whether the select can be cleared
+          * @default false
          */
         "isClearable": boolean;
         /**
           * Disables the select
+          * @default false
          */
         "isDisabled": boolean;
         /**
           * Error state of the select
+          * @default false
          */
         "isError": boolean;
         /**
@@ -3359,6 +3682,7 @@ declare namespace Components {
         "name"?: string;
         /**
           * Options for the select. Must be set using a query selector.
+          * @default []
          */
         "options": SelectOption[];
         /**
@@ -3371,6 +3695,7 @@ declare namespace Components {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the select is required
+          * @default false
          */
         "required"?: boolean;
         /**
@@ -3379,14 +3704,17 @@ declare namespace Components {
         "selectLabel": string;
         /**
           * Placeholder for the select
+          * @default ''
          */
         "selectPlaceholder": string;
         /**
           * Selected value of the select
+          * @default ''
          */
         "selectedValue": string;
         /**
           * The value of the select.
+          * @default ''
          */
         "value": string;
     }
@@ -3397,10 +3725,12 @@ declare namespace Components {
         "size"?: Size;
         /**
           * The icon element to display
+          * @default 'gray-1000'
          */
         "textColor": Color | (string & { _placeholder?: never });
         /**
           * Type of the text to display
+          * @default 'body'
          */
         "type": Type;
         /**
@@ -3411,6 +3741,7 @@ declare namespace Components {
     interface ZonosToggle {
         /**
           * Options for the toggle
+          * @default []
          */
         "options": ToggleItem<string>[];
         /**
@@ -3421,10 +3752,12 @@ declare namespace Components {
     interface ZonosTooltip {
         /**
           * The title of the tooltip
+          * @default ''
          */
         "label": string;
         /**
           * The subtitle of the tooltip
+          * @default ''
          */
         "subtitle": string;
     }
@@ -3469,6 +3802,10 @@ interface ZonosAddressCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressElement;
 }
+interface ZonosAddressCompletionDialogCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosAddressCompletionDialogElement;
+}
 interface ZonosAddressFormCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressFormElement;
@@ -3480,6 +3817,10 @@ interface ZonosAddressSuggestionsCustomEvent<T> extends CustomEvent<T> {
 interface ZonosAddressUpdateDialogCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressUpdateDialogElement;
+}
+interface ZonosAirwallexPaymentCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosAirwallexPaymentElement;
 }
 interface ZonosCheckboxCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -3596,6 +3937,24 @@ declare global {
         prototype: HTMLZonosAddressElement;
         new (): HTMLZonosAddressElement;
     };
+    interface HTMLZonosAddressCompletionDialogElementEventMap {
+        "closeCompletionDialog": void;
+        "completionSubmit": AddressCompletionSubmit;
+    }
+    interface HTMLZonosAddressCompletionDialogElement extends Components.ZonosAddressCompletionDialog, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosAddressCompletionDialogElementEventMap>(type: K, listener: (this: HTMLZonosAddressCompletionDialogElement, ev: ZonosAddressCompletionDialogCustomEvent<HTMLZonosAddressCompletionDialogElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosAddressCompletionDialogElementEventMap>(type: K, listener: (this: HTMLZonosAddressCompletionDialogElement, ev: ZonosAddressCompletionDialogCustomEvent<HTMLZonosAddressCompletionDialogElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosAddressCompletionDialogElement: {
+        prototype: HTMLZonosAddressCompletionDialogElement;
+        new (): HTMLZonosAddressCompletionDialogElement;
+    };
     interface HTMLZonosAddressDisplayElement extends Components.ZonosAddressDisplay, HTMLStencilElement {
     }
     var HTMLZonosAddressDisplayElement: {
@@ -3653,6 +4012,24 @@ declare global {
     var HTMLZonosAddressUpdateDialogElement: {
         prototype: HTMLZonosAddressUpdateDialogElement;
         new (): HTMLZonosAddressUpdateDialogElement;
+    };
+    interface HTMLZonosAirwallexPaymentElementEventMap {
+        "airwallexPaymentSuccess": void;
+        "airwallexPaymentError": void;
+    }
+    interface HTMLZonosAirwallexPaymentElement extends Components.ZonosAirwallexPayment, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosAirwallexPaymentElementEventMap>(type: K, listener: (this: HTMLZonosAirwallexPaymentElement, ev: ZonosAirwallexPaymentCustomEvent<HTMLZonosAirwallexPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosAirwallexPaymentElementEventMap>(type: K, listener: (this: HTMLZonosAirwallexPaymentElement, ev: ZonosAirwallexPaymentCustomEvent<HTMLZonosAirwallexPaymentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosAirwallexPaymentElement: {
+        prototype: HTMLZonosAirwallexPaymentElement;
+        new (): HTMLZonosAirwallexPaymentElement;
     };
     interface HTMLZonosBadgeElement extends Components.ZonosBadge, HTMLStencilElement {
     }
@@ -3829,6 +4206,7 @@ declare global {
         "continueClicked": void;
         "paypalSessionFailed": void;
         "paypalSessionDone": string;
+        "airwallexPaymentDone": void;
     }
     interface HTMLZonosCollectPaymentElement extends Components.ZonosCollectPayment, HTMLStencilElement {
         addEventListener<K extends keyof HTMLZonosCollectPaymentElementEventMap>(type: K, listener: (this: HTMLZonosCollectPaymentElement, ev: ZonosCollectPaymentCustomEvent<HTMLZonosCollectPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -4205,6 +4583,12 @@ declare global {
         prototype: HTMLZonosPaypalPaymentElement;
         new (): HTMLZonosPaypalPaymentElement;
     };
+    interface HTMLZonosPolicyConsentElement extends Components.ZonosPolicyConsent, HTMLStencilElement {
+    }
+    var HTMLZonosPolicyConsentElement: {
+        prototype: HTMLZonosPolicyConsentElement;
+        new (): HTMLZonosPolicyConsentElement;
+    };
     interface HTMLZonosRestStateElement extends Components.ZonosRestState, HTMLStencilElement {
     }
     var HTMLZonosRestStateElement: {
@@ -4384,10 +4768,12 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "zonos-address": HTMLZonosAddressElement;
+        "zonos-address-completion-dialog": HTMLZonosAddressCompletionDialogElement;
         "zonos-address-display": HTMLZonosAddressDisplayElement;
         "zonos-address-form": HTMLZonosAddressFormElement;
         "zonos-address-suggestions": HTMLZonosAddressSuggestionsElement;
         "zonos-address-update-dialog": HTMLZonosAddressUpdateDialogElement;
+        "zonos-airwallex-payment": HTMLZonosAirwallexPaymentElement;
         "zonos-badge": HTMLZonosBadgeElement;
         "zonos-banner": HTMLZonosBannerElement;
         "zonos-button": HTMLZonosButtonElement;
@@ -4443,6 +4829,7 @@ declare global {
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
         "zonos-paypal-payment": HTMLZonosPaypalPaymentElement;
+        "zonos-policy-consent": HTMLZonosPolicyConsentElement;
         "zonos-rest-state": HTMLZonosRestStateElement;
         "zonos-review": HTMLZonosReviewElement;
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
@@ -4462,9 +4849,12 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K]?: never };
+
     interface ZonosAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress"?: ContactOption[];
         /**
@@ -4477,10 +4867,17 @@ declare namespace LocalJSX {
         "onTaxIdChanged"?: (event: ZonosAddressCustomEvent<string>) => void;
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage"?: string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField"?: 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage"?: string;
         /**
@@ -4491,6 +4888,48 @@ declare namespace LocalJSX {
           * The type of address element to render
          */
         "type": 'billing' | 'shipping';
+    }
+    interface ZonosAddressCompletionDialog {
+        /**
+          * Whether or not the continue button is loading
+          * @default false
+         */
+        "continueLoading"?: boolean;
+        /**
+          * Whether or not the dialog is open
+          * @default false
+         */
+        "dialogOpen"?: boolean;
+        /**
+          * Whether or not the dialog is rendered in mobile mode
+          * @default false
+         */
+        "isMobile"?: boolean;
+        /**
+          * The Zonos-required fields still missing from the selected address
+          * @default []
+         */
+        "missingFields"?: MissingShippingField[];
+        /**
+          * Close dialog button click
+         */
+        "onCloseCompletionDialog"?: (event: ZonosAddressCompletionDialogCustomEvent<void>) => void;
+        /**
+          * Emitted with the captured values when the customer completes the missing fields
+         */
+        "onCompletionSubmit"?: (event: ZonosAddressCompletionDialogCustomEvent<AddressCompletionSubmit>) => void;
+        /**
+          * The shipping address selected from Stripe, shown read-only for context
+         */
+        "shippingAddress": EnteredInfo;
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosAddressDisplay {
         /**
@@ -4527,6 +4966,7 @@ declare namespace LocalJSX {
         "onSuggestionSelected"?: (event: ZonosAddressSuggestionsCustomEvent<EventPayloadMap['placeSelected']>) => void;
         /**
           * Suggestions to display
+          * @default []
          */
         "suggestions"?: IframeSuggestionsResponsePayload['suggestions'];
         /**
@@ -4541,6 +4981,7 @@ declare namespace LocalJSX {
         "billingAddress": EnteredInfo | null;
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
@@ -4549,10 +4990,12 @@ declare namespace LocalJSX {
         "dialogLoading": boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "dialogOpen"?: boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -4583,6 +5026,16 @@ declare namespace LocalJSX {
           * Translated address fields that GPT has translated
          */
         "translatedShippingAddress": TranslatedAddressObject;
+    }
+    interface ZonosAirwallexPayment {
+        /**
+          * Emitted when the Airwallex payment fails.
+         */
+        "onAirwallexPaymentError"?: (event: ZonosAirwallexPaymentCustomEvent<void>) => void;
+        /**
+          * Emitted when the Airwallex payment intent is confirmed successfully.
+         */
+        "onAirwallexPaymentSuccess"?: (event: ZonosAirwallexPaymentCustomEvent<void>) => void;
     }
     interface ZonosBadge {
         /**
@@ -4642,6 +5095,7 @@ declare namespace LocalJSX {
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
           * Whether or not the button text color is bold
+          * @default false
          */
         "bold"?: boolean;
         /**
@@ -4669,6 +5123,7 @@ declare namespace LocalJSX {
           * @prop ().
           * @prop decorator is to watch the update of the attribute of the component in the dom. And `disabled` prop is not an only factor to determine the component is disabled. isLoading
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
@@ -4678,6 +5133,7 @@ declare namespace LocalJSX {
         "justifyContent"?: 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
+          * @default false
          */
         "loading"?: boolean;
         /**
@@ -4687,10 +5143,12 @@ declare namespace LocalJSX {
         "noBackground"?: boolean;
         /**
           * Whether or not the button has a left padding
+          * @default false
          */
         "noPaddingLeft"?: boolean;
         /**
           * Whether or not the button has a right padding
+          * @default false
          */
         "noPaddingRight"?: boolean;
         /**
@@ -4716,6 +5174,7 @@ declare namespace LocalJSX {
     | 'warning';
         /**
           * Whether or not the button has a box shadow
+          * @default false
          */
         "withBoxShadow"?: boolean;
     }
@@ -4751,6 +5210,7 @@ declare namespace LocalJSX {
         "label"?: HTMLElement;
         /**
           * The spacing to apply between elements in the card
+          * @default '24px'
          */
         "spacing"?: string;
     }
@@ -4759,6 +5219,7 @@ declare namespace LocalJSX {
     interface ZonosCartRestrictedItems {
         /**
           * This is to hide the section when the parent collapse on mobile
+          * @default false
          */
         "hide"?: boolean;
     }
@@ -4775,6 +5236,7 @@ declare namespace LocalJSX {
     interface ZonosCheckbox {
         /**
           * background color of the checkbox
+          * @default 'blue'
          */
         "backgroundColor"?: | CheckboxColorPrefix
     | (string & { _placeholder?: never });
@@ -4785,14 +5247,17 @@ declare namespace LocalJSX {
         "borderStyle"?: ElementsUiStyle;
         /**
           * Font size of the checkbox text
+          * @default 'base'
          */
         "fontSize"?: Size;
         /**
           * Whether or not the checkbox is checked
+          * @default false
          */
         "isChecked"?: boolean;
         /**
           * Whether or not the checkbox is disabled
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
@@ -4805,6 +5270,7 @@ declare namespace LocalJSX {
         "onCheckboxSelected"?: (event: ZonosCheckboxCustomEvent<boolean>) => void;
         /**
           * Size of the checkbox
+          * @default 12
          */
         "size"?: 12 | 16 | 24;
     }
@@ -4815,19 +5281,23 @@ declare namespace LocalJSX {
         "appearanceSettingsOverride"?: Partial<AppearanceConfig>;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress"?: | StripeStoreContactOption[]
     | StripeStoreContactOption;
         /**
           * Force dialog to be open
+          * @default false
          */
         "forceDialogOpen"?: boolean;
         /**
           * Hidden mode to hide the checkout modal in preview mode
+          * @default false
          */
         "hiddenMode"?: boolean;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
@@ -4836,12 +5306,14 @@ declare namespace LocalJSX {
         "overrideStagingMode"?: boolean;
         /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
+          * @default false
          */
         "preview"?: boolean;
     }
     interface ZonosCheckoutFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius"?: ElementsUiStyle;
         /**
@@ -4868,16 +5340,19 @@ declare namespace LocalJSX {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile"?: boolean;
     }
     interface ZonosCheckoutPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
           * Whether or not the checkout is in mobile mode
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -4908,30 +5383,36 @@ declare namespace LocalJSX {
     interface ZonosCheckoutProgressTabs {
         /**
           * Background color of the parent that's wrapped around the tab progress bar
+          * @default null
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never }) | null;
         /**
           * Color of the tab progress bar and label, override the secondary color of the appearance settings
+          * @default null
          */
         "tabColor"?: string | null;
     }
     interface ZonosCollapse {
         /**
           * Collapsed size when collapsed
+          * @default 0
          */
         "collapseSize"?: number;
         /**
           * Collapsed state of the element
+          * @default false
          */
         "collapsed"?: boolean;
     }
     interface ZonosCollect {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -4940,10 +5421,12 @@ declare namespace LocalJSX {
     interface ZonosCollectFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius"?: ElementsUiStyle;
         /**
           * The confirmation id for the collect order
+          * @default null
          */
         "confirmationId"?: string | null;
         /**
@@ -4970,10 +5453,12 @@ declare namespace LocalJSX {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -4984,10 +5469,12 @@ declare namespace LocalJSX {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId"?: string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile"?: boolean;
         /**
@@ -4998,8 +5485,13 @@ declare namespace LocalJSX {
     interface ZonosCollectPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
+        /**
+          * Event to emit when the Airwallex payment is completed successfully
+         */
+        "onAirwallexPaymentDone"?: (event: ZonosCollectPaymentCustomEvent<void>) => void;
         /**
           * Event to emit when the continue button is clicked
          */
@@ -5028,14 +5520,17 @@ declare namespace LocalJSX {
     interface ZonosCollectReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed"?: boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -5044,14 +5539,17 @@ declare namespace LocalJSX {
     interface ZonosComponent {
         /**
           * The first name
+          * @default ''
          */
         "first"?: string;
         /**
           * The last name
+          * @default ''
          */
         "last"?: string;
         /**
           * The middle name
+          * @default ''
          */
         "middle"?: string;
     }
@@ -5095,6 +5593,7 @@ declare namespace LocalJSX {
         "dialogWidth"?: number;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -5157,6 +5656,7 @@ declare namespace LocalJSX {
     interface ZonosCustomAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress"?: ContactOption[];
         /**
@@ -5173,10 +5673,17 @@ declare namespace LocalJSX {
         "onInvalidCharacters"?: (event: ZonosCustomAddressCustomEvent<boolean>) => void;
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage"?: string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField"?: 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage"?: string;
         /**
@@ -5191,24 +5698,29 @@ declare namespace LocalJSX {
     interface ZonosCustomMessage {
         /**
           * The custom message icon
+          * @default ''
          */
         "icon"?: string;
         /**
           * The custom message text
+          * @default ''
          */
         "message"?: string;
     }
     interface ZonosCustomerInfo {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress"?: StripeStoreContactOption[];
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -5229,6 +5741,7 @@ declare namespace LocalJSX {
   }>) => void;
         /**
           * Whether to override custom address form to be always visible
+          * @default false
          */
         "shouldUseCustomAddressFormOverride"?: boolean;
         /**
@@ -5248,6 +5761,7 @@ declare namespace LocalJSX {
         "borderStyle"?: ElementsUiStyle;
         /**
           * The header text for the dialog
+          * @default ''
          */
         "headerText"?: string;
         /**
@@ -5256,6 +5770,7 @@ declare namespace LocalJSX {
         "height"?: string;
         /**
           * Load loading spinner for the dialog or not
+          * @default true
          */
         "isLoading"?: boolean;
         /**
@@ -5272,6 +5787,7 @@ declare namespace LocalJSX {
         "minHeight"?: string;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
@@ -5321,6 +5837,7 @@ declare namespace LocalJSX {
         "emptyStateText": string;
         /**
           * Theme color of the icon
+          * @default 'LIGHT'
          */
         "theme"?: ElementsUiTheme;
     }
@@ -5342,12 +5859,11 @@ declare namespace LocalJSX {
          */
         "appearanceSettingsOverride"?: Partial<AppearanceConfig>;
         /**
-          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocation` and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
+          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocationOverride` (HelloPlacement) and `helloSettings.desktopLocation`, and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
          */
         "desktopLocationOverride"?: HelloDesktopLocation;
         /**
-          * Force mobile styling instead of media query and use the passed location value
-          * @default false
+          * Override the configured mobile floating location (enum). Takes precedence over `helloSettings.mobileLocationOverride` (HelloPlacement) and `helloSettings.mobileLocation`.
          */
         "mobileLocationOverride"?: HelloMobileLocation;
     }
@@ -5363,6 +5879,7 @@ declare namespace LocalJSX {
         "appearanceSettings"?: Partial<AppearanceConfig>;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isOpen"?: boolean;
         /**
@@ -5430,22 +5947,27 @@ declare namespace LocalJSX {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder"?: string;
         /**
           * Input size
+          * @default 'md'
          */
         "inputSize"?: 'sm' | 'md' | 'lg' | 'xl';
         /**
           * Value of the input
+          * @default ''
          */
         "inputValue"?: string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError"?: boolean;
         /**
@@ -5456,26 +5978,31 @@ declare namespace LocalJSX {
     interface ZonosInvoice {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
     interface ZonosInvoiceCartItems {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile"?: boolean;
     }
     interface ZonosInvoiceFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius"?: ElementsUiStyle;
         /**
           * The confirmation id for the invoice order
+          * @default null
          */
         "confirmationId"?: string | null;
         /**
@@ -5502,10 +6029,12 @@ declare namespace LocalJSX {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -5516,10 +6045,12 @@ declare namespace LocalJSX {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId"?: string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile"?: boolean;
         /**
@@ -5530,6 +6061,7 @@ declare namespace LocalJSX {
     interface ZonosInvoicePayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
@@ -5560,20 +6092,24 @@ declare namespace LocalJSX {
     interface ZonosInvoiceReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed"?: boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
     interface ZonosInvoiceSubtotal {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile"?: boolean;
     }
@@ -5587,6 +6123,7 @@ declare namespace LocalJSX {
     interface ZonosLink {
         /**
           * The href for the link
+          * @default ''
          */
         "href"?: string;
         /**
@@ -5605,10 +6142,12 @@ declare namespace LocalJSX {
     interface ZonosLinkAuthentication {
         /**
           * Default email for stripe
+          * @default null
          */
         "defaultEmail"?: string | null;
         /**
           * Email error text to dispaly
+          * @default false
          */
         "isEmailError"?: boolean;
         /**
@@ -5628,6 +6167,7 @@ declare namespace LocalJSX {
         "open"?: boolean;
         /**
           * Spinner size (optional, default 40)
+          * @default 40
          */
         "size"?: number;
         /**
@@ -5644,10 +6184,12 @@ declare namespace LocalJSX {
     interface ZonosLogo {
         /**
           * Theme to change the color of the logo
+          * @default 'LIGHT'
          */
         "theme"?: ElementsUiTheme;
         /**
           * The width of the logo
+          * @default 'auto'
          */
         "width"?: string;
     }
@@ -5669,6 +6211,8 @@ declare namespace LocalJSX {
          */
         "onPaypalSessionFail"?: (event: ZonosPaypalPaymentCustomEvent<void>) => void;
     }
+    interface ZonosPolicyConsent {
+    }
     interface ZonosRestState {
         /**
           * The subtitle of the rest state
@@ -5686,10 +6230,12 @@ declare namespace LocalJSX {
     interface ZonosReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed"?: boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile"?: boolean;
     }
@@ -5701,12 +6247,14 @@ declare namespace LocalJSX {
         "handleOnClose"?: () => void;
         /**
           * The label for the select dialog
+          * @default ''
          */
         "label"?: string;
     }
     interface ZonosShipping {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
@@ -5787,6 +6335,7 @@ declare namespace LocalJSX {
     interface ZonosStoreCredit {
         /**
           * Whether the component is enabled
+          * @default true
          */
         "enabled"?: boolean;
     }
@@ -5800,6 +6349,7 @@ declare namespace LocalJSX {
         "autoComplete"?: string;
         /**
           * Error message of the input
+          * @default ''
          */
         "error"?: string;
         /**
@@ -5808,18 +6358,22 @@ declare namespace LocalJSX {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder"?: string;
         /**
           * Value of the stripeInput
+          * @default ''
          */
         "inputValue"?: string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError"?: boolean;
         /**
@@ -5840,28 +6394,34 @@ declare namespace LocalJSX {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the input is required
+          * @default false
          */
         "required"?: boolean;
         /**
           * The value of the input.
+          * @default ''
          */
         "value"?: string;
     }
     interface ZonosStripePhoneInput {
         /**
           * The autoComplete attribute for the phone input
+          * @default ''
          */
         "autoComplete"?: string;
         /**
           * The country code of the phone input
+          * @default null
          */
         "countryCode"?: CountryCode | null;
         /**
           * Available country options for the select dropdown
+          * @default null
          */
         "countryOptions"?: GenericZonosSettings['countryFields'] | null;
         /**
           * Whether the input is disabled
+          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -5902,22 +6462,27 @@ declare namespace LocalJSX {
     interface ZonosStripeSelect {
         /**
           * The autoComplete attribute for the select.
+          * @default ''
          */
         "autoComplete"?: string;
         /**
           * Error message of the select
+          * @default ''
          */
         "error"?: string;
         /**
           * Whether the select can be cleared
+          * @default false
          */
         "isClearable"?: boolean;
         /**
           * Disables the select
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
           * Error state of the select
+          * @default false
          */
         "isError"?: boolean;
         /**
@@ -5934,6 +6499,7 @@ declare namespace LocalJSX {
         "onSelectChange"?: (event: ZonosStripeSelectCustomEvent<string>) => void;
         /**
           * Options for the select. Must be set using a query selector.
+          * @default []
          */
         "options"?: SelectOption[];
         /**
@@ -5946,6 +6512,7 @@ declare namespace LocalJSX {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the select is required
+          * @default false
          */
         "required"?: boolean;
         /**
@@ -5954,14 +6521,17 @@ declare namespace LocalJSX {
         "selectLabel": string;
         /**
           * Placeholder for the select
+          * @default ''
          */
         "selectPlaceholder"?: string;
         /**
           * Selected value of the select
+          * @default ''
          */
         "selectedValue"?: string;
         /**
           * The value of the select.
+          * @default ''
          */
         "value"?: string;
     }
@@ -5972,10 +6542,12 @@ declare namespace LocalJSX {
         "size"?: Size;
         /**
           * The icon element to display
+          * @default 'gray-1000'
          */
         "textColor"?: Color | (string & { _placeholder?: never });
         /**
           * Type of the text to display
+          * @default 'body'
          */
         "type"?: Type;
         /**
@@ -5990,6 +6562,7 @@ declare namespace LocalJSX {
         "onToggleChanged"?: (event: ZonosToggleCustomEvent<string>) => void;
         /**
           * Options for the toggle
+          * @default []
          */
         "options"?: ToggleItem<string>[];
         /**
@@ -6000,10 +6573,12 @@ declare namespace LocalJSX {
     interface ZonosTooltip {
         /**
           * The title of the tooltip
+          * @default ''
          */
         "label"?: string;
         /**
           * The subtitle of the tooltip
+          * @default ''
          */
         "subtitle"?: string;
     }
@@ -6043,174 +6618,584 @@ declare namespace LocalJSX {
          */
         "renderItem": VirtualScrollRenderItem;
     }
+
+    interface ZonosAddressAttributes {
+        "type": 'billing' | 'shipping';
+        "titleText": string;
+        "taxIdErrorField": 'type' | 'value' | '';
+        "taxIdErrorMessage": string;
+        "shortAddressCodeErrorMessage": string;
+    }
+    interface ZonosAddressCompletionDialogAttributes {
+        "continueLoading": boolean;
+        "dialogOpen": boolean;
+        "isMobile": boolean;
+        "submitBtnColor": string;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+    }
+    interface ZonosAddressDisplayAttributes {
+        "addressType": 'shipping' | 'billing';
+    }
+    interface ZonosAddressFormAttributes {
+        "addressType": 'shipping' | 'billing';
+    }
+    interface ZonosAddressSuggestionsAttributes {
+        "type": 'billing' | 'shipping';
+    }
+    interface ZonosAddressUpdateDialogAttributes {
+        "continueLoading": boolean;
+        "dialogLoading": boolean;
+        "dialogOpen": boolean;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "submitBtnColor": string;
+        "isMobile": boolean;
+    }
+    interface ZonosBadgeAttributes {
+        "bold": boolean;
+        "badgeColor": ColorPrefix | 'transparent';
+        "iconRight": boolean;
+        "size": 'small' | 'default';
+        "rounded": boolean;
+        "loading": boolean;
+    }
+    interface ZonosBannerAttributes {
+        "bannerTitle": string;
+        "intent": BannerIntent;
+    }
+    interface ZonosButtonAttributes {
+        "buttonColor": Color | (string & { _placeholder?: never });
+        "backgroundColor": Color | (string & { _placeholder?: never });
+        "borderStyle": ElementsUiStyle;
+        "isDisabled": boolean;
+        "iconRight": boolean;
+        "size": 'sm' | 'md' | 'lg';
+        "variant": | 'primary'
+    | 'success'
+    | 'subtle'
+    | 'outline'
+    | 'standard'
+    | 'danger'
+    | 'warning';
+        "noBackground": boolean;
+        "withBoxShadow": boolean;
+        "noPaddingLeft": boolean;
+        "noPaddingRight": boolean;
+        "loading": boolean;
+        "justifyContent": 'center' | 'flex-end' | 'flex-start';
+        "bold": boolean;
+        "theme": ElementsUiTheme;
+    }
+    interface ZonosCardAttributes {
+        "backgroundColor": Color;
+        "borderRadius": number;
+        "footerHeight": number;
+        "spacing": string;
+    }
+    interface ZonosCartRestrictedItemsAttributes {
+        "hide": boolean;
+    }
+    interface ZonosCartSubtotalAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "submitBtnColor": string;
+    }
+    interface ZonosCheckboxAttributes {
+        "backgroundColor": | CheckboxColorPrefix
+    | (string & { _placeholder?: never });
+        "label": string;
+        "isChecked": boolean;
+        "isDisabled": boolean;
+        "size": 12 | 16 | 24;
+        "fontSize": Size;
+        "borderStyle": ElementsUiStyle;
+    }
+    interface ZonosCheckoutAttributes {
+        "preview": boolean;
+        "hiddenMode": boolean;
+        "mobile": boolean;
+        "overrideStagingMode": boolean;
+        "forceDialogOpen": boolean;
+    }
+    interface ZonosCheckoutFinishAttributes {
+        "borderRadius": ElementsUiStyle;
+        "storybookForceStatus": PaymentIntent['status'];
+    }
+    interface ZonosCheckoutFooterAttributes {
+        "mobile": boolean;
+        "dataTheme": ElementsUiTheme;
+    }
+    interface ZonosCheckoutPaymentAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "isMobile": boolean;
+        "overridePrimaryColor": string;
+    }
+    interface ZonosCheckoutProgressTabsAttributes {
+        "tabColor": string | null;
+        "backgroundColor": Color | (string & { _placeholder?: never }) | null;
+    }
+    interface ZonosCollapseAttributes {
+        "collapsed": boolean;
+        "collapseSize": number;
+    }
+    interface ZonosCollectAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+    }
+    interface ZonosCollectFinishAttributes {
+        "borderRadius": ElementsUiStyle;
+        "storybookForceStatus": PaymentIntent['status'];
+        "confirmationId": string | null;
+    }
+    interface ZonosCollectFooterAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "dataTheme": ElementsUiTheme;
+    }
+    interface ZonosCollectOrderDetailsAttributes {
+        "mobile": boolean;
+        "collapsed": boolean;
+        "landedCostId": string;
+    }
+    interface ZonosCollectPaymentAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "overridePrimaryColor": string;
+    }
+    interface ZonosCollectReviewAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "collapsed": boolean;
+    }
+    interface ZonosComponentAttributes {
+        "first": string;
+        "middle": string;
+        "last": string;
+    }
+    interface ZonosConfirmDialogAttributes {
+        "dialogTitle": string;
+        "dialogIntent": 'info' | 'danger' | 'warn';
+        "dialogSubtitle": string | null;
+        "submitBtnColor": string;
+        "dialogConfirmBtnText": string;
+        "dialogWidth": number;
+        "dialogCancelBtnText": string;
+        "dialogType": 'alert' | 'confirm';
+        "isMobile": boolean;
+        "dialogOpen": boolean;
+        "noClickOutside": boolean;
+    }
+    interface ZonosControllerAttributes {
+        "zonosApiKey": string;
+    }
+    interface ZonosCountryFlagAttributes {
+        "countryCode": CountryCode | null;
+        "size": number;
+    }
+    interface ZonosCustomAddressAttributes {
+        "type": 'billing' | 'shipping';
+        "titleText": string;
+        "taxIdErrorField": 'type' | 'value' | '';
+        "taxIdErrorMessage": string;
+        "shortAddressCodeErrorMessage": string;
+    }
+    interface ZonosCustomMessageAttributes {
+        "icon": string;
+        "message": string;
+    }
+    interface ZonosCustomerInfoAttributes {
+        "continueLoading": boolean;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "submitBtnColor": string;
+        "isMobile": boolean;
+        "shouldUseCustomAddressFormOverride": boolean;
+    }
+    interface ZonosDialogAttributes {
+        "open": boolean;
+        "headerText": string;
+        "width": string;
+        "height": string;
+        "minHeight": string;
+        "noHeader": boolean;
+        "loadingTitle": string;
+        "loadingText": string;
+        "noBodyPadding": boolean;
+        "noBorder": boolean;
+        "borderStyle": ElementsUiStyle;
+        "noCloseButton": boolean;
+        "noClickOutside": boolean;
+        "mobile": boolean;
+        "isLoading": boolean;
+    }
+    interface ZonosEmptyStatePaymentAttributes {
+        "emptyStateText": string;
+        "theme": ElementsUiTheme;
+    }
+    interface ZonosHStackAttributes {
+        "spacing": GridSpacing;
+    }
+    interface ZonosHelloAttributes {
+        "mobileLocationOverride": HelloMobileLocation;
+        "desktopLocationOverride": HelloDesktopLocation;
+        "animateFromLeftOverride": boolean;
+    }
+    interface ZonosHelloDialogAttributes {
+        "isOpen": boolean;
+        "mobileLocationOverride": HelloMobileLocation;
+        "animateFromLeftOverride": boolean;
+    }
+    interface ZonosIconAttributes {
+        "autoHeight": boolean;
+        "iconColor": Color | (string & { _placeholder?: never });
+        "content": string;
+        "size": number;
+    }
+    interface ZonosInputAttributes {
+        "inputValue": string;
+        "inputLabel": string;
+        "inputSize": 'sm' | 'md' | 'lg' | 'xl';
+        "isDisabled": boolean;
+        "isError": boolean;
+        "inputPlaceholder": string;
+    }
+    interface ZonosInvoiceAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+    }
+    interface ZonosInvoiceCartItemsAttributes {
+        "isMobile": boolean;
+    }
+    interface ZonosInvoiceFinishAttributes {
+        "borderRadius": ElementsUiStyle;
+        "storybookForceStatus": PaymentIntent['status'];
+        "confirmationId": string | null;
+    }
+    interface ZonosInvoiceFooterAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "dataTheme": ElementsUiTheme;
+    }
+    interface ZonosInvoiceOrderDetailsAttributes {
+        "mobile": boolean;
+        "collapsed": boolean;
+        "landedCostId": string;
+    }
+    interface ZonosInvoicePaymentAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "overridePrimaryColor": string;
+    }
+    interface ZonosInvoiceReviewAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "collapsed": boolean;
+    }
+    interface ZonosInvoiceSubtotalAttributes {
+        "isMobile": boolean;
+    }
+    interface ZonosLinkAttributes {
+        "href": string;
+        "rel": string;
+        "target": string;
+        "linkTitle": string;
+    }
+    interface ZonosLinkAuthenticationAttributes {
+        "titleText": string;
+        "defaultEmail": string | null;
+        "isEmailError": boolean;
+    }
+    interface ZonosLoadingOverlayAttributes {
+        "open": boolean;
+        "spinnerColor": | 'primary'
+    | 'info'
+    | 'success'
+    | 'danger'
+    | 'warning'
+    | 'black'
+    | 'white';
+        "size": number;
+    }
+    interface ZonosLogoAttributes {
+        "theme": ElementsUiTheme;
+        "width": string;
+    }
+    interface ZonosPaymentAttributes {
+        "titleText": string;
+    }
+    interface ZonosRestStateAttributes {
+        "restStateSubtitle": string;
+        "restStateTitle": string;
+        "restStateType": RestStateType;
+    }
+    interface ZonosReviewAttributes {
+        "mobile": boolean;
+        "collapsed": boolean;
+    }
+    interface ZonosSelectDialogHeaderAttributes {
+        "label": string;
+    }
+    interface ZonosShippingAttributes {
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "isMobile": boolean;
+    }
+    interface ZonosShippingRichRadioAttributes {
+        "borderColor": Color | (string & { _placeholder?: never });
+        "borderStyle": ElementsUiStyle;
+        "theme": ElementsUiTheme;
+        "isMobile": boolean;
+    }
+    interface ZonosSkeletonAttributes {
+        "skeletonWidth": string;
+        "skeletonHeight": string;
+    }
+    interface ZonosSpinnerAttributes {
+        "size": number;
+        "spinnerColor": SpinnerColor;
+    }
+    interface ZonosStoreCreditAttributes {
+        "enabled": boolean;
+    }
+    interface ZonosStripeInputAttributes {
+        "name": string;
+        "autoComplete": string;
+        "inputValue": string;
+        "inputLabel": string;
+        "overridePrimaryColor": string;
+        "overrideSecondaryColor": string;
+        "isDisabled": boolean;
+        "isError": boolean;
+        "error": string;
+        "inputPlaceholder": string;
+        "value": string;
+        "required": boolean;
+    }
+    interface ZonosStripePhoneInputAttributes {
+        "autoComplete": string;
+        "disabled": boolean;
+        "error": string;
+        "inputLabel": string;
+        "overridePrimaryColor": string;
+        "overrideSecondaryColor": string;
+        "inputValue": string;
+        "countryCode": CountryCode | null;
+        "minWidth": string;
+    }
+    interface ZonosStripeSelectAttributes {
+        "name": string;
+        "selectedValue": string;
+        "selectLabel": string;
+        "overridePrimaryColor": string;
+        "overrideSecondaryColor": string;
+        "isDisabled": boolean;
+        "isError": boolean;
+        "error": string;
+        "selectPlaceholder": string;
+        "autoComplete": string;
+        "value": string;
+        "required": boolean;
+        "isClearable": boolean;
+        "minWidth": string;
+    }
+    interface ZonosTextAttributes {
+        "textColor": Color | (string & { _placeholder?: never });
+        "size": Size;
+        "type": Type;
+        "weight": FontWeight;
+    }
+    interface ZonosToggleAttributes {
+        "value": string;
+    }
+    interface ZonosTooltipAttributes {
+        "label": string;
+        "subtitle": string;
+    }
+    interface ZonosVStackAttributes {
+        "spacing": GridSpacing;
+    }
+    interface ZonosVirtualScrollAttributes {
+        "itemWidth": number;
+        "fallbackItemHeight": number;
+        "buffer": number;
+    }
+
     interface IntrinsicElements {
-        "zonos-address": ZonosAddress;
-        "zonos-address-display": ZonosAddressDisplay;
-        "zonos-address-form": ZonosAddressForm;
-        "zonos-address-suggestions": ZonosAddressSuggestions;
-        "zonos-address-update-dialog": ZonosAddressUpdateDialog;
-        "zonos-badge": ZonosBadge;
-        "zonos-banner": ZonosBanner;
-        "zonos-button": ZonosButton;
-        "zonos-card": ZonosCard;
+        "zonos-address": Omit<ZonosAddress, keyof ZonosAddressAttributes> & { [K in keyof ZonosAddress & keyof ZonosAddressAttributes]?: ZonosAddress[K] } & { [K in keyof ZonosAddress & keyof ZonosAddressAttributes as `attr:${K}`]?: ZonosAddressAttributes[K] } & { [K in keyof ZonosAddress & keyof ZonosAddressAttributes as `prop:${K}`]?: ZonosAddress[K] } & OneOf<"type", ZonosAddress["type"], ZonosAddressAttributes["type"]> & OneOf<"titleText", ZonosAddress["titleText"], ZonosAddressAttributes["titleText"]>;
+        "zonos-address-completion-dialog": Omit<ZonosAddressCompletionDialog, keyof ZonosAddressCompletionDialogAttributes> & { [K in keyof ZonosAddressCompletionDialog & keyof ZonosAddressCompletionDialogAttributes]?: ZonosAddressCompletionDialog[K] } & { [K in keyof ZonosAddressCompletionDialog & keyof ZonosAddressCompletionDialogAttributes as `attr:${K}`]?: ZonosAddressCompletionDialogAttributes[K] } & { [K in keyof ZonosAddressCompletionDialog & keyof ZonosAddressCompletionDialogAttributes as `prop:${K}`]?: ZonosAddressCompletionDialog[K] };
+        "zonos-address-display": Omit<ZonosAddressDisplay, keyof ZonosAddressDisplayAttributes> & { [K in keyof ZonosAddressDisplay & keyof ZonosAddressDisplayAttributes]?: ZonosAddressDisplay[K] } & { [K in keyof ZonosAddressDisplay & keyof ZonosAddressDisplayAttributes as `attr:${K}`]?: ZonosAddressDisplayAttributes[K] } & { [K in keyof ZonosAddressDisplay & keyof ZonosAddressDisplayAttributes as `prop:${K}`]?: ZonosAddressDisplay[K] } & OneOf<"addressType", ZonosAddressDisplay["addressType"], ZonosAddressDisplayAttributes["addressType"]>;
+        "zonos-address-form": Omit<ZonosAddressForm, keyof ZonosAddressFormAttributes> & { [K in keyof ZonosAddressForm & keyof ZonosAddressFormAttributes]?: ZonosAddressForm[K] } & { [K in keyof ZonosAddressForm & keyof ZonosAddressFormAttributes as `attr:${K}`]?: ZonosAddressFormAttributes[K] } & { [K in keyof ZonosAddressForm & keyof ZonosAddressFormAttributes as `prop:${K}`]?: ZonosAddressForm[K] } & OneOf<"addressType", ZonosAddressForm["addressType"], ZonosAddressFormAttributes["addressType"]>;
+        "zonos-address-suggestions": Omit<ZonosAddressSuggestions, keyof ZonosAddressSuggestionsAttributes> & { [K in keyof ZonosAddressSuggestions & keyof ZonosAddressSuggestionsAttributes]?: ZonosAddressSuggestions[K] } & { [K in keyof ZonosAddressSuggestions & keyof ZonosAddressSuggestionsAttributes as `attr:${K}`]?: ZonosAddressSuggestionsAttributes[K] } & { [K in keyof ZonosAddressSuggestions & keyof ZonosAddressSuggestionsAttributes as `prop:${K}`]?: ZonosAddressSuggestions[K] } & OneOf<"type", ZonosAddressSuggestions["type"], ZonosAddressSuggestionsAttributes["type"]>;
+        "zonos-address-update-dialog": Omit<ZonosAddressUpdateDialog, keyof ZonosAddressUpdateDialogAttributes> & { [K in keyof ZonosAddressUpdateDialog & keyof ZonosAddressUpdateDialogAttributes]?: ZonosAddressUpdateDialog[K] } & { [K in keyof ZonosAddressUpdateDialog & keyof ZonosAddressUpdateDialogAttributes as `attr:${K}`]?: ZonosAddressUpdateDialogAttributes[K] } & { [K in keyof ZonosAddressUpdateDialog & keyof ZonosAddressUpdateDialogAttributes as `prop:${K}`]?: ZonosAddressUpdateDialog[K] } & OneOf<"dialogLoading", ZonosAddressUpdateDialog["dialogLoading"], ZonosAddressUpdateDialogAttributes["dialogLoading"]>;
+        "zonos-airwallex-payment": ZonosAirwallexPayment;
+        "zonos-badge": Omit<ZonosBadge, keyof ZonosBadgeAttributes> & { [K in keyof ZonosBadge & keyof ZonosBadgeAttributes]?: ZonosBadge[K] } & { [K in keyof ZonosBadge & keyof ZonosBadgeAttributes as `attr:${K}`]?: ZonosBadgeAttributes[K] } & { [K in keyof ZonosBadge & keyof ZonosBadgeAttributes as `prop:${K}`]?: ZonosBadge[K] };
+        "zonos-banner": Omit<ZonosBanner, keyof ZonosBannerAttributes> & { [K in keyof ZonosBanner & keyof ZonosBannerAttributes]?: ZonosBanner[K] } & { [K in keyof ZonosBanner & keyof ZonosBannerAttributes as `attr:${K}`]?: ZonosBannerAttributes[K] } & { [K in keyof ZonosBanner & keyof ZonosBannerAttributes as `prop:${K}`]?: ZonosBanner[K] };
+        "zonos-button": Omit<ZonosButton, keyof ZonosButtonAttributes> & { [K in keyof ZonosButton & keyof ZonosButtonAttributes]?: ZonosButton[K] } & { [K in keyof ZonosButton & keyof ZonosButtonAttributes as `attr:${K}`]?: ZonosButtonAttributes[K] } & { [K in keyof ZonosButton & keyof ZonosButtonAttributes as `prop:${K}`]?: ZonosButton[K] };
+        "zonos-card": Omit<ZonosCard, keyof ZonosCardAttributes> & { [K in keyof ZonosCard & keyof ZonosCardAttributes]?: ZonosCard[K] } & { [K in keyof ZonosCard & keyof ZonosCardAttributes as `attr:${K}`]?: ZonosCardAttributes[K] } & { [K in keyof ZonosCard & keyof ZonosCardAttributes as `prop:${K}`]?: ZonosCard[K] };
         "zonos-cart-items": ZonosCartItems;
-        "zonos-cart-restricted-items": ZonosCartRestrictedItems;
-        "zonos-cart-subtotal": ZonosCartSubtotal;
-        "zonos-checkbox": ZonosCheckbox;
-        "zonos-checkout": ZonosCheckout;
-        "zonos-checkout-finish": ZonosCheckoutFinish;
-        "zonos-checkout-footer": ZonosCheckoutFooter;
-        "zonos-checkout-payment": ZonosCheckoutPayment;
-        "zonos-checkout-progress-tabs": ZonosCheckoutProgressTabs;
-        "zonos-collapse": ZonosCollapse;
-        "zonos-collect": ZonosCollect;
+        "zonos-cart-restricted-items": Omit<ZonosCartRestrictedItems, keyof ZonosCartRestrictedItemsAttributes> & { [K in keyof ZonosCartRestrictedItems & keyof ZonosCartRestrictedItemsAttributes]?: ZonosCartRestrictedItems[K] } & { [K in keyof ZonosCartRestrictedItems & keyof ZonosCartRestrictedItemsAttributes as `attr:${K}`]?: ZonosCartRestrictedItemsAttributes[K] } & { [K in keyof ZonosCartRestrictedItems & keyof ZonosCartRestrictedItemsAttributes as `prop:${K}`]?: ZonosCartRestrictedItems[K] };
+        "zonos-cart-subtotal": Omit<ZonosCartSubtotal, keyof ZonosCartSubtotalAttributes> & { [K in keyof ZonosCartSubtotal & keyof ZonosCartSubtotalAttributes]?: ZonosCartSubtotal[K] } & { [K in keyof ZonosCartSubtotal & keyof ZonosCartSubtotalAttributes as `attr:${K}`]?: ZonosCartSubtotalAttributes[K] } & { [K in keyof ZonosCartSubtotal & keyof ZonosCartSubtotalAttributes as `prop:${K}`]?: ZonosCartSubtotal[K] };
+        "zonos-checkbox": Omit<ZonosCheckbox, keyof ZonosCheckboxAttributes> & { [K in keyof ZonosCheckbox & keyof ZonosCheckboxAttributes]?: ZonosCheckbox[K] } & { [K in keyof ZonosCheckbox & keyof ZonosCheckboxAttributes as `attr:${K}`]?: ZonosCheckboxAttributes[K] } & { [K in keyof ZonosCheckbox & keyof ZonosCheckboxAttributes as `prop:${K}`]?: ZonosCheckbox[K] };
+        "zonos-checkout": Omit<ZonosCheckout, keyof ZonosCheckoutAttributes> & { [K in keyof ZonosCheckout & keyof ZonosCheckoutAttributes]?: ZonosCheckout[K] } & { [K in keyof ZonosCheckout & keyof ZonosCheckoutAttributes as `attr:${K}`]?: ZonosCheckoutAttributes[K] } & { [K in keyof ZonosCheckout & keyof ZonosCheckoutAttributes as `prop:${K}`]?: ZonosCheckout[K] };
+        "zonos-checkout-finish": Omit<ZonosCheckoutFinish, keyof ZonosCheckoutFinishAttributes> & { [K in keyof ZonosCheckoutFinish & keyof ZonosCheckoutFinishAttributes]?: ZonosCheckoutFinish[K] } & { [K in keyof ZonosCheckoutFinish & keyof ZonosCheckoutFinishAttributes as `attr:${K}`]?: ZonosCheckoutFinishAttributes[K] } & { [K in keyof ZonosCheckoutFinish & keyof ZonosCheckoutFinishAttributes as `prop:${K}`]?: ZonosCheckoutFinish[K] };
+        "zonos-checkout-footer": Omit<ZonosCheckoutFooter, keyof ZonosCheckoutFooterAttributes> & { [K in keyof ZonosCheckoutFooter & keyof ZonosCheckoutFooterAttributes]?: ZonosCheckoutFooter[K] } & { [K in keyof ZonosCheckoutFooter & keyof ZonosCheckoutFooterAttributes as `attr:${K}`]?: ZonosCheckoutFooterAttributes[K] } & { [K in keyof ZonosCheckoutFooter & keyof ZonosCheckoutFooterAttributes as `prop:${K}`]?: ZonosCheckoutFooter[K] };
+        "zonos-checkout-payment": Omit<ZonosCheckoutPayment, keyof ZonosCheckoutPaymentAttributes> & { [K in keyof ZonosCheckoutPayment & keyof ZonosCheckoutPaymentAttributes]?: ZonosCheckoutPayment[K] } & { [K in keyof ZonosCheckoutPayment & keyof ZonosCheckoutPaymentAttributes as `attr:${K}`]?: ZonosCheckoutPaymentAttributes[K] } & { [K in keyof ZonosCheckoutPayment & keyof ZonosCheckoutPaymentAttributes as `prop:${K}`]?: ZonosCheckoutPayment[K] };
+        "zonos-checkout-progress-tabs": Omit<ZonosCheckoutProgressTabs, keyof ZonosCheckoutProgressTabsAttributes> & { [K in keyof ZonosCheckoutProgressTabs & keyof ZonosCheckoutProgressTabsAttributes]?: ZonosCheckoutProgressTabs[K] } & { [K in keyof ZonosCheckoutProgressTabs & keyof ZonosCheckoutProgressTabsAttributes as `attr:${K}`]?: ZonosCheckoutProgressTabsAttributes[K] } & { [K in keyof ZonosCheckoutProgressTabs & keyof ZonosCheckoutProgressTabsAttributes as `prop:${K}`]?: ZonosCheckoutProgressTabs[K] };
+        "zonos-collapse": Omit<ZonosCollapse, keyof ZonosCollapseAttributes> & { [K in keyof ZonosCollapse & keyof ZonosCollapseAttributes]?: ZonosCollapse[K] } & { [K in keyof ZonosCollapse & keyof ZonosCollapseAttributes as `attr:${K}`]?: ZonosCollapseAttributes[K] } & { [K in keyof ZonosCollapse & keyof ZonosCollapseAttributes as `prop:${K}`]?: ZonosCollapse[K] };
+        "zonos-collect": Omit<ZonosCollect, keyof ZonosCollectAttributes> & { [K in keyof ZonosCollect & keyof ZonosCollectAttributes]?: ZonosCollect[K] } & { [K in keyof ZonosCollect & keyof ZonosCollectAttributes as `attr:${K}`]?: ZonosCollectAttributes[K] } & { [K in keyof ZonosCollect & keyof ZonosCollectAttributes as `prop:${K}`]?: ZonosCollect[K] };
         "zonos-collect-cart-items": ZonosCollectCartItems;
-        "zonos-collect-finish": ZonosCollectFinish;
-        "zonos-collect-footer": ZonosCollectFooter;
-        "zonos-collect-order-details": ZonosCollectOrderDetails;
-        "zonos-collect-payment": ZonosCollectPayment;
-        "zonos-collect-review": ZonosCollectReview;
+        "zonos-collect-finish": Omit<ZonosCollectFinish, keyof ZonosCollectFinishAttributes> & { [K in keyof ZonosCollectFinish & keyof ZonosCollectFinishAttributes]?: ZonosCollectFinish[K] } & { [K in keyof ZonosCollectFinish & keyof ZonosCollectFinishAttributes as `attr:${K}`]?: ZonosCollectFinishAttributes[K] } & { [K in keyof ZonosCollectFinish & keyof ZonosCollectFinishAttributes as `prop:${K}`]?: ZonosCollectFinish[K] };
+        "zonos-collect-footer": Omit<ZonosCollectFooter, keyof ZonosCollectFooterAttributes> & { [K in keyof ZonosCollectFooter & keyof ZonosCollectFooterAttributes]?: ZonosCollectFooter[K] } & { [K in keyof ZonosCollectFooter & keyof ZonosCollectFooterAttributes as `attr:${K}`]?: ZonosCollectFooterAttributes[K] } & { [K in keyof ZonosCollectFooter & keyof ZonosCollectFooterAttributes as `prop:${K}`]?: ZonosCollectFooter[K] };
+        "zonos-collect-order-details": Omit<ZonosCollectOrderDetails, keyof ZonosCollectOrderDetailsAttributes> & { [K in keyof ZonosCollectOrderDetails & keyof ZonosCollectOrderDetailsAttributes]?: ZonosCollectOrderDetails[K] } & { [K in keyof ZonosCollectOrderDetails & keyof ZonosCollectOrderDetailsAttributes as `attr:${K}`]?: ZonosCollectOrderDetailsAttributes[K] } & { [K in keyof ZonosCollectOrderDetails & keyof ZonosCollectOrderDetailsAttributes as `prop:${K}`]?: ZonosCollectOrderDetails[K] } & OneOf<"collapsed", ZonosCollectOrderDetails["collapsed"], ZonosCollectOrderDetailsAttributes["collapsed"]>;
+        "zonos-collect-payment": Omit<ZonosCollectPayment, keyof ZonosCollectPaymentAttributes> & { [K in keyof ZonosCollectPayment & keyof ZonosCollectPaymentAttributes]?: ZonosCollectPayment[K] } & { [K in keyof ZonosCollectPayment & keyof ZonosCollectPaymentAttributes as `attr:${K}`]?: ZonosCollectPaymentAttributes[K] } & { [K in keyof ZonosCollectPayment & keyof ZonosCollectPaymentAttributes as `prop:${K}`]?: ZonosCollectPayment[K] };
+        "zonos-collect-review": Omit<ZonosCollectReview, keyof ZonosCollectReviewAttributes> & { [K in keyof ZonosCollectReview & keyof ZonosCollectReviewAttributes]?: ZonosCollectReview[K] } & { [K in keyof ZonosCollectReview & keyof ZonosCollectReviewAttributes as `attr:${K}`]?: ZonosCollectReviewAttributes[K] } & { [K in keyof ZonosCollectReview & keyof ZonosCollectReviewAttributes as `prop:${K}`]?: ZonosCollectReview[K] };
         "zonos-collect-subtotal": ZonosCollectSubtotal;
-        "zonos-component": ZonosComponent;
-        "zonos-confirm-dialog": ZonosConfirmDialog;
-        "zonos-controller": ZonosController;
-        "zonos-country-flag": ZonosCountryFlag;
+        "zonos-component": Omit<ZonosComponent, keyof ZonosComponentAttributes> & { [K in keyof ZonosComponent & keyof ZonosComponentAttributes]?: ZonosComponent[K] } & { [K in keyof ZonosComponent & keyof ZonosComponentAttributes as `attr:${K}`]?: ZonosComponentAttributes[K] } & { [K in keyof ZonosComponent & keyof ZonosComponentAttributes as `prop:${K}`]?: ZonosComponent[K] };
+        "zonos-confirm-dialog": Omit<ZonosConfirmDialog, keyof ZonosConfirmDialogAttributes> & { [K in keyof ZonosConfirmDialog & keyof ZonosConfirmDialogAttributes]?: ZonosConfirmDialog[K] } & { [K in keyof ZonosConfirmDialog & keyof ZonosConfirmDialogAttributes as `attr:${K}`]?: ZonosConfirmDialogAttributes[K] } & { [K in keyof ZonosConfirmDialog & keyof ZonosConfirmDialogAttributes as `prop:${K}`]?: ZonosConfirmDialog[K] } & OneOf<"dialogConfirmBtnText", ZonosConfirmDialog["dialogConfirmBtnText"], ZonosConfirmDialogAttributes["dialogConfirmBtnText"]> & OneOf<"dialogOpen", ZonosConfirmDialog["dialogOpen"], ZonosConfirmDialogAttributes["dialogOpen"]>;
+        "zonos-controller": Omit<ZonosController, keyof ZonosControllerAttributes> & { [K in keyof ZonosController & keyof ZonosControllerAttributes]?: ZonosController[K] } & { [K in keyof ZonosController & keyof ZonosControllerAttributes as `attr:${K}`]?: ZonosControllerAttributes[K] } & { [K in keyof ZonosController & keyof ZonosControllerAttributes as `prop:${K}`]?: ZonosController[K] } & OneOf<"zonosApiKey", ZonosController["zonosApiKey"], ZonosControllerAttributes["zonosApiKey"]>;
+        "zonos-country-flag": Omit<ZonosCountryFlag, keyof ZonosCountryFlagAttributes> & { [K in keyof ZonosCountryFlag & keyof ZonosCountryFlagAttributes]?: ZonosCountryFlag[K] } & { [K in keyof ZonosCountryFlag & keyof ZonosCountryFlagAttributes as `attr:${K}`]?: ZonosCountryFlagAttributes[K] } & { [K in keyof ZonosCountryFlag & keyof ZonosCountryFlagAttributes as `prop:${K}`]?: ZonosCountryFlag[K] };
         "zonos-country-select": ZonosCountrySelect;
         "zonos-currency-toggle": ZonosCurrencyToggle;
-        "zonos-custom-address": ZonosCustomAddress;
-        "zonos-custom-message": ZonosCustomMessage;
-        "zonos-customer-info": ZonosCustomerInfo;
-        "zonos-dialog": ZonosDialog;
-        "zonos-empty-state-payment": ZonosEmptyStatePayment;
-        "zonos-h-stack": ZonosHStack;
-        "zonos-hello": ZonosHello;
-        "zonos-hello-dialog": ZonosHelloDialog;
+        "zonos-custom-address": Omit<ZonosCustomAddress, keyof ZonosCustomAddressAttributes> & { [K in keyof ZonosCustomAddress & keyof ZonosCustomAddressAttributes]?: ZonosCustomAddress[K] } & { [K in keyof ZonosCustomAddress & keyof ZonosCustomAddressAttributes as `attr:${K}`]?: ZonosCustomAddressAttributes[K] } & { [K in keyof ZonosCustomAddress & keyof ZonosCustomAddressAttributes as `prop:${K}`]?: ZonosCustomAddress[K] } & OneOf<"type", ZonosCustomAddress["type"], ZonosCustomAddressAttributes["type"]> & OneOf<"titleText", ZonosCustomAddress["titleText"], ZonosCustomAddressAttributes["titleText"]>;
+        "zonos-custom-message": Omit<ZonosCustomMessage, keyof ZonosCustomMessageAttributes> & { [K in keyof ZonosCustomMessage & keyof ZonosCustomMessageAttributes]?: ZonosCustomMessage[K] } & { [K in keyof ZonosCustomMessage & keyof ZonosCustomMessageAttributes as `attr:${K}`]?: ZonosCustomMessageAttributes[K] } & { [K in keyof ZonosCustomMessage & keyof ZonosCustomMessageAttributes as `prop:${K}`]?: ZonosCustomMessage[K] };
+        "zonos-customer-info": Omit<ZonosCustomerInfo, keyof ZonosCustomerInfoAttributes> & { [K in keyof ZonosCustomerInfo & keyof ZonosCustomerInfoAttributes]?: ZonosCustomerInfo[K] } & { [K in keyof ZonosCustomerInfo & keyof ZonosCustomerInfoAttributes as `attr:${K}`]?: ZonosCustomerInfoAttributes[K] } & { [K in keyof ZonosCustomerInfo & keyof ZonosCustomerInfoAttributes as `prop:${K}`]?: ZonosCustomerInfo[K] };
+        "zonos-dialog": Omit<ZonosDialog, keyof ZonosDialogAttributes> & { [K in keyof ZonosDialog & keyof ZonosDialogAttributes]?: ZonosDialog[K] } & { [K in keyof ZonosDialog & keyof ZonosDialogAttributes as `attr:${K}`]?: ZonosDialogAttributes[K] } & { [K in keyof ZonosDialog & keyof ZonosDialogAttributes as `prop:${K}`]?: ZonosDialog[K] };
+        "zonos-empty-state-payment": Omit<ZonosEmptyStatePayment, keyof ZonosEmptyStatePaymentAttributes> & { [K in keyof ZonosEmptyStatePayment & keyof ZonosEmptyStatePaymentAttributes]?: ZonosEmptyStatePayment[K] } & { [K in keyof ZonosEmptyStatePayment & keyof ZonosEmptyStatePaymentAttributes as `attr:${K}`]?: ZonosEmptyStatePaymentAttributes[K] } & { [K in keyof ZonosEmptyStatePayment & keyof ZonosEmptyStatePaymentAttributes as `prop:${K}`]?: ZonosEmptyStatePayment[K] } & OneOf<"emptyStateText", ZonosEmptyStatePayment["emptyStateText"], ZonosEmptyStatePaymentAttributes["emptyStateText"]>;
+        "zonos-h-stack": Omit<ZonosHStack, keyof ZonosHStackAttributes> & { [K in keyof ZonosHStack & keyof ZonosHStackAttributes]?: ZonosHStack[K] } & { [K in keyof ZonosHStack & keyof ZonosHStackAttributes as `attr:${K}`]?: ZonosHStackAttributes[K] } & { [K in keyof ZonosHStack & keyof ZonosHStackAttributes as `prop:${K}`]?: ZonosHStack[K] };
+        "zonos-hello": Omit<ZonosHello, keyof ZonosHelloAttributes> & { [K in keyof ZonosHello & keyof ZonosHelloAttributes]?: ZonosHello[K] } & { [K in keyof ZonosHello & keyof ZonosHelloAttributes as `attr:${K}`]?: ZonosHelloAttributes[K] } & { [K in keyof ZonosHello & keyof ZonosHelloAttributes as `prop:${K}`]?: ZonosHello[K] };
+        "zonos-hello-dialog": Omit<ZonosHelloDialog, keyof ZonosHelloDialogAttributes> & { [K in keyof ZonosHelloDialog & keyof ZonosHelloDialogAttributes]?: ZonosHelloDialog[K] } & { [K in keyof ZonosHelloDialog & keyof ZonosHelloDialogAttributes as `attr:${K}`]?: ZonosHelloDialogAttributes[K] } & { [K in keyof ZonosHelloDialog & keyof ZonosHelloDialogAttributes as `prop:${K}`]?: ZonosHelloDialog[K] };
         "zonos-hello-dialog-footer": ZonosHelloDialogFooter;
-        "zonos-icon": ZonosIcon;
-        "zonos-input": ZonosInput;
-        "zonos-invoice": ZonosInvoice;
-        "zonos-invoice-cart-items": ZonosInvoiceCartItems;
-        "zonos-invoice-finish": ZonosInvoiceFinish;
-        "zonos-invoice-footer": ZonosInvoiceFooter;
-        "zonos-invoice-order-details": ZonosInvoiceOrderDetails;
-        "zonos-invoice-payment": ZonosInvoicePayment;
-        "zonos-invoice-review": ZonosInvoiceReview;
-        "zonos-invoice-subtotal": ZonosInvoiceSubtotal;
+        "zonos-icon": Omit<ZonosIcon, keyof ZonosIconAttributes> & { [K in keyof ZonosIcon & keyof ZonosIconAttributes]?: ZonosIcon[K] } & { [K in keyof ZonosIcon & keyof ZonosIconAttributes as `attr:${K}`]?: ZonosIconAttributes[K] } & { [K in keyof ZonosIcon & keyof ZonosIconAttributes as `prop:${K}`]?: ZonosIcon[K] } & OneOf<"content", ZonosIcon["content"], ZonosIconAttributes["content"]>;
+        "zonos-input": Omit<ZonosInput, keyof ZonosInputAttributes> & { [K in keyof ZonosInput & keyof ZonosInputAttributes]?: ZonosInput[K] } & { [K in keyof ZonosInput & keyof ZonosInputAttributes as `attr:${K}`]?: ZonosInputAttributes[K] } & { [K in keyof ZonosInput & keyof ZonosInputAttributes as `prop:${K}`]?: ZonosInput[K] } & OneOf<"inputLabel", ZonosInput["inputLabel"], ZonosInputAttributes["inputLabel"]>;
+        "zonos-invoice": Omit<ZonosInvoice, keyof ZonosInvoiceAttributes> & { [K in keyof ZonosInvoice & keyof ZonosInvoiceAttributes]?: ZonosInvoice[K] } & { [K in keyof ZonosInvoice & keyof ZonosInvoiceAttributes as `attr:${K}`]?: ZonosInvoiceAttributes[K] } & { [K in keyof ZonosInvoice & keyof ZonosInvoiceAttributes as `prop:${K}`]?: ZonosInvoice[K] };
+        "zonos-invoice-cart-items": Omit<ZonosInvoiceCartItems, keyof ZonosInvoiceCartItemsAttributes> & { [K in keyof ZonosInvoiceCartItems & keyof ZonosInvoiceCartItemsAttributes]?: ZonosInvoiceCartItems[K] } & { [K in keyof ZonosInvoiceCartItems & keyof ZonosInvoiceCartItemsAttributes as `attr:${K}`]?: ZonosInvoiceCartItemsAttributes[K] } & { [K in keyof ZonosInvoiceCartItems & keyof ZonosInvoiceCartItemsAttributes as `prop:${K}`]?: ZonosInvoiceCartItems[K] };
+        "zonos-invoice-finish": Omit<ZonosInvoiceFinish, keyof ZonosInvoiceFinishAttributes> & { [K in keyof ZonosInvoiceFinish & keyof ZonosInvoiceFinishAttributes]?: ZonosInvoiceFinish[K] } & { [K in keyof ZonosInvoiceFinish & keyof ZonosInvoiceFinishAttributes as `attr:${K}`]?: ZonosInvoiceFinishAttributes[K] } & { [K in keyof ZonosInvoiceFinish & keyof ZonosInvoiceFinishAttributes as `prop:${K}`]?: ZonosInvoiceFinish[K] };
+        "zonos-invoice-footer": Omit<ZonosInvoiceFooter, keyof ZonosInvoiceFooterAttributes> & { [K in keyof ZonosInvoiceFooter & keyof ZonosInvoiceFooterAttributes]?: ZonosInvoiceFooter[K] } & { [K in keyof ZonosInvoiceFooter & keyof ZonosInvoiceFooterAttributes as `attr:${K}`]?: ZonosInvoiceFooterAttributes[K] } & { [K in keyof ZonosInvoiceFooter & keyof ZonosInvoiceFooterAttributes as `prop:${K}`]?: ZonosInvoiceFooter[K] };
+        "zonos-invoice-order-details": Omit<ZonosInvoiceOrderDetails, keyof ZonosInvoiceOrderDetailsAttributes> & { [K in keyof ZonosInvoiceOrderDetails & keyof ZonosInvoiceOrderDetailsAttributes]?: ZonosInvoiceOrderDetails[K] } & { [K in keyof ZonosInvoiceOrderDetails & keyof ZonosInvoiceOrderDetailsAttributes as `attr:${K}`]?: ZonosInvoiceOrderDetailsAttributes[K] } & { [K in keyof ZonosInvoiceOrderDetails & keyof ZonosInvoiceOrderDetailsAttributes as `prop:${K}`]?: ZonosInvoiceOrderDetails[K] } & OneOf<"collapsed", ZonosInvoiceOrderDetails["collapsed"], ZonosInvoiceOrderDetailsAttributes["collapsed"]>;
+        "zonos-invoice-payment": Omit<ZonosInvoicePayment, keyof ZonosInvoicePaymentAttributes> & { [K in keyof ZonosInvoicePayment & keyof ZonosInvoicePaymentAttributes]?: ZonosInvoicePayment[K] } & { [K in keyof ZonosInvoicePayment & keyof ZonosInvoicePaymentAttributes as `attr:${K}`]?: ZonosInvoicePaymentAttributes[K] } & { [K in keyof ZonosInvoicePayment & keyof ZonosInvoicePaymentAttributes as `prop:${K}`]?: ZonosInvoicePayment[K] };
+        "zonos-invoice-review": Omit<ZonosInvoiceReview, keyof ZonosInvoiceReviewAttributes> & { [K in keyof ZonosInvoiceReview & keyof ZonosInvoiceReviewAttributes]?: ZonosInvoiceReview[K] } & { [K in keyof ZonosInvoiceReview & keyof ZonosInvoiceReviewAttributes as `attr:${K}`]?: ZonosInvoiceReviewAttributes[K] } & { [K in keyof ZonosInvoiceReview & keyof ZonosInvoiceReviewAttributes as `prop:${K}`]?: ZonosInvoiceReview[K] };
+        "zonos-invoice-subtotal": Omit<ZonosInvoiceSubtotal, keyof ZonosInvoiceSubtotalAttributes> & { [K in keyof ZonosInvoiceSubtotal & keyof ZonosInvoiceSubtotalAttributes]?: ZonosInvoiceSubtotal[K] } & { [K in keyof ZonosInvoiceSubtotal & keyof ZonosInvoiceSubtotalAttributes as `attr:${K}`]?: ZonosInvoiceSubtotalAttributes[K] } & { [K in keyof ZonosInvoiceSubtotal & keyof ZonosInvoiceSubtotalAttributes as `prop:${K}`]?: ZonosInvoiceSubtotal[K] };
         "zonos-language-select": ZonosLanguageSelect;
-        "zonos-link": ZonosLink;
-        "zonos-link-authentication": ZonosLinkAuthentication;
-        "zonos-loading-overlay": ZonosLoadingOverlay;
-        "zonos-logo": ZonosLogo;
+        "zonos-link": Omit<ZonosLink, keyof ZonosLinkAttributes> & { [K in keyof ZonosLink & keyof ZonosLinkAttributes]?: ZonosLink[K] } & { [K in keyof ZonosLink & keyof ZonosLinkAttributes as `attr:${K}`]?: ZonosLinkAttributes[K] } & { [K in keyof ZonosLink & keyof ZonosLinkAttributes as `prop:${K}`]?: ZonosLink[K] };
+        "zonos-link-authentication": Omit<ZonosLinkAuthentication, keyof ZonosLinkAuthenticationAttributes> & { [K in keyof ZonosLinkAuthentication & keyof ZonosLinkAuthenticationAttributes]?: ZonosLinkAuthentication[K] } & { [K in keyof ZonosLinkAuthentication & keyof ZonosLinkAuthenticationAttributes as `attr:${K}`]?: ZonosLinkAuthenticationAttributes[K] } & { [K in keyof ZonosLinkAuthentication & keyof ZonosLinkAuthenticationAttributes as `prop:${K}`]?: ZonosLinkAuthentication[K] } & OneOf<"titleText", ZonosLinkAuthentication["titleText"], ZonosLinkAuthenticationAttributes["titleText"]>;
+        "zonos-loading-overlay": Omit<ZonosLoadingOverlay, keyof ZonosLoadingOverlayAttributes> & { [K in keyof ZonosLoadingOverlay & keyof ZonosLoadingOverlayAttributes]?: ZonosLoadingOverlay[K] } & { [K in keyof ZonosLoadingOverlay & keyof ZonosLoadingOverlayAttributes as `attr:${K}`]?: ZonosLoadingOverlayAttributes[K] } & { [K in keyof ZonosLoadingOverlay & keyof ZonosLoadingOverlayAttributes as `prop:${K}`]?: ZonosLoadingOverlay[K] };
+        "zonos-logo": Omit<ZonosLogo, keyof ZonosLogoAttributes> & { [K in keyof ZonosLogo & keyof ZonosLogoAttributes]?: ZonosLogo[K] } & { [K in keyof ZonosLogo & keyof ZonosLogoAttributes as `attr:${K}`]?: ZonosLogoAttributes[K] } & { [K in keyof ZonosLogo & keyof ZonosLogoAttributes as `prop:${K}`]?: ZonosLogo[K] };
         "zonos-notification": ZonosNotification;
-        "zonos-payment": ZonosPayment;
+        "zonos-payment": Omit<ZonosPayment, keyof ZonosPaymentAttributes> & { [K in keyof ZonosPayment & keyof ZonosPaymentAttributes]?: ZonosPayment[K] } & { [K in keyof ZonosPayment & keyof ZonosPaymentAttributes as `attr:${K}`]?: ZonosPaymentAttributes[K] } & { [K in keyof ZonosPayment & keyof ZonosPaymentAttributes as `prop:${K}`]?: ZonosPayment[K] };
         "zonos-paypal-payment": ZonosPaypalPayment;
-        "zonos-rest-state": ZonosRestState;
-        "zonos-review": ZonosReview;
-        "zonos-select-dialog-header": ZonosSelectDialogHeader;
-        "zonos-shipping": ZonosShipping;
-        "zonos-shipping-rich-radio": ZonosShippingRichRadio;
-        "zonos-skeleton": ZonosSkeleton;
-        "zonos-spinner": ZonosSpinner;
-        "zonos-store-credit": ZonosStoreCredit;
-        "zonos-stripe-input": ZonosStripeInput;
-        "zonos-stripe-phone-input": ZonosStripePhoneInput;
-        "zonos-stripe-select": ZonosStripeSelect;
-        "zonos-text": ZonosText;
-        "zonos-toggle": ZonosToggle;
-        "zonos-tooltip": ZonosTooltip;
-        "zonos-v-stack": ZonosVStack;
-        "zonos-virtual-scroll": ZonosVirtualScroll;
+        "zonos-policy-consent": ZonosPolicyConsent;
+        "zonos-rest-state": Omit<ZonosRestState, keyof ZonosRestStateAttributes> & { [K in keyof ZonosRestState & keyof ZonosRestStateAttributes]?: ZonosRestState[K] } & { [K in keyof ZonosRestState & keyof ZonosRestStateAttributes as `attr:${K}`]?: ZonosRestStateAttributes[K] } & { [K in keyof ZonosRestState & keyof ZonosRestStateAttributes as `prop:${K}`]?: ZonosRestState[K] } & OneOf<"restStateSubtitle", ZonosRestState["restStateSubtitle"], ZonosRestStateAttributes["restStateSubtitle"]> & OneOf<"restStateTitle", ZonosRestState["restStateTitle"], ZonosRestStateAttributes["restStateTitle"]> & OneOf<"restStateType", ZonosRestState["restStateType"], ZonosRestStateAttributes["restStateType"]>;
+        "zonos-review": Omit<ZonosReview, keyof ZonosReviewAttributes> & { [K in keyof ZonosReview & keyof ZonosReviewAttributes]?: ZonosReview[K] } & { [K in keyof ZonosReview & keyof ZonosReviewAttributes as `attr:${K}`]?: ZonosReviewAttributes[K] } & { [K in keyof ZonosReview & keyof ZonosReviewAttributes as `prop:${K}`]?: ZonosReview[K] };
+        "zonos-select-dialog-header": Omit<ZonosSelectDialogHeader, keyof ZonosSelectDialogHeaderAttributes> & { [K in keyof ZonosSelectDialogHeader & keyof ZonosSelectDialogHeaderAttributes]?: ZonosSelectDialogHeader[K] } & { [K in keyof ZonosSelectDialogHeader & keyof ZonosSelectDialogHeaderAttributes as `attr:${K}`]?: ZonosSelectDialogHeaderAttributes[K] } & { [K in keyof ZonosSelectDialogHeader & keyof ZonosSelectDialogHeaderAttributes as `prop:${K}`]?: ZonosSelectDialogHeader[K] };
+        "zonos-shipping": Omit<ZonosShipping, keyof ZonosShippingAttributes> & { [K in keyof ZonosShipping & keyof ZonosShippingAttributes]?: ZonosShipping[K] } & { [K in keyof ZonosShipping & keyof ZonosShippingAttributes as `attr:${K}`]?: ZonosShippingAttributes[K] } & { [K in keyof ZonosShipping & keyof ZonosShippingAttributes as `prop:${K}`]?: ZonosShipping[K] } & OneOf<"isMobile", ZonosShipping["isMobile"], ZonosShippingAttributes["isMobile"]>;
+        "zonos-shipping-rich-radio": Omit<ZonosShippingRichRadio, keyof ZonosShippingRichRadioAttributes> & { [K in keyof ZonosShippingRichRadio & keyof ZonosShippingRichRadioAttributes]?: ZonosShippingRichRadio[K] } & { [K in keyof ZonosShippingRichRadio & keyof ZonosShippingRichRadioAttributes as `attr:${K}`]?: ZonosShippingRichRadioAttributes[K] } & { [K in keyof ZonosShippingRichRadio & keyof ZonosShippingRichRadioAttributes as `prop:${K}`]?: ZonosShippingRichRadio[K] } & OneOf<"isMobile", ZonosShippingRichRadio["isMobile"], ZonosShippingRichRadioAttributes["isMobile"]>;
+        "zonos-skeleton": Omit<ZonosSkeleton, keyof ZonosSkeletonAttributes> & { [K in keyof ZonosSkeleton & keyof ZonosSkeletonAttributes]?: ZonosSkeleton[K] } & { [K in keyof ZonosSkeleton & keyof ZonosSkeletonAttributes as `attr:${K}`]?: ZonosSkeletonAttributes[K] } & { [K in keyof ZonosSkeleton & keyof ZonosSkeletonAttributes as `prop:${K}`]?: ZonosSkeleton[K] };
+        "zonos-spinner": Omit<ZonosSpinner, keyof ZonosSpinnerAttributes> & { [K in keyof ZonosSpinner & keyof ZonosSpinnerAttributes]?: ZonosSpinner[K] } & { [K in keyof ZonosSpinner & keyof ZonosSpinnerAttributes as `attr:${K}`]?: ZonosSpinnerAttributes[K] } & { [K in keyof ZonosSpinner & keyof ZonosSpinnerAttributes as `prop:${K}`]?: ZonosSpinner[K] };
+        "zonos-store-credit": Omit<ZonosStoreCredit, keyof ZonosStoreCreditAttributes> & { [K in keyof ZonosStoreCredit & keyof ZonosStoreCreditAttributes]?: ZonosStoreCredit[K] } & { [K in keyof ZonosStoreCredit & keyof ZonosStoreCreditAttributes as `attr:${K}`]?: ZonosStoreCreditAttributes[K] } & { [K in keyof ZonosStoreCredit & keyof ZonosStoreCreditAttributes as `prop:${K}`]?: ZonosStoreCredit[K] };
+        "zonos-stripe-input": Omit<ZonosStripeInput, keyof ZonosStripeInputAttributes> & { [K in keyof ZonosStripeInput & keyof ZonosStripeInputAttributes]?: ZonosStripeInput[K] } & { [K in keyof ZonosStripeInput & keyof ZonosStripeInputAttributes as `attr:${K}`]?: ZonosStripeInputAttributes[K] } & { [K in keyof ZonosStripeInput & keyof ZonosStripeInputAttributes as `prop:${K}`]?: ZonosStripeInput[K] } & OneOf<"inputLabel", ZonosStripeInput["inputLabel"], ZonosStripeInputAttributes["inputLabel"]>;
+        "zonos-stripe-phone-input": Omit<ZonosStripePhoneInput, keyof ZonosStripePhoneInputAttributes> & { [K in keyof ZonosStripePhoneInput & keyof ZonosStripePhoneInputAttributes]?: ZonosStripePhoneInput[K] } & { [K in keyof ZonosStripePhoneInput & keyof ZonosStripePhoneInputAttributes as `attr:${K}`]?: ZonosStripePhoneInputAttributes[K] } & { [K in keyof ZonosStripePhoneInput & keyof ZonosStripePhoneInputAttributes as `prop:${K}`]?: ZonosStripePhoneInput[K] };
+        "zonos-stripe-select": Omit<ZonosStripeSelect, keyof ZonosStripeSelectAttributes> & { [K in keyof ZonosStripeSelect & keyof ZonosStripeSelectAttributes]?: ZonosStripeSelect[K] } & { [K in keyof ZonosStripeSelect & keyof ZonosStripeSelectAttributes as `attr:${K}`]?: ZonosStripeSelectAttributes[K] } & { [K in keyof ZonosStripeSelect & keyof ZonosStripeSelectAttributes as `prop:${K}`]?: ZonosStripeSelect[K] } & OneOf<"selectLabel", ZonosStripeSelect["selectLabel"], ZonosStripeSelectAttributes["selectLabel"]>;
+        "zonos-text": Omit<ZonosText, keyof ZonosTextAttributes> & { [K in keyof ZonosText & keyof ZonosTextAttributes]?: ZonosText[K] } & { [K in keyof ZonosText & keyof ZonosTextAttributes as `attr:${K}`]?: ZonosTextAttributes[K] } & { [K in keyof ZonosText & keyof ZonosTextAttributes as `prop:${K}`]?: ZonosText[K] };
+        "zonos-toggle": Omit<ZonosToggle, keyof ZonosToggleAttributes> & { [K in keyof ZonosToggle & keyof ZonosToggleAttributes]?: ZonosToggle[K] } & { [K in keyof ZonosToggle & keyof ZonosToggleAttributes as `attr:${K}`]?: ZonosToggleAttributes[K] } & { [K in keyof ZonosToggle & keyof ZonosToggleAttributes as `prop:${K}`]?: ZonosToggle[K] } & OneOf<"value", ZonosToggle["value"], ZonosToggleAttributes["value"]>;
+        "zonos-tooltip": Omit<ZonosTooltip, keyof ZonosTooltipAttributes> & { [K in keyof ZonosTooltip & keyof ZonosTooltipAttributes]?: ZonosTooltip[K] } & { [K in keyof ZonosTooltip & keyof ZonosTooltipAttributes as `attr:${K}`]?: ZonosTooltipAttributes[K] } & { [K in keyof ZonosTooltip & keyof ZonosTooltipAttributes as `prop:${K}`]?: ZonosTooltip[K] };
+        "zonos-v-stack": Omit<ZonosVStack, keyof ZonosVStackAttributes> & { [K in keyof ZonosVStack & keyof ZonosVStackAttributes]?: ZonosVStack[K] } & { [K in keyof ZonosVStack & keyof ZonosVStackAttributes as `attr:${K}`]?: ZonosVStackAttributes[K] } & { [K in keyof ZonosVStack & keyof ZonosVStackAttributes as `prop:${K}`]?: ZonosVStack[K] };
+        "zonos-virtual-scroll": Omit<ZonosVirtualScroll, keyof ZonosVirtualScrollAttributes> & { [K in keyof ZonosVirtualScroll & keyof ZonosVirtualScrollAttributes]?: ZonosVirtualScroll[K] } & { [K in keyof ZonosVirtualScroll & keyof ZonosVirtualScrollAttributes as `attr:${K}`]?: ZonosVirtualScrollAttributes[K] } & { [K in keyof ZonosVirtualScroll & keyof ZonosVirtualScrollAttributes as `prop:${K}`]?: ZonosVirtualScroll[K] } & OneOf<"fallbackItemHeight", ZonosVirtualScroll["fallbackItemHeight"], ZonosVirtualScrollAttributes["fallbackItemHeight"]>;
     }
 }
 
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "zonos-address": LocalJSX.ZonosAddress & JSXBase.HTMLAttributes<HTMLZonosAddressElement>;
-            "zonos-address-display": LocalJSX.ZonosAddressDisplay & JSXBase.HTMLAttributes<HTMLZonosAddressDisplayElement>;
-            "zonos-address-form": LocalJSX.ZonosAddressForm & JSXBase.HTMLAttributes<HTMLZonosAddressFormElement>;
-            "zonos-address-suggestions": LocalJSX.ZonosAddressSuggestions & JSXBase.HTMLAttributes<HTMLZonosAddressSuggestionsElement>;
-            "zonos-address-update-dialog": LocalJSX.ZonosAddressUpdateDialog & JSXBase.HTMLAttributes<HTMLZonosAddressUpdateDialogElement>;
-            "zonos-badge": LocalJSX.ZonosBadge & JSXBase.HTMLAttributes<HTMLZonosBadgeElement>;
-            "zonos-banner": LocalJSX.ZonosBanner & JSXBase.HTMLAttributes<HTMLZonosBannerElement>;
-            "zonos-button": LocalJSX.ZonosButton & JSXBase.HTMLAttributes<HTMLZonosButtonElement>;
-            "zonos-card": LocalJSX.ZonosCard & JSXBase.HTMLAttributes<HTMLZonosCardElement>;
-            "zonos-cart-items": LocalJSX.ZonosCartItems & JSXBase.HTMLAttributes<HTMLZonosCartItemsElement>;
-            "zonos-cart-restricted-items": LocalJSX.ZonosCartRestrictedItems & JSXBase.HTMLAttributes<HTMLZonosCartRestrictedItemsElement>;
-            "zonos-cart-subtotal": LocalJSX.ZonosCartSubtotal & JSXBase.HTMLAttributes<HTMLZonosCartSubtotalElement>;
-            "zonos-checkbox": LocalJSX.ZonosCheckbox & JSXBase.HTMLAttributes<HTMLZonosCheckboxElement>;
-            "zonos-checkout": LocalJSX.ZonosCheckout & JSXBase.HTMLAttributes<HTMLZonosCheckoutElement>;
-            "zonos-checkout-finish": LocalJSX.ZonosCheckoutFinish & JSXBase.HTMLAttributes<HTMLZonosCheckoutFinishElement>;
-            "zonos-checkout-footer": LocalJSX.ZonosCheckoutFooter & JSXBase.HTMLAttributes<HTMLZonosCheckoutFooterElement>;
-            "zonos-checkout-payment": LocalJSX.ZonosCheckoutPayment & JSXBase.HTMLAttributes<HTMLZonosCheckoutPaymentElement>;
-            "zonos-checkout-progress-tabs": LocalJSX.ZonosCheckoutProgressTabs & JSXBase.HTMLAttributes<HTMLZonosCheckoutProgressTabsElement>;
-            "zonos-collapse": LocalJSX.ZonosCollapse & JSXBase.HTMLAttributes<HTMLZonosCollapseElement>;
-            "zonos-collect": LocalJSX.ZonosCollect & JSXBase.HTMLAttributes<HTMLZonosCollectElement>;
-            "zonos-collect-cart-items": LocalJSX.ZonosCollectCartItems & JSXBase.HTMLAttributes<HTMLZonosCollectCartItemsElement>;
-            "zonos-collect-finish": LocalJSX.ZonosCollectFinish & JSXBase.HTMLAttributes<HTMLZonosCollectFinishElement>;
-            "zonos-collect-footer": LocalJSX.ZonosCollectFooter & JSXBase.HTMLAttributes<HTMLZonosCollectFooterElement>;
-            "zonos-collect-order-details": LocalJSX.ZonosCollectOrderDetails & JSXBase.HTMLAttributes<HTMLZonosCollectOrderDetailsElement>;
-            "zonos-collect-payment": LocalJSX.ZonosCollectPayment & JSXBase.HTMLAttributes<HTMLZonosCollectPaymentElement>;
-            "zonos-collect-review": LocalJSX.ZonosCollectReview & JSXBase.HTMLAttributes<HTMLZonosCollectReviewElement>;
-            "zonos-collect-subtotal": LocalJSX.ZonosCollectSubtotal & JSXBase.HTMLAttributes<HTMLZonosCollectSubtotalElement>;
-            "zonos-component": LocalJSX.ZonosComponent & JSXBase.HTMLAttributes<HTMLZonosComponentElement>;
-            "zonos-confirm-dialog": LocalJSX.ZonosConfirmDialog & JSXBase.HTMLAttributes<HTMLZonosConfirmDialogElement>;
-            "zonos-controller": LocalJSX.ZonosController & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
-            "zonos-country-flag": LocalJSX.ZonosCountryFlag & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
-            "zonos-country-select": LocalJSX.ZonosCountrySelect & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
-            "zonos-currency-toggle": LocalJSX.ZonosCurrencyToggle & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
-            "zonos-custom-address": LocalJSX.ZonosCustomAddress & JSXBase.HTMLAttributes<HTMLZonosCustomAddressElement>;
-            "zonos-custom-message": LocalJSX.ZonosCustomMessage & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
-            "zonos-customer-info": LocalJSX.ZonosCustomerInfo & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
-            "zonos-dialog": LocalJSX.ZonosDialog & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
-            "zonos-empty-state-payment": LocalJSX.ZonosEmptyStatePayment & JSXBase.HTMLAttributes<HTMLZonosEmptyStatePaymentElement>;
-            "zonos-h-stack": LocalJSX.ZonosHStack & JSXBase.HTMLAttributes<HTMLZonosHStackElement>;
-            "zonos-hello": LocalJSX.ZonosHello & JSXBase.HTMLAttributes<HTMLZonosHelloElement>;
-            "zonos-hello-dialog": LocalJSX.ZonosHelloDialog & JSXBase.HTMLAttributes<HTMLZonosHelloDialogElement>;
-            "zonos-hello-dialog-footer": LocalJSX.ZonosHelloDialogFooter & JSXBase.HTMLAttributes<HTMLZonosHelloDialogFooterElement>;
-            "zonos-icon": LocalJSX.ZonosIcon & JSXBase.HTMLAttributes<HTMLZonosIconElement>;
-            "zonos-input": LocalJSX.ZonosInput & JSXBase.HTMLAttributes<HTMLZonosInputElement>;
-            "zonos-invoice": LocalJSX.ZonosInvoice & JSXBase.HTMLAttributes<HTMLZonosInvoiceElement>;
-            "zonos-invoice-cart-items": LocalJSX.ZonosInvoiceCartItems & JSXBase.HTMLAttributes<HTMLZonosInvoiceCartItemsElement>;
-            "zonos-invoice-finish": LocalJSX.ZonosInvoiceFinish & JSXBase.HTMLAttributes<HTMLZonosInvoiceFinishElement>;
-            "zonos-invoice-footer": LocalJSX.ZonosInvoiceFooter & JSXBase.HTMLAttributes<HTMLZonosInvoiceFooterElement>;
-            "zonos-invoice-order-details": LocalJSX.ZonosInvoiceOrderDetails & JSXBase.HTMLAttributes<HTMLZonosInvoiceOrderDetailsElement>;
-            "zonos-invoice-payment": LocalJSX.ZonosInvoicePayment & JSXBase.HTMLAttributes<HTMLZonosInvoicePaymentElement>;
-            "zonos-invoice-review": LocalJSX.ZonosInvoiceReview & JSXBase.HTMLAttributes<HTMLZonosInvoiceReviewElement>;
-            "zonos-invoice-subtotal": LocalJSX.ZonosInvoiceSubtotal & JSXBase.HTMLAttributes<HTMLZonosInvoiceSubtotalElement>;
-            "zonos-language-select": LocalJSX.ZonosLanguageSelect & JSXBase.HTMLAttributes<HTMLZonosLanguageSelectElement>;
-            "zonos-link": LocalJSX.ZonosLink & JSXBase.HTMLAttributes<HTMLZonosLinkElement>;
-            "zonos-link-authentication": LocalJSX.ZonosLinkAuthentication & JSXBase.HTMLAttributes<HTMLZonosLinkAuthenticationElement>;
-            "zonos-loading-overlay": LocalJSX.ZonosLoadingOverlay & JSXBase.HTMLAttributes<HTMLZonosLoadingOverlayElement>;
-            "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
-            "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
-            "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
-            "zonos-paypal-payment": LocalJSX.ZonosPaypalPayment & JSXBase.HTMLAttributes<HTMLZonosPaypalPaymentElement>;
-            "zonos-rest-state": LocalJSX.ZonosRestState & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
-            "zonos-review": LocalJSX.ZonosReview & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
-            "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
-            "zonos-shipping": LocalJSX.ZonosShipping & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
-            "zonos-shipping-rich-radio": LocalJSX.ZonosShippingRichRadio & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
-            "zonos-skeleton": LocalJSX.ZonosSkeleton & JSXBase.HTMLAttributes<HTMLZonosSkeletonElement>;
-            "zonos-spinner": LocalJSX.ZonosSpinner & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
-            "zonos-store-credit": LocalJSX.ZonosStoreCredit & JSXBase.HTMLAttributes<HTMLZonosStoreCreditElement>;
+            "zonos-address": LocalJSX.IntrinsicElements["zonos-address"] & JSXBase.HTMLAttributes<HTMLZonosAddressElement>;
+            "zonos-address-completion-dialog": LocalJSX.IntrinsicElements["zonos-address-completion-dialog"] & JSXBase.HTMLAttributes<HTMLZonosAddressCompletionDialogElement>;
+            "zonos-address-display": LocalJSX.IntrinsicElements["zonos-address-display"] & JSXBase.HTMLAttributes<HTMLZonosAddressDisplayElement>;
+            "zonos-address-form": LocalJSX.IntrinsicElements["zonos-address-form"] & JSXBase.HTMLAttributes<HTMLZonosAddressFormElement>;
+            "zonos-address-suggestions": LocalJSX.IntrinsicElements["zonos-address-suggestions"] & JSXBase.HTMLAttributes<HTMLZonosAddressSuggestionsElement>;
+            "zonos-address-update-dialog": LocalJSX.IntrinsicElements["zonos-address-update-dialog"] & JSXBase.HTMLAttributes<HTMLZonosAddressUpdateDialogElement>;
+            "zonos-airwallex-payment": LocalJSX.IntrinsicElements["zonos-airwallex-payment"] & JSXBase.HTMLAttributes<HTMLZonosAirwallexPaymentElement>;
+            "zonos-badge": LocalJSX.IntrinsicElements["zonos-badge"] & JSXBase.HTMLAttributes<HTMLZonosBadgeElement>;
+            "zonos-banner": LocalJSX.IntrinsicElements["zonos-banner"] & JSXBase.HTMLAttributes<HTMLZonosBannerElement>;
+            "zonos-button": LocalJSX.IntrinsicElements["zonos-button"] & JSXBase.HTMLAttributes<HTMLZonosButtonElement>;
+            "zonos-card": LocalJSX.IntrinsicElements["zonos-card"] & JSXBase.HTMLAttributes<HTMLZonosCardElement>;
+            "zonos-cart-items": LocalJSX.IntrinsicElements["zonos-cart-items"] & JSXBase.HTMLAttributes<HTMLZonosCartItemsElement>;
+            "zonos-cart-restricted-items": LocalJSX.IntrinsicElements["zonos-cart-restricted-items"] & JSXBase.HTMLAttributes<HTMLZonosCartRestrictedItemsElement>;
+            "zonos-cart-subtotal": LocalJSX.IntrinsicElements["zonos-cart-subtotal"] & JSXBase.HTMLAttributes<HTMLZonosCartSubtotalElement>;
+            "zonos-checkbox": LocalJSX.IntrinsicElements["zonos-checkbox"] & JSXBase.HTMLAttributes<HTMLZonosCheckboxElement>;
+            "zonos-checkout": LocalJSX.IntrinsicElements["zonos-checkout"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutElement>;
+            "zonos-checkout-finish": LocalJSX.IntrinsicElements["zonos-checkout-finish"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutFinishElement>;
+            "zonos-checkout-footer": LocalJSX.IntrinsicElements["zonos-checkout-footer"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutFooterElement>;
+            "zonos-checkout-payment": LocalJSX.IntrinsicElements["zonos-checkout-payment"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutPaymentElement>;
+            "zonos-checkout-progress-tabs": LocalJSX.IntrinsicElements["zonos-checkout-progress-tabs"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutProgressTabsElement>;
+            "zonos-collapse": LocalJSX.IntrinsicElements["zonos-collapse"] & JSXBase.HTMLAttributes<HTMLZonosCollapseElement>;
+            "zonos-collect": LocalJSX.IntrinsicElements["zonos-collect"] & JSXBase.HTMLAttributes<HTMLZonosCollectElement>;
+            "zonos-collect-cart-items": LocalJSX.IntrinsicElements["zonos-collect-cart-items"] & JSXBase.HTMLAttributes<HTMLZonosCollectCartItemsElement>;
+            "zonos-collect-finish": LocalJSX.IntrinsicElements["zonos-collect-finish"] & JSXBase.HTMLAttributes<HTMLZonosCollectFinishElement>;
+            "zonos-collect-footer": LocalJSX.IntrinsicElements["zonos-collect-footer"] & JSXBase.HTMLAttributes<HTMLZonosCollectFooterElement>;
+            "zonos-collect-order-details": LocalJSX.IntrinsicElements["zonos-collect-order-details"] & JSXBase.HTMLAttributes<HTMLZonosCollectOrderDetailsElement>;
+            "zonos-collect-payment": LocalJSX.IntrinsicElements["zonos-collect-payment"] & JSXBase.HTMLAttributes<HTMLZonosCollectPaymentElement>;
+            "zonos-collect-review": LocalJSX.IntrinsicElements["zonos-collect-review"] & JSXBase.HTMLAttributes<HTMLZonosCollectReviewElement>;
+            "zonos-collect-subtotal": LocalJSX.IntrinsicElements["zonos-collect-subtotal"] & JSXBase.HTMLAttributes<HTMLZonosCollectSubtotalElement>;
+            "zonos-component": LocalJSX.IntrinsicElements["zonos-component"] & JSXBase.HTMLAttributes<HTMLZonosComponentElement>;
+            "zonos-confirm-dialog": LocalJSX.IntrinsicElements["zonos-confirm-dialog"] & JSXBase.HTMLAttributes<HTMLZonosConfirmDialogElement>;
+            "zonos-controller": LocalJSX.IntrinsicElements["zonos-controller"] & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
+            "zonos-country-flag": LocalJSX.IntrinsicElements["zonos-country-flag"] & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
+            "zonos-country-select": LocalJSX.IntrinsicElements["zonos-country-select"] & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
+            "zonos-currency-toggle": LocalJSX.IntrinsicElements["zonos-currency-toggle"] & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
+            "zonos-custom-address": LocalJSX.IntrinsicElements["zonos-custom-address"] & JSXBase.HTMLAttributes<HTMLZonosCustomAddressElement>;
+            "zonos-custom-message": LocalJSX.IntrinsicElements["zonos-custom-message"] & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
+            "zonos-customer-info": LocalJSX.IntrinsicElements["zonos-customer-info"] & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
+            "zonos-dialog": LocalJSX.IntrinsicElements["zonos-dialog"] & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
+            "zonos-empty-state-payment": LocalJSX.IntrinsicElements["zonos-empty-state-payment"] & JSXBase.HTMLAttributes<HTMLZonosEmptyStatePaymentElement>;
+            "zonos-h-stack": LocalJSX.IntrinsicElements["zonos-h-stack"] & JSXBase.HTMLAttributes<HTMLZonosHStackElement>;
+            "zonos-hello": LocalJSX.IntrinsicElements["zonos-hello"] & JSXBase.HTMLAttributes<HTMLZonosHelloElement>;
+            "zonos-hello-dialog": LocalJSX.IntrinsicElements["zonos-hello-dialog"] & JSXBase.HTMLAttributes<HTMLZonosHelloDialogElement>;
+            "zonos-hello-dialog-footer": LocalJSX.IntrinsicElements["zonos-hello-dialog-footer"] & JSXBase.HTMLAttributes<HTMLZonosHelloDialogFooterElement>;
+            "zonos-icon": LocalJSX.IntrinsicElements["zonos-icon"] & JSXBase.HTMLAttributes<HTMLZonosIconElement>;
+            "zonos-input": LocalJSX.IntrinsicElements["zonos-input"] & JSXBase.HTMLAttributes<HTMLZonosInputElement>;
+            "zonos-invoice": LocalJSX.IntrinsicElements["zonos-invoice"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceElement>;
+            "zonos-invoice-cart-items": LocalJSX.IntrinsicElements["zonos-invoice-cart-items"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceCartItemsElement>;
+            "zonos-invoice-finish": LocalJSX.IntrinsicElements["zonos-invoice-finish"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceFinishElement>;
+            "zonos-invoice-footer": LocalJSX.IntrinsicElements["zonos-invoice-footer"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceFooterElement>;
+            "zonos-invoice-order-details": LocalJSX.IntrinsicElements["zonos-invoice-order-details"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceOrderDetailsElement>;
+            "zonos-invoice-payment": LocalJSX.IntrinsicElements["zonos-invoice-payment"] & JSXBase.HTMLAttributes<HTMLZonosInvoicePaymentElement>;
+            "zonos-invoice-review": LocalJSX.IntrinsicElements["zonos-invoice-review"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceReviewElement>;
+            "zonos-invoice-subtotal": LocalJSX.IntrinsicElements["zonos-invoice-subtotal"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceSubtotalElement>;
+            "zonos-language-select": LocalJSX.IntrinsicElements["zonos-language-select"] & JSXBase.HTMLAttributes<HTMLZonosLanguageSelectElement>;
+            "zonos-link": LocalJSX.IntrinsicElements["zonos-link"] & JSXBase.HTMLAttributes<HTMLZonosLinkElement>;
+            "zonos-link-authentication": LocalJSX.IntrinsicElements["zonos-link-authentication"] & JSXBase.HTMLAttributes<HTMLZonosLinkAuthenticationElement>;
+            "zonos-loading-overlay": LocalJSX.IntrinsicElements["zonos-loading-overlay"] & JSXBase.HTMLAttributes<HTMLZonosLoadingOverlayElement>;
+            "zonos-logo": LocalJSX.IntrinsicElements["zonos-logo"] & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
+            "zonos-notification": LocalJSX.IntrinsicElements["zonos-notification"] & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
+            "zonos-payment": LocalJSX.IntrinsicElements["zonos-payment"] & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
+            "zonos-paypal-payment": LocalJSX.IntrinsicElements["zonos-paypal-payment"] & JSXBase.HTMLAttributes<HTMLZonosPaypalPaymentElement>;
+            "zonos-policy-consent": LocalJSX.IntrinsicElements["zonos-policy-consent"] & JSXBase.HTMLAttributes<HTMLZonosPolicyConsentElement>;
+            "zonos-rest-state": LocalJSX.IntrinsicElements["zonos-rest-state"] & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
+            "zonos-review": LocalJSX.IntrinsicElements["zonos-review"] & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
+            "zonos-select-dialog-header": LocalJSX.IntrinsicElements["zonos-select-dialog-header"] & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
+            "zonos-shipping": LocalJSX.IntrinsicElements["zonos-shipping"] & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
+            "zonos-shipping-rich-radio": LocalJSX.IntrinsicElements["zonos-shipping-rich-radio"] & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
+            "zonos-skeleton": LocalJSX.IntrinsicElements["zonos-skeleton"] & JSXBase.HTMLAttributes<HTMLZonosSkeletonElement>;
+            "zonos-spinner": LocalJSX.IntrinsicElements["zonos-spinner"] & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
+            "zonos-store-credit": LocalJSX.IntrinsicElements["zonos-store-credit"] & JSXBase.HTMLAttributes<HTMLZonosStoreCreditElement>;
             /**
              * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
              */
-            "zonos-stripe-input": LocalJSX.ZonosStripeInput & JSXBase.HTMLAttributes<HTMLZonosStripeInputElement>;
-            "zonos-stripe-phone-input": LocalJSX.ZonosStripePhoneInput & JSXBase.HTMLAttributes<HTMLZonosStripePhoneInputElement>;
-            "zonos-stripe-select": LocalJSX.ZonosStripeSelect & JSXBase.HTMLAttributes<HTMLZonosStripeSelectElement>;
-            "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
-            "zonos-toggle": LocalJSX.ZonosToggle & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
-            "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
-            "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
+            "zonos-stripe-input": LocalJSX.IntrinsicElements["zonos-stripe-input"] & JSXBase.HTMLAttributes<HTMLZonosStripeInputElement>;
+            "zonos-stripe-phone-input": LocalJSX.IntrinsicElements["zonos-stripe-phone-input"] & JSXBase.HTMLAttributes<HTMLZonosStripePhoneInputElement>;
+            "zonos-stripe-select": LocalJSX.IntrinsicElements["zonos-stripe-select"] & JSXBase.HTMLAttributes<HTMLZonosStripeSelectElement>;
+            "zonos-text": LocalJSX.IntrinsicElements["zonos-text"] & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
+            "zonos-toggle": LocalJSX.IntrinsicElements["zonos-toggle"] & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
+            "zonos-tooltip": LocalJSX.IntrinsicElements["zonos-tooltip"] & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
+            "zonos-v-stack": LocalJSX.IntrinsicElements["zonos-v-stack"] & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
             /**
              * Virtual scroll component for efficiently rendering large lists
              * The idea is from:
              * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
              * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
              */
-            "zonos-virtual-scroll": LocalJSX.ZonosVirtualScroll & JSXBase.HTMLAttributes<HTMLZonosVirtualScrollElement>;
+            "zonos-virtual-scroll": LocalJSX.IntrinsicElements["zonos-virtual-scroll"] & JSXBase.HTMLAttributes<HTMLZonosVirtualScrollElement>;
         }
     }
 }
@@ -6232,6 +7217,8 @@ type Extensions = {
         name: string;
     };
     ruleMessageType?: 'CUSTOM' | 'DEFAULT';
+    /** Set on shipment-rating errors emitted by a country constraint that blocked a service level. */
+    source?: string;
 };
 type ApiError = {
     extensions?: Extensions | null;
@@ -6277,6 +7264,11 @@ type CalculateLandedCostRequest = {
      * TaxId that the some destination countries require for the shipment.
      */
     shipToTaxId?: string;
+    /**
+     * Document kind selected in checkout. Mexico uses RFC or CURP.
+     * Peru uses DNI, RUC, or CE.
+     */
+    shipToTaxIdType?: CheckoutTaxIdTypeValue;
     shippingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;
@@ -6448,10 +7440,19 @@ declare const stringsBase: {
     'CPF/CNPJ number': {
         value: string;
     };
+    CURP: {
+        value: string;
+    };
     Cancel: {
         value: string;
     };
     'Card number copied to clipboard': {
+        value: string;
+    };
+    'Carn\u00E9 de extranjer\u00EDa': {
+        value: string;
+    };
+    'Carn\u00E9 de extranjer\u00EDa must be 9 digits.': {
         value: string;
     };
     'Cart subtotal': {
@@ -6479,6 +7480,9 @@ declare const stringsBase: {
         value: string;
     };
     'Company name (optional)': {
+        value: string;
+    };
+    'Complete your shipping address': {
         value: string;
     };
     Confirm: {
@@ -6521,6 +7525,12 @@ declare const stringsBase: {
         value: string;
     };
     'Customs fees total': {
+        value: string;
+    };
+    DNI: {
+        value: string;
+    };
+    'DNI must be 8 digits.': {
         value: string;
     };
     Delivery: {
@@ -6586,6 +7596,9 @@ declare const stringsBase: {
     'Duties will apply to all orders.': {
         value: string;
     };
+    'Duties will be charged upon delivery.': {
+        value: string;
+    };
     'Duties, taxes, and fees': {
         value: string;
     };
@@ -6643,6 +7656,18 @@ declare const stringsBase: {
     'Hide non-prepaid options': {
         value: string;
     };
+    "I agree to [merchantName]'s [policies]": {
+        value: string;
+    };
+    'I agree to the [policies]': {
+        value: string;
+    };
+    'If you later choose to exercise your right to withdrawal, you will be responsible for any associated return shipping costs, up to a maximum [amount].': {
+        value: string;
+    };
+    'If you later choose to exercise your right to withdrawal, you will be responsible for any associated return shipping costs.': {
+        value: string;
+    };
     "If you select FedEx Ground as your shipping option, you'll need to complete a General Agency Agreement (GAA) after placing your order. This form allows FedEx to clear your package through Canadian customs on your behalf. FedEx will contact you directly\u2014usually by email or phone\u2014with instructions on how to complete the GAA. To avoid delays or the return of your package, please respond promptly to their request.": {
         value: string;
     };
@@ -6655,7 +7680,10 @@ declare const stringsBase: {
     'Invalid CUIT/CUIL format. Must contain 11 digits, with or without dashes (XX-XXXXXXXX-X).': {
         value: string;
     };
-    'Invalid RFC format. Must be 12\u201313 uppercase letters and numbers only.': {
+    'Invalid CURP format. Must be 18 uppercase letters and numbers.': {
+        value: string;
+    };
+    'Invalid RFC format. Must be 12\u201313 uppercase letters and numbers.': {
         value: string;
     };
     'Invalid promo code': {
@@ -6766,6 +7794,9 @@ declare const stringsBase: {
     'Pay [organizationName]': {
         value: string;
     };
+    'Pay [organizationName] duties, taxes and fees for your shipment': {
+        value: string;
+    };
     'Pay in USD (United States Dollar)?': {
         value: string;
     };
@@ -6856,7 +7887,19 @@ declare const stringsBase: {
     Quantity: {
         value: string;
     };
-    'RFC number': {
+    RFC: {
+        value: string;
+    };
+    'RFC or CURP number': {
+        value: string;
+    };
+    RUC: {
+        value: string;
+    };
+    'RUC must be 11 digits.': {
+        value: string;
+    };
+    'Refund policy': {
         value: string;
     };
     Region: {
@@ -6877,6 +7920,9 @@ declare const stringsBase: {
     'Return to merchant site': {
         value: string;
     };
+    'Save and continue': {
+        value: string;
+    };
     'Search countries': {
         value: string;
     };
@@ -6895,10 +7941,16 @@ declare const stringsBase: {
     'Select a language': {
         value: string;
     };
+    'Selected address': {
+        value: string;
+    };
     'Session does not have valid landed cost. Please contact [organizationName] for assistance.': {
         value: string;
     };
     'Session timed out': {
+        value: string;
+    };
+    'Shipment details': {
         value: string;
     };
     Shipping: {
@@ -6911,6 +7963,9 @@ declare const stringsBase: {
         value: string;
     };
     'Shipping method': {
+        value: string;
+    };
+    'Shipping policy': {
         value: string;
     };
     'Shopping cart expired': {
@@ -6985,6 +8040,12 @@ declare const stringsBase: {
     'Tax id is required': {
         value: string;
     };
+    'Tax id type': {
+        value: string;
+    };
+    'Tax id type is required': {
+        value: string;
+    };
     Taxes: {
         value: string;
     };
@@ -6998,6 +8059,9 @@ declare const stringsBase: {
         value: string;
     };
     'Taxes, duties, and fees included': {
+        value: string;
+    };
+    'Terms and conditions': {
         value: string;
     };
     'Test cards': {
@@ -7028,6 +8092,9 @@ declare const stringsBase: {
         value: string;
     };
     "There's been an error updating your checkout session. Please reload and try again or contact support if the error persists": {
+        value: string;
+    };
+    'This saved address is missing information required to ship internationally. Please add the details below.': {
         value: string;
     };
     'To ensure delivery all address details must be in Latin characters.': {
@@ -7087,6 +8154,9 @@ declare const stringsBase: {
     Village: {
         value: string;
     };
+    'Warranty policy': {
+        value: string;
+    };
     "We couldn't complete your payment. Please verify the payment details and try again.": {
         value: string;
     };
@@ -7117,6 +8187,9 @@ declare const stringsBase: {
     'You may incur additional fees from the shipping carrier by not prepaying.': {
         value: string;
     };
+    'You must accept the policies to place this order': {
+        value: string;
+    };
     "You will be redirected back to the merchant's site in a few seconds.": {
         value: string;
     };
@@ -7144,7 +8217,7 @@ declare const stringsBase: {
     'Your payment went through successfully! Thank you for shopping with us! We hope you had an enjoyable experience and your support means the world to us.': {
         value: string;
     };
-    'Your saved default address ships internationally. Would you like to continue to international checkout, or stay here and select a domestic address?': {
+    'Your selected address ships internationally. Would you like to continue to international checkout, or stay here and select a domestic address?': {
         value: string;
     };
     'Your selected payment method requires additional verification. Please follow the instructions provided by your payment provider to complete the transaction.': {
@@ -7288,6 +8361,15 @@ type CheckoutConfig = {
      * @note if set to true, the place order button will not be enabled or disabled
      */
     disablePlaceOrderButtonActivation?: boolean;
+    /**
+     * CSS selector for storefront elements that should be hidden once the
+     * shopper is in a Zonos shipping zone (body has the `z-intl` class).
+     * @description The selector is applied inside a `body.z-intl :is(...)`
+     * rule that Zonos injects after settings load, so merchants don't need
+     * to repeat `.z-intl` themselves. Multiple comma-separated selectors are
+     * supported (e.g. `.cart-tax, .cart-shipping`).
+     */
+    domesticElementSelector?: string | null;
     externalPaymentMethods: Array<{
         status: ExternalPaymentMethodStatus;
         type: ExternalPaymentMethodType;
@@ -7297,10 +8379,57 @@ type CheckoutConfig = {
         type: ExternalServiceTokenType;
     }[];
     /**
+     * Merchant-configured policy URLs the buyer must consent to before placing an
+     * order. Any policy whose `link` is null/empty is hidden from the consent UI.
+     * The wrapping object lets the schema add fields (e.g. display name) later
+     * without breaking existing consumers.
+     */
+    merchantPolicyLinks: {
+        /**
+         * EU right-of-withdrawal policy. When `status` is ENABLED, EU buyers see a
+         * notice above the Pay button about return shipping costs they may owe.
+         * Optional so configs written before this field existed still type-check.
+         */
+        euWithdrawalPolicy?: {
+            currencyCode: CurrencyCode;
+            maximumReturnShippingEstimate: number | null;
+            status: NotificationActiveStatus | null;
+        } | null;
+        privacyPolicy: {
+            link: string | null;
+        } | null;
+        refundPolicy: {
+            link: string | null;
+        } | null;
+        shippingPolicy: {
+            link: string | null;
+        } | null;
+        termsAndConditions: {
+            link: string | null;
+        } | null;
+        warrantyPolicy: {
+            link: string | null;
+        } | null;
+    } | null;
+    /**
      * Test mode for checkout (sandbox or production)
      * @default TEST
      */
     mode: Mode;
+    /**
+     * Platform plugins. BigCommerce `allowBypassQuery` comes from the
+     * zonos-settings response. The storefront does not default it on.
+     */
+    plugins?: {
+        bigcommerce?: {
+            /**
+             * When `true`, a `zBypass` query on the BigCommerce checkout page skips
+             * address detection for that page load. The parameter is removed from the
+             * URL after it is read. `false` or omitted ignores the parameter.
+             */
+            allowBypassQuery?: boolean;
+        };
+    };
     orderNotifications: {
         abandonedCart: {
             delay: number;
@@ -7466,9 +8595,21 @@ type HelloConfig = {
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
     desktopLocation?: HelloDesktopLocation | null;
+    /**
+     * Fine-grained float placement (corner anchor + pixel offsets) from settings.
+     * Distinct from the component `@Prop` of the same name, which remains an enum.
+     * @default null
+     */
+    desktopLocationOverride?: HelloSettingFragment['desktopLocationOverride'];
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
     mobileLocation: HelloMobileLocation | null;
+    /**
+     * Fine-grained float placement for mobile viewports from settings.
+     * Distinct from the component `@Prop` of the same name, which remains an enum.
+     * @default null
+     */
+    mobileLocationOverride?: HelloSettingFragment['mobileLocationOverride'];
     mode: Mode;
     /**
      * Position of floating hello if `anchorElementSelector` is not found after 3 seconds
@@ -7552,6 +8693,13 @@ type AppearanceConfig = {
     fontSizeXS?: number;
     logoUrl: string;
     style: ElementsUiStyle;
+    /**
+     * Locales the merchant offers in the language selector, as lowercase codes.
+     * `null` offers every locale Elements supports. Plain `string[]`, matching the
+     * `[String!]` the settings graph sends — a merchant's saved list is data, not a
+     * compile-time constant, so `getSupportedLanguages` drops codes it can't render.
+     */
+    supportedLocales: string[] | null;
     theme: ElementsUiTheme;
     zonosAttribution: ZonosAttribution | null;
 };
@@ -7741,12 +8889,22 @@ interface Zonos {
      * Mock error response for Paypal. Mainly used for testing purposes
      */
     _paypalMockResponse: PaypalMockResponse | null;
+    /**
+     * Cart detail callback exposed from `checkoutSettings.buildCartDetail` on init.
+     * Used to decide whether Stripe should be loaded.
+     */
+    buildCartDetail: CheckoutConfig['buildCartDetail'];
     cartData: NormalizedTempCart | null;
     cartId: string | null;
     /**
      * Cart settings from `getCartCheckout`
      */
     cartSettings: CartCheckoutResult['settings'] | null;
+    /**
+     * Cart id callback exposed from `checkoutSettings.createCartId` on init.
+     * Used to decide whether Stripe should be loaded.
+     */
+    createCartId: CheckoutConfig['createCartId'];
     /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
@@ -7777,6 +8935,13 @@ interface Zonos {
      */
     iframeLogType: string | null;
     isBigCommerce: boolean;
+    /**
+     * Settled native-checkout answer for `isBigCommerceNativeCheckoutPath`.
+     * `undefined` means that checkout path is still waiting for host detection.
+     */
+    isBigCommerceNativeCheckout?: boolean;
+    /** Pathname `isBigCommerceNativeCheckout` was settled for. */
+    isBigCommerceNativeCheckoutPath?: string;
     /**
      * This will be set to true when it's called form collect
      */
@@ -7856,6 +9021,15 @@ declare abstract class Zonos {
     static _paypalMockResponse: PaypalMockResponse | null;
     static iframeLogType: string | null;
     static isBigCommerce: boolean;
+    /**
+     * Settled native-checkout answer for `isBigCommerceNativeCheckoutPath`.
+     * Stored on `window.Zonos` so loadZonos.js, zonos.js, and the component
+     * bundle read the same value. `undefined` means that checkout path is
+     * still waiting for host detection.
+     */
+    static isBigCommerceNativeCheckout?: boolean;
+    /** Pathname `isBigCommerceNativeCheckout` was settled for. */
+    static isBigCommerceNativeCheckoutPath?: string;
     static releaseDate: string;
     static isLegacyCheckout: boolean;
     static googleAnalyticId: string | null;
@@ -7883,6 +9057,8 @@ declare abstract class Zonos {
     static IframeService: typeof IframeService;
     static getCurrentTimestamp: () => number;
     static cartId: string | null;
+    static createCartId: CheckoutConfig['createCartId'];
+    static buildCartDetail: CheckoutConfig['buildCartDetail'];
     private static zonosController;
     static loadTimeApiInfoList: LoadTimeApiLogInfo[];
     static logIntervalId: NodeJS.Timeout | null;

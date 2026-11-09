@@ -191,12 +191,22 @@ export interface Zonos {
      * Mock error response for Paypal. Mainly used for testing purposes
      */
     _paypalMockResponse: PaypalMockResponse | null;
+    /**
+     * Cart detail callback exposed from `checkoutSettings.buildCartDetail` on init.
+     * Used to decide whether Stripe should be loaded.
+     */
+    buildCartDetail: CheckoutConfig['buildCartDetail'];
     cartData: NormalizedTempCart | null;
     cartId: string | null;
     /**
      * Cart settings from `getCartCheckout`
      */
     cartSettings: CartCheckoutResult['settings'] | null;
+    /**
+     * Cart id callback exposed from `checkoutSettings.createCartId` on init.
+     * Used to decide whether Stripe should be loaded.
+     */
+    createCartId: CheckoutConfig['createCartId'];
     /**
      * Toggle debug mode (add query param 'zonosDebug=1' to url)
      * @default false
@@ -227,6 +237,13 @@ export interface Zonos {
      */
     iframeLogType: string | null;
     isBigCommerce: boolean;
+    /**
+     * Settled native-checkout answer for `isBigCommerceNativeCheckoutPath`.
+     * `undefined` means that checkout path is still waiting for host detection.
+     */
+    isBigCommerceNativeCheckout?: boolean;
+    /** Pathname `isBigCommerceNativeCheckout` was settled for. */
+    isBigCommerceNativeCheckoutPath?: string;
     /**
      * This will be set to true when it's called form collect
      */
@@ -306,6 +323,15 @@ export declare abstract class Zonos {
     static _paypalMockResponse: PaypalMockResponse | null;
     static iframeLogType: string | null;
     static isBigCommerce: boolean;
+    /**
+     * Settled native-checkout answer for `isBigCommerceNativeCheckoutPath`.
+     * Stored on `window.Zonos` so loadZonos.js, zonos.js, and the component
+     * bundle read the same value. `undefined` means that checkout path is
+     * still waiting for host detection.
+     */
+    static isBigCommerceNativeCheckout?: boolean;
+    /** Pathname `isBigCommerceNativeCheckout` was settled for. */
+    static isBigCommerceNativeCheckoutPath?: string;
     static releaseDate: string;
     static isLegacyCheckout: boolean;
     static googleAnalyticId: string | null;
@@ -333,6 +359,8 @@ export declare abstract class Zonos {
     static IframeService: typeof IframeService;
     static getCurrentTimestamp: () => number;
     static cartId: string | null;
+    static createCartId: CheckoutConfig['createCartId'];
+    static buildCartDetail: CheckoutConfig['buildCartDetail'];
     private static zonosController;
     static loadTimeApiInfoList: LoadTimeApiLogInfo[];
     static logIntervalId: NodeJS.Timeout | null;

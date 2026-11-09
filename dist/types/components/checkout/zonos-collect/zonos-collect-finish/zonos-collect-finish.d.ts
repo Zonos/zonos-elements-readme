@@ -42,6 +42,13 @@ export declare class ZonosCollectFinish {
     private handleSuccessBehavior;
     private getPullOrder;
     private checkStripePaymentStatus;
+    /**
+     * Resolve the Airwallex payment intent id, preferring the value already in the
+     * store and falling back to re-fetching the collect checkout session (e.g. when
+     * the page was reloaded after a redirect).
+     */
+    private getAirwallexSessionInfo;
+    private checkAirwallexPaymentStatus;
     private checkStagingOrderStatus;
     private checkPaypalPaymentStatus;
     private getReceiptUrl;

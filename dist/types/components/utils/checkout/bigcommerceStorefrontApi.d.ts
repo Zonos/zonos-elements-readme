@@ -23,6 +23,7 @@ export type BigCommerceCustomerAddress = {
  */
 export type BigCommerceCheckoutResponse = {
     consignments?: {
+        id?: string;
         shippingAddress?: BigCommerceCustomerAddress;
     }[];
     customer?: {
@@ -45,6 +46,14 @@ export declare const fetchCheckoutId: () => Promise<string | null>;
  * This API is cookie-authenticated (same-origin), so no token is needed.
  */
 export declare const fetchBigCommerceCheckout: (checkoutId: string) => Promise<BigCommerceCheckoutResponse | null>;
+/**
+ * Delete a consignment (a saved shipping selection, e.g. a domestic shipping
+ * quote the shopper added on the cart page) from the active BigCommerce
+ * checkout via the Storefront API. Cookie-authenticated (same-origin), so no
+ * token is needed. Returns the updated checkout on success, or null on
+ * failure.
+ */
+export declare const deleteBigCommerceConsignment: (checkoutId: string, consignmentId: string) => Promise<BigCommerceCheckoutResponse | null>;
 /**
  * Whether the BigCommerce shopper is already logged in. We key off the
  * customer's numeric `id` since the storefront API populates it only for

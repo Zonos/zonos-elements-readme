@@ -8,13 +8,15 @@ export declare class ZonosHello {
     private helloRef?;
     private observerWatcher?;
     /**
-     * Force mobile styling instead of media query and use the passed location value
-     * @default false
+     * Override the configured mobile floating location (enum). Takes precedence over
+     * `helloSettings.mobileLocationOverride` (HelloPlacement) and
+     * `helloSettings.mobileLocation`.
      */
     mobileLocationOverride?: HelloMobileLocation;
     /**
      * Override the configured desktop floating location. Takes precedence over
-     * `helloSettings.desktopLocation` and also drives the peek-message animation
+     * `helloSettings.desktopLocationOverride` (HelloPlacement) and
+     * `helloSettings.desktopLocation`, and also drives the peek-message animation
      * direction, so consumers no longer need `animateFromLeftOverride` for
      * desktop positioning.
      */
@@ -102,7 +104,6 @@ export declare class ZonosHello {
      */
     private shouldAnimateLeftDesktop;
     handleResize(): void;
-    private shouldRenderHello;
     /**
      * This method will handle the Hello widget initialized state, should only trigger once
      */

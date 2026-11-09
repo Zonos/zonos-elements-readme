@@ -1,4 +1,4 @@
-import type { CheckoutSessionBaseCurrencyUpdateMutation, CheckoutSessionPaymentIntentCreateMutation, CheckoutSessionStoreCreditOrderCreateMutation, CountryCode, CurrencyCode, GetCheckoutSessionQuery, GetCollectCheckoutSessionQuery } from "../../generated/graphql.internal.types";
+import type { CheckoutPaymentProcessorType, CheckoutSessionBaseCurrencyUpdateMutation, CheckoutSessionPaymentIntentCreateMutation, CheckoutSessionStoreCreditOrderCreateMutation, CountryCode, CurrencyCode, GetAirwallexPaymentIntentQuery, GetCheckoutSessionQuery, GetCollectCheckoutSessionQuery } from "../../generated/graphql.internal.types";
 export type GetCheckoutSessionRequest = {
     checkoutSessionId: string;
 };
@@ -72,6 +72,12 @@ export type CheckoutSessionCreateRequest = {
     isInvoice?: boolean;
     itemsAmount: number;
     metadata: CheckoutSessionUpdateMetadata;
+    /**
+     * Override the payment processor for the checkout session. Normally determined
+     * server-side by the billing company; primarily used to force a processor (e.g.
+     * AIRWALLEX) on demand in tests.
+     */
+    paymentProcessor?: CheckoutPaymentProcessorType;
     presentmentCountryCode: CountryCode | null;
     skipPaymentIntent?: boolean;
     varianceTestInput?: CheckoutSessionVariantTest[];
@@ -89,6 +95,10 @@ export type GetCollectCheckoutSessionPayload = {
     checkoutSessionId: string;
 };
 export type GetCollectCheckoutSessionResponse = GetCollectCheckoutSessionQuery;
+export type GetAirwallexPaymentIntentPayload = {
+    paymentIntentId: string;
+};
+export type GetAirwallexPaymentIntentResponse = GetAirwallexPaymentIntentQuery;
 export type StoreCreditOrderCreateRequest = {
     checkoutSessionId: string;
 };

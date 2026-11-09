@@ -95,6 +95,15 @@ export type CheckoutConfig = {
      * @note if set to true, the place order button will not be enabled or disabled
      */
     disablePlaceOrderButtonActivation?: boolean;
+    /**
+     * CSS selector for storefront elements that should be hidden once the
+     * shopper is in a Zonos shipping zone (body has the `z-intl` class).
+     * @description The selector is applied inside a `body.z-intl :is(...)`
+     * rule that Zonos injects after settings load, so merchants don't need
+     * to repeat `.z-intl` themselves. Multiple comma-separated selectors are
+     * supported (e.g. `.cart-tax, .cart-shipping`).
+     */
+    domesticElementSelector?: string | null;
     externalPaymentMethods: Array<{
         status: ExternalPaymentMethodStatus;
         type: ExternalPaymentMethodType;
@@ -104,10 +113,57 @@ export type CheckoutConfig = {
         type: ExternalServiceTokenType;
     }[];
     /**
+     * Merchant-configured policy URLs the buyer must consent to before placing an
+     * order. Any policy whose `link` is null/empty is hidden from the consent UI.
+     * The wrapping object lets the schema add fields (e.g. display name) later
+     * without breaking existing consumers.
+     */
+    merchantPolicyLinks: {
+        /**
+         * EU right-of-withdrawal policy. When `status` is ENABLED, EU buyers see a
+         * notice above the Pay button about return shipping costs they may owe.
+         * Optional so configs written before this field existed still type-check.
+         */
+        euWithdrawalPolicy?: {
+            currencyCode: CurrencyCode;
+            maximumReturnShippingEstimate: number | null;
+            status: NotificationActiveStatus | null;
+        } | null;
+        privacyPolicy: {
+            link: string | null;
+        } | null;
+        refundPolicy: {
+            link: string | null;
+        } | null;
+        shippingPolicy: {
+            link: string | null;
+        } | null;
+        termsAndConditions: {
+            link: string | null;
+        } | null;
+        warrantyPolicy: {
+            link: string | null;
+        } | null;
+    } | null;
+    /**
      * Test mode for checkout (sandbox or production)
      * @default TEST
      */
     mode: Mode;
+    /**
+     * Platform plugins. BigCommerce `allowBypassQuery` comes from the
+     * zonos-settings response. The storefront does not default it on.
+     */
+    plugins?: {
+        bigcommerce?: {
+            /**
+             * When `true`, a `zBypass` query on the BigCommerce checkout page skips
+             * address detection for that page load. The parameter is removed from the
+             * URL after it is read. `false` or omitted ignores the parameter.
+             */
+            allowBypassQuery?: boolean;
+        };
+    };
     orderNotifications: {
         abandonedCart: {
             delay: number;

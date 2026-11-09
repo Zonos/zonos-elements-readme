@@ -1,5 +1,4 @@
-import type { CountryCode } from "../../types/generated/graphql.internal.types";
 /**
- * Retrieve the zCountry from the URL or session storage.
+ * Retrieve the shopper country override from the URL or remembered storage.
  */
-export declare const getOverridenZCountry: () => CountryCode | null;
+export declare const getOverridenZCountry: () => import("../..").CountryCode | null;

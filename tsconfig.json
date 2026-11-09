@@ -19,9 +19,10 @@
     "noUnusedParameters": true,
     "noUncheckedIndexedAccess": true,
     "paths": {
-      "src/*": ["./dist/types/*"],
-    },
+      "google.maps": ["./google.maps-shim.d.ts"],
+      "src/*": ["./dist/types/*"]
+    }
   },
   "include": ["dist/types/**/*", "__tests__/**/*"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist/types/__tests__"]
 }

@@ -1,31 +1,33 @@
-import type { GraphQLClient } from 'graphql-request';
-import type { GraphQLClientRequestHeaders } from 'graphql-request/build/cjs/types';
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends {
-    [key: string]: unknown;
-}> = {
-    [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-    [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-    [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type MakeEmpty<T extends {
-    [key: string]: unknown;
-}, K extends keyof T> = {
-    [_ in K]?: never;
-};
+/** Internal type. DO NOT USE DIRECTLY. */
+/** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | {
     [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
 };
+import type { GraphQLClient, RequestOptions } from 'graphql-request';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+type GraphQLClientRequestHeaders = RequestOptions['requestHeaders'];
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
+    ID: {
+        input: string;
+        output: string;
+    };
+    String: {
+        input: string;
+        output: string;
+    };
     Boolean: {
         input: boolean;
         output: boolean;
+    };
+    Int: {
+        input: number;
+        output: number;
+    };
+    Float: {
+        input: number;
+        output: number;
     };
     DateTime: {
         input: string;
@@ -35,31 +37,43 @@ export type Scalars = {
         input: number;
         output: number;
     };
-    Float: {
-        input: number;
-        output: number;
-    };
-    ID: {
-        input: string;
-        output: string;
-    };
-    Int: {
-        input: number;
-        output: number;
-    };
     JSON: {
         input: Record<string, unknown>;
         output: Record<string, unknown>;
     };
-    String: {
-        input: string;
-        output: string;
+    Long: {
+        input: number;
+        output: number;
     };
     ZonedDateTime: {
         input: string;
         output: string;
     };
 };
+export declare const accountCreditReason: {
+    readonly Conversion: "CONVERSION";
+    readonly InvoiceCredit: "INVOICE_CREDIT";
+    readonly ManualAdjustment: "MANUAL_ADJUSTMENT";
+};
+export type AccountCreditReason = (typeof accountCreditReason)[keyof typeof accountCreditReason];
+export declare const accountCreditStatus: {
+    readonly Active: "ACTIVE";
+    readonly Converted: "CONVERTED";
+    readonly Exhausted: "EXHAUSTED";
+    readonly Void: "VOID";
+};
+export type AccountCreditStatus = (typeof accountCreditStatus)[keyof typeof accountCreditStatus];
+export declare const accountCreditTransactionType: {
+    readonly Adjustment: "ADJUSTMENT";
+    readonly Apply: "APPLY";
+    readonly ConversionIn: "CONVERSION_IN";
+    readonly ConversionOut: "CONVERSION_OUT";
+    readonly Grant: "GRANT";
+    readonly Refund: "REFUND";
+    readonly Restore: "RESTORE";
+    readonly Void: "VOID";
+};
+export type AccountCreditTransactionType = (typeof accountCreditTransactionType)[keyof typeof accountCreditTransactionType];
 export declare const accountHolderType: {
     readonly Company: "COMPANY";
     readonly Individual: "INDIVIDUAL";
@@ -69,6 +83,8 @@ export declare const accountingFeeType: {
     readonly AdditionalTariffLines: "ADDITIONAL_TARIFF_LINES";
     readonly Adjustment: "ADJUSTMENT";
     readonly Advancement: "ADVANCEMENT";
+    readonly AirlineRecoveryFee: "AIRLINE_RECOVERY_FEE";
+    readonly AirwallexTransferFee: "AIRWALLEX_TRANSFER_FEE";
     readonly AnnualPlatformFee: "ANNUAL_PLATFORM_FEE";
     readonly ApiCrossDocking: "API_CROSS_DOCKING";
     readonly ApiGuaranteeOrder: "API_GUARANTEE_ORDER";
@@ -114,7 +130,10 @@ export declare const accountingFeeType: {
     readonly CarrierBillShipping: "CARRIER_BILL_SHIPPING";
     readonly CaymanIslandsDisbursementFee: "CAYMAN_ISLANDS_DISBURSEMENT_FEE";
     readonly CaymanIslandsRemittanceFee: "CAYMAN_ISLANDS_REMITTANCE_FEE";
+    readonly CbpCentralizedExaminationStationFee: "CBP_CENTRALIZED_EXAMINATION_STATION_FEE";
+    readonly CbpHoldManagementFee: "CBP_HOLD_MANAGEMENT_FEE";
     readonly CbpReassessment: "CBP_REASSESSMENT";
+    readonly CbpTradeSolutionPilot: "CBP_TRADE_SOLUTION_PILOT";
     readonly Chargeback: "CHARGEBACK";
     readonly ChargebackFee: "CHARGEBACK_FEE";
     readonly CheckoutCrossDocking: "CHECKOUT_CROSS_DOCKING";
@@ -151,6 +170,9 @@ export declare const accountingFeeType: {
     readonly CyprusPrepayFee: "CYPRUS_PREPAY_FEE";
     readonly CyprusPrepayPercent: "CYPRUS_PREPAY_PERCENT";
     readonly CyprusPrepayPhotoDiscount: "CYPRUS_PREPAY_PHOTO_DISCOUNT";
+    readonly CzechDisbursementFee: "CZECH_DISBURSEMENT_FEE";
+    readonly CzechGuaranteeOrder: "CZECH_GUARANTEE_ORDER";
+    readonly CzechRemittanceFee: "CZECH_REMITTANCE_FEE";
     readonly DashboardLite: "DASHBOARD_LITE";
     readonly DdpServiceFee: "DDP_SERVICE_FEE";
     readonly DdpServiceFeeBuffer: "DDP_SERVICE_FEE_BUFFER";
@@ -160,9 +182,46 @@ export declare const accountingFeeType: {
     readonly Discount: "DISCOUNT";
     readonly DuplicatePayment: "DUPLICATE_PAYMENT";
     readonly Duty: "DUTY";
+    readonly DutyBrokerageUs: "DUTY_BROKERAGE_US";
     readonly DutyFx: "DUTY_FX";
     readonly DutyRemittance: "DUTY_REMITTANCE";
+    readonly DutyRemittanceAt: "DUTY_REMITTANCE_AT";
+    readonly DutyRemittanceAx: "DUTY_REMITTANCE_AX";
+    readonly DutyRemittanceBe: "DUTY_REMITTANCE_BE";
+    readonly DutyRemittanceBg: "DUTY_REMITTANCE_BG";
+    readonly DutyRemittanceCy: "DUTY_REMITTANCE_CY";
+    readonly DutyRemittanceCz: "DUTY_REMITTANCE_CZ";
+    readonly DutyRemittanceDe: "DUTY_REMITTANCE_DE";
+    readonly DutyRemittanceDk: "DUTY_REMITTANCE_DK";
+    readonly DutyRemittanceEe: "DUTY_REMITTANCE_EE";
+    readonly DutyRemittanceEs: "DUTY_REMITTANCE_ES";
+    readonly DutyRemittanceFi: "DUTY_REMITTANCE_FI";
+    readonly DutyRemittanceFr: "DUTY_REMITTANCE_FR";
+    readonly DutyRemittanceGb: "DUTY_REMITTANCE_GB";
+    readonly DutyRemittanceGf: "DUTY_REMITTANCE_GF";
+    readonly DutyRemittanceGp: "DUTY_REMITTANCE_GP";
+    readonly DutyRemittanceGr: "DUTY_REMITTANCE_GR";
+    readonly DutyRemittanceHr: "DUTY_REMITTANCE_HR";
+    readonly DutyRemittanceHu: "DUTY_REMITTANCE_HU";
+    readonly DutyRemittanceIc: "DUTY_REMITTANCE_IC";
+    readonly DutyRemittanceIe: "DUTY_REMITTANCE_IE";
+    readonly DutyRemittanceIt: "DUTY_REMITTANCE_IT";
+    readonly DutyRemittanceLt: "DUTY_REMITTANCE_LT";
+    readonly DutyRemittanceLu: "DUTY_REMITTANCE_LU";
+    readonly DutyRemittanceLv: "DUTY_REMITTANCE_LV";
+    readonly DutyRemittanceMc: "DUTY_REMITTANCE_MC";
+    readonly DutyRemittanceMq: "DUTY_REMITTANCE_MQ";
+    readonly DutyRemittanceMt: "DUTY_REMITTANCE_MT";
+    readonly DutyRemittanceNl: "DUTY_REMITTANCE_NL";
+    readonly DutyRemittancePl: "DUTY_REMITTANCE_PL";
+    readonly DutyRemittancePt: "DUTY_REMITTANCE_PT";
+    readonly DutyRemittanceRe: "DUTY_REMITTANCE_RE";
+    readonly DutyRemittanceRo: "DUTY_REMITTANCE_RO";
+    readonly DutyRemittanceSe: "DUTY_REMITTANCE_SE";
+    readonly DutyRemittanceSi: "DUTY_REMITTANCE_SI";
+    readonly DutyRemittanceSk: "DUTY_REMITTANCE_SK";
     readonly DutyRemittanceUs: "DUTY_REMITTANCE_US";
+    readonly DutyRemittanceYt: "DUTY_REMITTANCE_YT";
     readonly DutyTax: "DUTY_TAX";
     readonly DutyTaxBuffer: "DUTY_TAX_BUFFER";
     readonly DutyTaxFee: "DUTY_TAX_FEE";
@@ -189,14 +248,17 @@ export declare const accountingFeeType: {
     readonly HaypostDisbursementFee: "HAYPOST_DISBURSEMENT_FEE";
     readonly HaypostRemittanceFee: "HAYPOST_REMITTANCE_FEE";
     readonly IglobalLandedCostGuaranteeBuffer: "IGLOBAL_LANDED_COST_GUARANTEE_BUFFER";
+    readonly ImportServiceCharge: "IMPORT_SERVICE_CHARGE";
     readonly InclusivePricing: "INCLUSIVE_PRICING";
     readonly IsraelDisbursementFee: "ISRAEL_DISBURSEMENT_FEE";
     readonly IsraelRemittanceFee: "ISRAEL_REMITTANCE_FEE";
     readonly ItalianeRemittanceFee: "ITALIANE_REMITTANCE_FEE";
     readonly Item: "ITEM";
+    readonly JapanDisbursementFee: "JAPAN_DISBURSEMENT_FEE";
     readonly JapanPrepayFee: "JAPAN_PREPAY_FEE";
     readonly JapanPrepayPercent: "JAPAN_PREPAY_PERCENT";
     readonly JapanPrepayPhotoDiscount: "JAPAN_PREPAY_PHOTO_DISCOUNT";
+    readonly JapanRemittanceFee: "JAPAN_REMITTANCE_FEE";
     readonly KazpostDisbursementFee: "KAZPOST_DISBURSEMENT_FEE";
     readonly KazpostPrepayFee: "KAZPOST_PREPAY_FEE";
     readonly KazpostPrepayPercent: "KAZPOST_PREPAY_PERCENT";
@@ -227,6 +289,10 @@ export declare const accountingFeeType: {
     readonly LiberiaDisbursementFee: "LIBERIA_DISBURSEMENT_FEE";
     readonly LiberiaRemittanceFee: "LIBERIA_REMITTANCE_FEE";
     readonly LiechtensteinischeRemittanceFee: "LIECHTENSTEINISCHE_REMITTANCE_FEE";
+    readonly MaltaDisbursementFee: "MALTA_DISBURSEMENT_FEE";
+    readonly MaltaGuaranteeOrder: "MALTA_GUARANTEE_ORDER";
+    readonly MaltaRemittanceFee: "MALTA_REMITTANCE_FEE";
+    readonly MerchandiseProcessingFee: "MERCHANDISE_PROCESSING_FEE";
     readonly MerchantProcessing: "MERCHANT_PROCESSING";
     readonly MongolDisbursementFee: "MONGOL_DISBURSEMENT_FEE";
     readonly MongolGuaranteeOrder: "MONGOL_GUARANTEE_ORDER";
@@ -237,6 +303,8 @@ export declare const accountingFeeType: {
     readonly NetparcelRemittanceFee: "NETPARCEL_REMITTANCE_FEE";
     readonly NewZealandDisbursementFee: "NEW_ZEALAND_DISBURSEMENT_FEE";
     readonly NewZealandRemittanceFee: "NEW_ZEALAND_REMITTANCE_FEE";
+    readonly NigerDisbursementFee: "NIGER_DISBURSEMENT_FEE";
+    readonly NigerRemittanceFee: "NIGER_REMITTANCE_FEE";
     readonly NigeriaDisbursementFee: "NIGERIA_DISBURSEMENT_FEE";
     readonly NigeriaRemittanceFee: "NIGERIA_REMITTANCE_FEE";
     readonly NonGuaranteeAdditionalTariffLines: "NON_GUARANTEE_ADDITIONAL_TARIFF_LINES";
@@ -260,6 +328,7 @@ export declare const accountingFeeType: {
     readonly OmnivaRemittanceFee: "OMNIVA_REMITTANCE_FEE";
     readonly OrderError: "ORDER_ERROR";
     readonly Other: "OTHER";
+    readonly PalletFee: "PALLET_FEE";
     readonly PartnerReferralRevenueShare: "PARTNER_REFERRAL_REVENUE_SHARE";
     readonly PaymentNoOrder: "PAYMENT_NO_ORDER";
     readonly PaypalCancel: "PAYPAL_CANCEL";
@@ -268,6 +337,12 @@ export declare const accountingFeeType: {
     readonly PeruBondFee: "PERU_BOND_FEE";
     readonly PeruDisbursementFee: "PERU_DISBURSEMENT_FEE";
     readonly PeruRemittanceFee: "PERU_REMITTANCE_FEE";
+    readonly PgaAmsProcessing: "PGA_AMS_PROCESSING";
+    readonly PgaAphis: "PGA_APHIS";
+    readonly PgaBtaPriorNotice: "PGA_BTA_PRIOR_NOTICE";
+    readonly PgaDisclaim: "PGA_DISCLAIM";
+    readonly PgaDot: "PGA_DOT";
+    readonly PgaFdaClearance: "PGA_FDA_CLEARANCE";
     readonly PlatformFee: "PLATFORM_FEE";
     readonly PostalOperator: "POSTAL_OPERATOR";
     readonly PostenBringDisbursementFee: "POSTEN_BRING_DISBURSEMENT_FEE";
@@ -303,9 +378,11 @@ export declare const accountingFeeType: {
     readonly SierraLeoneDisbursementFee: "SIERRA_LEONE_DISBURSEMENT_FEE";
     readonly SierraLeoneRemittanceFee: "SIERRA_LEONE_REMITTANCE_FEE";
     readonly SingaporeRemittanceFee: "SINGAPORE_REMITTANCE_FEE";
+    readonly SortationFee: "SORTATION_FEE";
     readonly SriLankaDisbursementFee: "SRI_LANKA_DISBURSEMENT_FEE";
     readonly SriLankaGuaranteeOrder: "SRI_LANKA_GUARANTEE_ORDER";
     readonly SriLankaRemittanceFee: "SRI_LANKA_REMITTANCE_FEE";
+    readonly StopDeliveryFee: "STOP_DELIVERY_FEE";
     readonly StorageFee: "STORAGE_FEE";
     readonly StoreCredit: "STORE_CREDIT";
     readonly StripeConnectTransfer: "STRIPE_CONNECT_TRANSFER";
@@ -327,6 +404,12 @@ export declare const accountingFeeType: {
     readonly TurkishDisbursementFee: "TURKISH_DISBURSEMENT_FEE";
     readonly TurkishGuaranteeOrder: "TURKISH_GUARANTEE_ORDER";
     readonly TurkishRemittanceFee: "TURKISH_REMITTANCE_FEE";
+    readonly Type_01EntryFee: "TYPE_01_ENTRY_FEE";
+    readonly Type_01HtsClassificationFee: "TYPE_01_HTS_CLASSIFICATION_FEE";
+    readonly Type_01PerLineFee: "TYPE_01_PER_LINE_FEE";
+    readonly Type_11EntryFee: "TYPE_11_ENTRY_FEE";
+    readonly Type_11EntryFeeMinimum: "TYPE_11_ENTRY_FEE_MINIMUM";
+    readonly Type_11EntryFeePga: "TYPE_11_ENTRY_FEE_PGA";
     readonly UgandaPrepayFee: "UGANDA_PREPAY_FEE";
     readonly UgandaPrepayPercent: "UGANDA_PREPAY_PERCENT";
     readonly UgandaPrepayPhotoDiscount: "UGANDA_PREPAY_PHOTO_DISCOUNT";
@@ -418,14 +501,9 @@ export declare const addressResult: {
     readonly Valid: "VALID";
 };
 export type AddressResult = (typeof addressResult)[keyof typeof addressResult];
-export declare const adjustmentRecordType: {
-    readonly ConnectAccountAdjustment: "CONNECT_ACCOUNT_ADJUSTMENT";
-    readonly CreditNote: "CREDIT_NOTE";
-    readonly InvoiceLineRecord: "INVOICE_LINE_RECORD";
-};
-export type AdjustmentRecordType = (typeof adjustmentRecordType)[keyof typeof adjustmentRecordType];
 export declare const adjustmentSource: {
     readonly ApiRequest: "API_REQUEST";
+    readonly Discount: "DISCOUNT";
     readonly PromoCode: "PROMO_CODE";
 };
 export type AdjustmentSource = (typeof adjustmentSource)[keyof typeof adjustmentSource];
@@ -435,7 +513,13 @@ export declare const adjustmentType: {
 };
 export type AdjustmentType = (typeof adjustmentType)[keyof typeof adjustmentType];
 export declare const agency: {
+    readonly Ams: "AMS";
+    readonly Aphis: "APHIS";
+    readonly Apl: "APL";
     readonly Cpsc: "CPSC";
+    readonly Epa: "EPA";
+    readonly Fda: "FDA";
+    readonly Fws: "FWS";
 };
 export type Agency = (typeof agency)[keyof typeof agency];
 export declare const aiModel: {
@@ -444,6 +528,12 @@ export declare const aiModel: {
     readonly ClaudeSonnet_4: "CLAUDE_SONNET_4";
 };
 export type AiModel = (typeof aiModel)[keyof typeof aiModel];
+export declare const airwallexAccountType: {
+    readonly AirwallexAuCustomer: "AIRWALLEX_AU_CUSTOMER";
+    readonly AirwallexPaymentsCustomer: "AIRWALLEX_PAYMENTS_CUSTOMER";
+    readonly AirwallexUsCustomer: "AIRWALLEX_US_CUSTOMER";
+};
+export type AirwallexAccountType = (typeof airwallexAccountType)[keyof typeof airwallexAccountType];
 export declare const airwallexPaymentLinkStatus: {
     readonly Active: "ACTIVE";
     readonly Inactive: "INACTIVE";
@@ -468,13 +558,6 @@ export declare const allowedSettlementCurrencies: {
     readonly LocalAndUsd: "LOCAL_AND_USD";
 };
 export type AllowedSettlementCurrencies = (typeof allowedSettlementCurrencies)[keyof typeof allowedSettlementCurrencies];
-export declare const amountDetailRefundSourceType: {
-    readonly Discount: "DISCOUNT";
-    readonly DutyTaxFee: "DUTY_TAX_FEE";
-    readonly Item: "ITEM";
-    readonly Shipping: "SHIPPING";
-};
-export type AmountDetailRefundSourceType = (typeof amountDetailRefundSourceType)[keyof typeof amountDetailRefundSourceType];
 export declare const amountDetailSourceType: {
     readonly Discount: "DISCOUNT";
     readonly Duty: "DUTY";
@@ -486,15 +569,6 @@ export declare const amountDetailSourceType: {
     readonly Tax: "TAX";
 };
 export type AmountDetailSourceType = (typeof amountDetailSourceType)[keyof typeof amountDetailSourceType];
-export declare const amountDetailSubtotalType: {
-    readonly Discount: "DISCOUNT";
-    readonly Duty: "DUTY";
-    readonly Fee: "FEE";
-    readonly Item: "ITEM";
-    readonly Shipping: "SHIPPING";
-    readonly Tax: "TAX";
-};
-export type AmountDetailSubtotalType = (typeof amountDetailSubtotalType)[keyof typeof amountDetailSubtotalType];
 export declare const amountDetailTarget: {
     readonly BillingCompany: "BILLING_COMPANY";
     readonly MerchantBase: "MERCHANT_BASE";
@@ -504,6 +578,35 @@ export declare const amountDetailTarget: {
     readonly ZonosBase: "ZONOS_BASE";
 };
 export type AmountDetailTarget = (typeof amountDetailTarget)[keyof typeof amountDetailTarget];
+export declare const amsCertificateType: {
+    readonly Inspection: "INSPECTION";
+    readonly NopImport: "NOP_IMPORT";
+    readonly Sc6Exemption: "SC6_EXEMPTION";
+};
+export type AmsCertificateType = (typeof amsCertificateType)[keyof typeof amsCertificateType];
+export declare const amsDisclaimCode: {
+    readonly A: "A";
+};
+export type AmsDisclaimCode = (typeof amsDisclaimCode)[keyof typeof amsDisclaimCode];
+export declare const amsProgram: {
+    readonly Eg: "EG";
+    readonly Mo: "MO";
+    readonly Or: "OR";
+    readonly Pn: "PN";
+};
+export type AmsProgram = (typeof amsProgram)[keyof typeof amsProgram];
+export declare const amsUnspscFragmentType: {
+    readonly Class: "CLASS";
+    readonly Commodity: "COMMODITY";
+    readonly Family: "FAMILY";
+    readonly Segment: "SEGMENT";
+};
+export type AmsUnspscFragmentType = (typeof amsUnspscFragmentType)[keyof typeof amsUnspscFragmentType];
+export declare const amsWeightUnit: {
+    readonly Kg: "KG";
+    readonly Lb: "LB";
+};
+export type AmsWeightUnit = (typeof amsWeightUnit)[keyof typeof amsWeightUnit];
 export declare const analyticsProviderStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -514,6 +617,69 @@ export declare const analyticsProviderType: {
     readonly GoogleAnalytics: "GOOGLE_ANALYTICS";
 };
 export type AnalyticsProviderType = (typeof analyticsProviderType)[keyof typeof analyticsProviderType];
+export declare const animalDrugApplicationType: {
+    readonly AbbreviatedNada: "ABBREVIATED_NADA";
+    readonly ConditionallyApprovedNada: "CONDITIONALLY_APPROVED_NADA";
+    readonly Nada: "NADA";
+    readonly Unspecified: "UNSPECIFIED";
+};
+export type AnimalDrugApplicationType = (typeof animalDrugApplicationType)[keyof typeof animalDrugApplicationType];
+export declare const answerProvenance: {
+    readonly Agent: "AGENT";
+    readonly Copied: "COPIED";
+    readonly Derived: "DERIVED";
+    readonly Inferred: "INFERRED";
+    readonly Manual: "MANUAL";
+    readonly Supplied: "SUPPLIED";
+};
+export type AnswerProvenance = (typeof answerProvenance)[keyof typeof answerProvenance];
+export declare const answerSource: {
+    readonly AgentInferred: "AGENT_INFERRED";
+    readonly CatalogData: "CATALOG_DATA";
+    readonly MerchantProfile: "MERCHANT_PROFILE";
+    readonly UserStated: "USER_STATED";
+};
+export type AnswerSource = (typeof answerSource)[keyof typeof answerSource];
+export declare const answerType: {
+    readonly Boolean: "BOOLEAN";
+    readonly Checkbox: "CHECKBOX";
+    readonly Date: "DATE";
+    readonly Document: "DOCUMENT";
+    readonly MultiSelect: "MULTI_SELECT";
+    readonly Number: "NUMBER";
+    readonly Reference: "REFERENCE";
+    readonly SingleSelect: "SINGLE_SELECT";
+    readonly Text: "TEXT";
+};
+export type AnswerType = (typeof answerType)[keyof typeof answerType];
+export declare const aphisDisclaimCode: {
+    readonly A: "A";
+    readonly B: "B";
+    readonly C: "C";
+    readonly D: "D";
+};
+export type AphisDisclaimCode = (typeof aphisDisclaimCode)[keyof typeof aphisDisclaimCode];
+export declare const aphisItemType: {
+    readonly Component: "COMPONENT";
+    readonly Product: "PRODUCT";
+};
+export type AphisItemType = (typeof aphisItemType)[keyof typeof aphisItemType];
+export declare const aphisUnitOfMeasure: {
+    readonly Amu: "AMU";
+    readonly Bh: "BH";
+    readonly Bqt: "BQT";
+    readonly Bx: "BX";
+    readonly Ct: "CT";
+    readonly G: "G";
+    readonly Kg: "KG";
+    readonly L: "L";
+    readonly Ml: "ML";
+    readonly No: "NO";
+    readonly Ptu: "PTU";
+    readonly Sad: "SAD";
+    readonly Stm: "STM";
+};
+export type AphisUnitOfMeasure = (typeof aphisUnitOfMeasure)[keyof typeof aphisUnitOfMeasure];
 export declare const apiUsageEntityType: {
     readonly BillingCompany: "BILLING_COMPANY";
     readonly Organization: "ORGANIZATION";
@@ -524,22 +690,46 @@ export declare const apiUsageRecordInterval: {
     readonly Weekly: "WEEKLY";
 };
 export type ApiUsageRecordInterval = (typeof apiUsageRecordInterval)[keyof typeof apiUsageRecordInterval];
-export declare const apiUsageRecordStatus: {
-    readonly Failed: "FAILED";
-    readonly ManualIntervention: "MANUAL_INTERVENTION";
-    readonly Pending: "PENDING";
-    readonly Processed: "PROCESSED";
+export declare const aplDisclaimCode: {
+    readonly A: "A";
+    readonly B: "B";
+    readonly C: "C";
+    readonly D: "D";
+    readonly G: "G";
 };
-export type ApiUsageRecordStatus = (typeof apiUsageRecordStatus)[keyof typeof apiUsageRecordStatus];
-export declare const apiUsageRecordType: {
-    readonly Classify: "CLASSIFY";
-    readonly DeniedParty: "DENIED_PARTY";
-    readonly LandedCost: "LANDED_COST";
-    readonly OrderComplete: "ORDER_COMPLETE";
-    readonly RestrictedItem: "RESTRICTED_ITEM";
-    readonly ShipmentRating: "SHIPMENT_RATING";
+export type AplDisclaimCode = (typeof aplDisclaimCode)[keyof typeof aplDisclaimCode];
+export declare const aplDisclaimGround: {
+    readonly CommonCultivar: "COMMON_CULTIVAR";
+    readonly CommonFoodCrop: "COMMON_FOOD_CROP";
+    readonly NoPlantMaterial: "NO_PLANT_MATERIAL";
+    readonly PlantsForPlanting: "PLANTS_FOR_PLANTING";
+    readonly ScientificSpecimen: "SCIENTIFIC_SPECIMEN";
 };
-export type ApiUsageRecordType = (typeof apiUsageRecordType)[keyof typeof apiUsageRecordType];
+export type AplDisclaimGround = (typeof aplDisclaimGround)[keyof typeof aplDisclaimGround];
+export declare const aplItemType: {
+    readonly Component: "COMPONENT";
+    readonly Product: "PRODUCT";
+};
+export type AplItemType = (typeof aplItemType)[keyof typeof aplItemType];
+export declare const aplUnitOfMeasure: {
+    readonly Cg: "CG";
+    readonly Cm: "CM";
+    readonly Cm2: "CM2";
+    readonly Cm3: "CM3";
+    readonly Ctl: "CTL";
+    readonly G: "G";
+    readonly Kg: "KG";
+    readonly Kl: "KL";
+    readonly L: "L";
+    readonly M: "M";
+    readonly M2: "M2";
+    readonly M3: "M3";
+    readonly Ml: "ML";
+    readonly Mm: "MM";
+    readonly Mm2: "MM2";
+    readonly Mm3: "MM3";
+};
+export type AplUnitOfMeasure = (typeof aplUnitOfMeasure)[keyof typeof aplUnitOfMeasure];
 export declare const appliesTo: {
     readonly BillDetail: "BILL_DETAIL";
     readonly DepositDetail: "DEPOSIT_DETAIL";
@@ -573,6 +763,11 @@ export declare const balanceTransactionParentType: {
     readonly Invoice: "INVOICE";
 };
 export type BalanceTransactionParentType = (typeof balanceTransactionParentType)[keyof typeof balanceTransactionParentType];
+export declare const batchValidationSeverity: {
+    readonly Error: "ERROR";
+    readonly Warning: "WARNING";
+};
+export type BatchValidationSeverity = (typeof batchValidationSeverity)[keyof typeof batchValidationSeverity];
 export declare const batteryMaterialType: {
     readonly LithiumIon: "LITHIUM_ION";
     readonly LithiumMetal: "LITHIUM_METAL";
@@ -584,6 +779,11 @@ export declare const batteryPackingType: {
     readonly BatteryPackagedWithEquipment: "BATTERY_PACKAGED_WITH_EQUIPMENT";
 };
 export type BatteryPackingType = (typeof batteryPackingType)[keyof typeof batteryPackingType];
+export declare const billingArrangement: {
+    readonly Proxy: "PROXY";
+    readonly Standard: "STANDARD";
+};
+export type BillingArrangement = (typeof billingArrangement)[keyof typeof billingArrangement];
 export declare const billingCompanyAccountStanding: {
     readonly Current: "CURRENT";
     readonly Delinquent: "DELINQUENT";
@@ -591,8 +791,11 @@ export declare const billingCompanyAccountStanding: {
 export type BillingCompanyAccountStanding = (typeof billingCompanyAccountStanding)[keyof typeof billingCompanyAccountStanding];
 export declare const billingCompanyAccountType: {
     readonly AirwallexAuCustomer: "AIRWALLEX_AU_CUSTOMER";
+    readonly AirwallexBeneficiary: "AIRWALLEX_BENEFICIARY";
+    readonly AirwallexConnectedAccount: "AIRWALLEX_CONNECTED_ACCOUNT";
     readonly AirwallexGlobalAccount: "AIRWALLEX_GLOBAL_ACCOUNT";
     readonly AirwallexPaymentsCustomer: "AIRWALLEX_PAYMENTS_CUSTOMER";
+    readonly AirwallexPlatformAccount: "AIRWALLEX_PLATFORM_ACCOUNT";
     readonly AirwallexUsCustomer: "AIRWALLEX_US_CUSTOMER";
     readonly StripeBillingCustomer: "STRIPE_BILLING_CUSTOMER";
     readonly StripePaymentsConnectAccount: "STRIPE_PAYMENTS_CONNECT_ACCOUNT";
@@ -605,11 +808,27 @@ export declare const billingCompanyBusinessUnit: {
     readonly SupplyChain: "SUPPLY_CHAIN";
 };
 export type BillingCompanyBusinessUnit = (typeof billingCompanyBusinessUnit)[keyof typeof billingCompanyBusinessUnit];
+export declare const billingCompanyExemptionType: {
+    readonly CcFee: "CC_FEE";
+    readonly LateFee: "LATE_FEE";
+    readonly SaasTax: "SAAS_TAX";
+};
+export type BillingCompanyExemptionType = (typeof billingCompanyExemptionType)[keyof typeof billingCompanyExemptionType];
 export declare const billingCompanyInvoiceProcessor: {
     readonly Stripe: "STRIPE";
     readonly Zonos: "ZONOS";
 };
 export type BillingCompanyInvoiceProcessor = (typeof billingCompanyInvoiceProcessor)[keyof typeof billingCompanyInvoiceProcessor];
+export declare const billingDayOfWeek: {
+    readonly Friday: "FRIDAY";
+    readonly Monday: "MONDAY";
+    readonly Saturday: "SATURDAY";
+    readonly Sunday: "SUNDAY";
+    readonly Thursday: "THURSDAY";
+    readonly Tuesday: "TUESDAY";
+    readonly Wednesday: "WEDNESDAY";
+};
+export type BillingDayOfWeek = (typeof billingDayOfWeek)[keyof typeof billingDayOfWeek];
 export declare const billingOptionCode: {
     readonly DdpAndDdu: "DDP_AND_DDU";
     readonly ShipperOnly: "SHIPPER_ONLY";
@@ -617,18 +836,287 @@ export declare const billingOptionCode: {
     readonly Unavailable: "UNAVAILABLE";
 };
 export type BillingOptionCode = (typeof billingOptionCode)[keyof typeof billingOptionCode];
+export declare const billingScheduleInterval: {
+    readonly Daily: "DAILY";
+    readonly Monthly: "MONTHLY";
+    readonly SemiMonthly: "SEMI_MONTHLY";
+    readonly Weekly: "WEEKLY";
+};
+export type BillingScheduleInterval = (typeof billingScheduleInterval)[keyof typeof billingScheduleInterval];
+export declare const billingSettingsStatus: {
+    readonly Disabled: "DISABLED";
+    readonly Enabled: "ENABLED";
+};
+export type BillingSettingsStatus = (typeof billingSettingsStatus)[keyof typeof billingSettingsStatus];
 export declare const billingStatusCode: {
     readonly Failed: "FAILED";
     readonly Pending: "PENDING";
     readonly Processed: "PROCESSED";
 };
 export type BillingStatusCode = (typeof billingStatusCode)[keyof typeof billingStatusCode];
+export declare const brokerageAbiMessageType: {
+    readonly Aq: "AQ";
+    readonly Ax: "AX";
+    readonly C1: "C1";
+    readonly Cc: "CC";
+    readonly Er: "ER";
+    readonly Pf: "PF";
+    readonly So: "SO";
+    readonly Sx: "SX";
+};
+export type BrokerageAbiMessageType = (typeof brokerageAbiMessageType)[keyof typeof brokerageAbiMessageType];
+export declare const brokerageAbiSendAction: {
+    readonly Add: "ADD";
+    readonly Replace: "REPLACE";
+    readonly Update: "UPDATE";
+};
+export type BrokerageAbiSendAction = (typeof brokerageAbiSendAction)[keyof typeof brokerageAbiSendAction];
+export declare const brokerageAbiSendApplication: {
+    readonly CargoRelease: "CARGO_RELEASE";
+    readonly CargoReleaseWithPga: "CARGO_RELEASE_WITH_PGA";
+    readonly EntrySummary: "ENTRY_SUMMARY";
+    readonly EntrySummaryCargoRelease: "ENTRY_SUMMARY_CARGO_RELEASE";
+    readonly PgaOnly: "PGA_ONLY";
+};
+export type BrokerageAbiSendApplication = (typeof brokerageAbiSendApplication)[keyof typeof brokerageAbiSendApplication];
+export declare const brokerageBatchChannel: {
+    readonly Portal: "PORTAL";
+    readonly Sftp: "SFTP";
+};
+export type BrokerageBatchChannel = (typeof brokerageBatchChannel)[keyof typeof brokerageBatchChannel];
+export declare const brokerageBatchJobPhase: {
+    readonly File: "FILE";
+    readonly Upload: "UPLOAD";
+    readonly Validate: "VALIDATE";
+};
+export type BrokerageBatchJobPhase = (typeof brokerageBatchJobPhase)[keyof typeof brokerageBatchJobPhase];
+export declare const brokerageBatchJobStatus: {
+    readonly Completed: "COMPLETED";
+    readonly CompletedWithErrors: "COMPLETED_WITH_ERRORS";
+    readonly Failed: "FAILED";
+    readonly Pending: "PENDING";
+    readonly Processing: "PROCESSING";
+    readonly Submitted: "SUBMITTED";
+};
+export type BrokerageBatchJobStatus = (typeof brokerageBatchJobStatus)[keyof typeof brokerageBatchJobStatus];
+export declare const brokerageCbpMessageCategory: {
+    readonly Bond: "BOND";
+    readonly CargoRelease: "CARGO_RELEASE";
+    readonly Carrier: "CARRIER";
+    readonly Census: "CENSUS";
+    readonly Classification: "CLASSIFICATION";
+    readonly Compliance: "COMPLIANCE";
+    readonly Country: "COUNTRY";
+    readonly Date: "DATE";
+    readonly EntrySummary: "ENTRY_SUMMARY";
+    readonly Manifest: "MANIFEST";
+    readonly Notification: "NOTIFICATION";
+    readonly Party: "PARTY";
+    readonly Pga: "PGA";
+    readonly Port: "PORT";
+    readonly Rollup: "ROLLUP";
+    readonly System: "SYSTEM";
+    readonly Value: "VALUE";
+};
+export type BrokerageCbpMessageCategory = (typeof brokerageCbpMessageCategory)[keyof typeof brokerageCbpMessageCategory];
+export declare const brokerageCbpMessageSemantic: {
+    readonly AckAccepted: "ACK_ACCEPTED";
+    readonly AckRejected: "ACK_REJECTED";
+    readonly AllClear: "ALL_CLEAR";
+    readonly BillLifecycle: "BILL_LIFECYCLE";
+    readonly CbpExamPending: "CBP_EXAM_PENDING";
+    readonly CbpHoldPlaced: "CBP_HOLD_PLACED";
+    readonly CbpHoldRemoved: "CBP_HOLD_REMOVED";
+    readonly CbpReviewInfo: "CBP_REVIEW_INFO";
+    readonly CrCancelled: "CR_CANCELLED";
+    readonly EditError: "EDIT_ERROR";
+    readonly EditWarning: "EDIT_WARNING";
+    readonly EntryCancellationUnset: "ENTRY_CANCELLATION_UNSET";
+    readonly EntryCancelled: "ENTRY_CANCELLED";
+    readonly EsCancelled: "ES_CANCELLED";
+    readonly PgaHoldPlaced: "PGA_HOLD_PLACED";
+    readonly PgaHoldRemoved: "PGA_HOLD_REMOVED";
+    readonly PgaInfo: "PGA_INFO";
+    readonly PgaMayProceed: "PGA_MAY_PROCEED";
+    readonly PgaRejected: "PGA_REJECTED";
+    readonly PgaUnderReview: "PGA_UNDER_REVIEW";
+    readonly Released: "RELEASED";
+    readonly SystemFailure: "SYSTEM_FAILURE";
+    readonly Unknown: "UNKNOWN";
+};
+export type BrokerageCbpMessageSemantic = (typeof brokerageCbpMessageSemantic)[keyof typeof brokerageCbpMessageSemantic];
+export declare const brokerageCbpSeverity: {
+    readonly Error: "ERROR";
+    readonly Fatal: "FATAL";
+    readonly Info: "INFO";
+    readonly Warning: "WARNING";
+};
+export type BrokerageCbpSeverity = (typeof brokerageCbpSeverity)[keyof typeof brokerageCbpSeverity];
+export declare const brokerageCbpStream: {
+    readonly CargoRelease: "CARGO_RELEASE";
+    readonly EntrySummary: "ENTRY_SUMMARY";
+    readonly PeriodicFee: "PERIODIC_FEE";
+    readonly Unknown: "UNKNOWN";
+};
+export type BrokerageCbpStream = (typeof brokerageCbpStream)[keyof typeof brokerageCbpStream];
+export declare const brokerageConsignmentSource: {
+    readonly Api: "API";
+    readonly Csv: "CSV";
+};
+export type BrokerageConsignmentSource = (typeof brokerageConsignmentSource)[keyof typeof brokerageConsignmentSource];
+export declare const brokerageDocumentEvidenceStatus: {
+    readonly Deleted: "DELETED";
+    readonly Found: "FOUND";
+    readonly Missing: "MISSING";
+    readonly Unsupported: "UNSUPPORTED";
+};
+export type BrokerageDocumentEvidenceStatus = (typeof brokerageDocumentEvidenceStatus)[keyof typeof brokerageDocumentEvidenceStatus];
+export declare const brokerageDocumentStatus: {
+    readonly Active: "ACTIVE";
+    readonly Deleted: "DELETED";
+};
+export type BrokerageDocumentStatus = (typeof brokerageDocumentStatus)[keyof typeof brokerageDocumentStatus];
+export declare const brokerageDocumentType: {
+    readonly CertificateOfOrigin: "CERTIFICATE_OF_ORIGIN";
+    readonly ClearancePackage: "CLEARANCE_PACKAGE";
+    readonly CommercialInvoice: "COMMERCIAL_INVOICE";
+    readonly ConsolidationWorksheet: "CONSOLIDATION_WORKSHEET";
+    readonly CountryOfCastCertificate: "COUNTRY_OF_CAST_CERTIFICATE";
+    readonly CountryOfMeltAndPourCertificate: "COUNTRY_OF_MELT_AND_POUR_CERTIFICATE";
+    readonly CountryOfOriginCertificate: "COUNTRY_OF_ORIGIN_CERTIFICATE";
+    readonly CountryOfPourCertificate: "COUNTRY_OF_POUR_CERTIFICATE";
+    readonly CountryOfSmeltCertificate: "COUNTRY_OF_SMELT_CERTIFICATE";
+    readonly CpscCpc: "CPSC_CPC";
+    readonly CpscGcc: "CPSC_GCC";
+    readonly CustomsBond: "CUSTOMS_BOND";
+    readonly CustomsDutyInvoice: "CUSTOMS_DUTY_INVOICE";
+    readonly DotHs7: "DOT_HS7";
+    readonly EntrySummary: "ENTRY_SUMMARY";
+    readonly EpaForm_3520_1: "EPA_FORM_3520_1";
+    readonly EpaForm_3520_21: "EPA_FORM_3520_21";
+    readonly EpaTscaCertification: "EPA_TSCA_CERTIFICATION";
+    readonly FccForm_740: "FCC_FORM_740";
+    readonly FdaFacilityRegistration: "FDA_FACILITY_REGISTRATION";
+    readonly FdaPriorNotice: "FDA_PRIOR_NOTICE";
+    readonly Isf: "ISF";
+    readonly MaterialCertificate: "MATERIAL_CERTIFICATE";
+    readonly MillTestCertificate: "MILL_TEST_CERTIFICATE";
+    readonly Other: "OTHER";
+    readonly PackingList: "PACKING_LIST";
+    readonly PowerOfAttorney: "POWER_OF_ATTORNEY";
+    readonly TtbCola: "TTB_COLA";
+    readonly UsdaPhytosanitaryCertificate: "USDA_PHYTOSANITARY_CERTIFICATE";
+    readonly UsfwsForm_3_177: "USFWS_FORM_3_177";
+};
+export type BrokerageDocumentType = (typeof brokerageDocumentType)[keyof typeof brokerageDocumentType];
+export declare const brokerageDutyDisputeCatalogAction: {
+    readonly Created: "CREATED";
+    readonly Failed: "FAILED";
+    readonly Skipped: "SKIPPED";
+    readonly Updated: "UPDATED";
+};
+export type BrokerageDutyDisputeCatalogAction = (typeof brokerageDutyDisputeCatalogAction)[keyof typeof brokerageDutyDisputeCatalogAction];
+export declare const brokerageDutyDisputeClaimType: {
+    readonly CountryOfOrigin: "COUNTRY_OF_ORIGIN";
+    readonly DeclaredValue: "DECLARED_VALUE";
+    readonly Description: "DESCRIPTION";
+    readonly DutyExclusion: "DUTY_EXCLUSION";
+    readonly HsCode: "HS_CODE";
+    readonly Quantity: "QUANTITY";
+    readonly Questionnaire: "QUESTIONNAIRE";
+    readonly TariffLine: "TARIFF_LINE";
+    readonly Weight: "WEIGHT";
+};
+export type BrokerageDutyDisputeClaimType = (typeof brokerageDutyDisputeClaimType)[keyof typeof brokerageDutyDisputeClaimType];
+export declare const brokerageDutyDisputeEventType: {
+    readonly ClaimDecided: "CLAIM_DECIDED";
+    readonly Completed: "COMPLETED";
+    readonly Created: "CREATED";
+    readonly Expired: "EXPIRED";
+    readonly Note: "NOTE";
+    readonly ResolutionFailed: "RESOLUTION_FAILED";
+    readonly ResolutionRequested: "RESOLUTION_REQUESTED";
+    readonly Resolved: "RESOLVED";
+    readonly ReviewCompleted: "REVIEW_COMPLETED";
+    readonly ReviewRequested: "REVIEW_REQUESTED";
+    readonly Submitted: "SUBMITTED";
+    readonly Updated: "UPDATED";
+    readonly Withdrawn: "WITHDRAWN";
+};
+export type BrokerageDutyDisputeEventType = (typeof brokerageDutyDisputeEventType)[keyof typeof brokerageDutyDisputeEventType];
+export declare const brokerageDutyDisputeIneligibilityReason: {
+    readonly DisputeExists: "DISPUTE_EXISTS";
+    readonly NoDuties: "NO_DUTIES";
+    readonly NotFiled: "NOT_FILED";
+    readonly NotFound: "NOT_FOUND";
+    readonly Paid: "PAID";
+    readonly PastDeadline: "PAST_DEADLINE";
+};
+export type BrokerageDutyDisputeIneligibilityReason = (typeof brokerageDutyDisputeIneligibilityReason)[keyof typeof brokerageDutyDisputeIneligibilityReason];
+export declare const brokerageDutyDisputeOutcome: {
+    readonly Accepted: "ACCEPTED";
+    readonly Denied: "DENIED";
+    readonly Partial: "PARTIAL";
+    readonly Review: "REVIEW";
+};
+export type BrokerageDutyDisputeOutcome = (typeof brokerageDutyDisputeOutcome)[keyof typeof brokerageDutyDisputeOutcome];
+export declare const brokerageDutyDisputeStatus: {
+    readonly Complete: "COMPLETE";
+    readonly Draft: "DRAFT";
+    readonly Expired: "EXPIRED";
+    readonly ResolutionFailed: "RESOLUTION_FAILED";
+    readonly Resolved: "RESOLVED";
+    readonly Submitted: "SUBMITTED";
+    readonly UnderReview: "UNDER_REVIEW";
+    readonly Withdrawn: "WITHDRAWN";
+};
+export type BrokerageDutyDisputeStatus = (typeof brokerageDutyDisputeStatus)[keyof typeof brokerageDutyDisputeStatus];
+export declare const brokerageDutyDisputeVerdict: {
+    readonly Accepted: "ACCEPTED";
+    readonly Deferred: "DEFERRED";
+    readonly Denied: "DENIED";
+    readonly Review: "REVIEW";
+};
+export type BrokerageDutyDisputeVerdict = (typeof brokerageDutyDisputeVerdict)[keyof typeof brokerageDutyDisputeVerdict];
+export declare const brokerageEntryCancelReason: {
+    readonly ClearedUnderAnotherEntry: "CLEARED_UNDER_ANOTHER_ENTRY";
+    readonly ClearedUnderInformalEntry: "CLEARED_UNDER_INFORMAL_ENTRY";
+    readonly ClericalError: "CLERICAL_ERROR";
+    readonly Destroyed: "DESTROYED";
+    readonly NonArrival: "NON_ARRIVAL";
+    readonly NotAuthorizedForImport: "NOT_AUTHORIZED_FOR_IMPORT";
+    readonly RefusedByImporter: "REFUSED_BY_IMPORTER";
+    readonly ReplacedByCbpf_7512: "REPLACED_BY_CBPF_7512";
+    readonly ReplacedByFtzAdmission: "REPLACED_BY_FTZ_ADMISSION";
+    readonly Seized: "SEIZED";
+    readonly SystemError: "SYSTEM_ERROR";
+};
+export type BrokerageEntryCancelReason = (typeof brokerageEntryCancelReason)[keyof typeof brokerageEntryCancelReason];
+export declare const brokerageEntryClearanceStatus: {
+    readonly Accepted: "ACCEPTED";
+    readonly Cancelled: "CANCELLED";
+    readonly CbpExam: "CBP_EXAM";
+    readonly CbpHold: "CBP_HOLD";
+    readonly Filed: "FILED";
+    readonly PgaHold: "PGA_HOLD";
+    readonly PgaMayProceed: "PGA_MAY_PROCEED";
+    readonly PgaReview: "PGA_REVIEW";
+    readonly Processing: "PROCESSING";
+    readonly Rejected: "REJECTED";
+    readonly Released: "RELEASED";
+};
+export type BrokerageEntryClearanceStatus = (typeof brokerageEntryClearanceStatus)[keyof typeof brokerageEntryClearanceStatus];
 export declare const brokerageEntryType: {
     readonly Formal: "FORMAL";
     readonly Informal: "INFORMAL";
     readonly Postal: "POSTAL";
 };
 export type BrokerageEntryType = (typeof brokerageEntryType)[keyof typeof brokerageEntryType];
+export declare const brokerageFeedMode: {
+    readonly Live: "LIVE";
+    readonly Test: "TEST";
+};
+export type BrokerageFeedMode = (typeof brokerageFeedMode)[keyof typeof brokerageFeedMode];
 export declare const brokerageNatureOfTransaction: {
     readonly Documents: "DOCUMENTS";
     readonly ForResale: "FOR_RESALE";
@@ -637,6 +1125,19 @@ export declare const brokerageNatureOfTransaction: {
     readonly Return: "RETURN";
 };
 export type BrokerageNatureOfTransaction = (typeof brokerageNatureOfTransaction)[keyof typeof brokerageNatureOfTransaction];
+export declare const brokerageOpsNotificationChannel: {
+    readonly Email: "EMAIL";
+};
+export type BrokerageOpsNotificationChannel = (typeof brokerageOpsNotificationChannel)[keyof typeof brokerageOpsNotificationChannel];
+export declare const brokerageOpsNotificationType: {
+    readonly BatchSubmitted: "BATCH_SUBMITTED";
+};
+export type BrokerageOpsNotificationType = (typeof brokerageOpsNotificationType)[keyof typeof brokerageOpsNotificationType];
+export declare const brokerageOutreachRecipient: {
+    readonly PostalOperator: "POSTAL_OPERATOR";
+    readonly Shipper: "SHIPPER";
+};
+export type BrokerageOutreachRecipient = (typeof brokerageOutreachRecipient)[keyof typeof brokerageOutreachRecipient];
 export declare const brokeragePgaAgency: {
     readonly Other: "OTHER";
     readonly UsAtf: "US_ATF";
@@ -679,6 +1180,68 @@ export declare const brokerageTransportationMode: {
     readonly VesselNonContainer: "VESSEL_NON_CONTAINER";
 };
 export type BrokerageTransportationMode = (typeof brokerageTransportationMode)[keyof typeof brokerageTransportationMode];
+export declare const brokerageWorkOrderEscalationTarget: {
+    readonly Broker: "BROKER";
+    readonly Engineering: "ENGINEERING";
+};
+export type BrokerageWorkOrderEscalationTarget = (typeof brokerageWorkOrderEscalationTarget)[keyof typeof brokerageWorkOrderEscalationTarget];
+export declare const brokerageWorkOrderEventType: {
+    readonly Assigned: "ASSIGNED";
+    readonly AutoResolved: "AUTO_RESOLVED";
+    readonly Cancelled: "CANCELLED";
+    readonly Claimed: "CLAIMED";
+    readonly Created: "CREATED";
+    readonly Escalated: "ESCALATED";
+    readonly Note: "NOTE";
+    readonly Released: "RELEASED";
+    readonly Resolved: "RESOLVED";
+    readonly Resumed: "RESUMED";
+    readonly Waiting: "WAITING";
+};
+export type BrokerageWorkOrderEventType = (typeof brokerageWorkOrderEventType)[keyof typeof brokerageWorkOrderEventType];
+export declare const brokerageWorkOrderResolution: {
+    readonly CancelledAndRefiled: "CANCELLED_AND_REFILED";
+    readonly ConditionCleared: "CONDITION_CLEARED";
+    readonly CorrectedPrefile: "CORRECTED_PREFILE";
+    readonly NoActionRequired: "NO_ACTION_REQUIRED";
+    readonly ReferenceDataFixedResent: "REFERENCE_DATA_FIXED_RESENT";
+    readonly UnfileableAccepted: "UNFILEABLE_ACCEPTED";
+};
+export type BrokerageWorkOrderResolution = (typeof brokerageWorkOrderResolution)[keyof typeof brokerageWorkOrderResolution];
+export declare const brokerageWorkOrderStatus: {
+    readonly AutoResolved: "AUTO_RESOLVED";
+    readonly Cancelled: "CANCELLED";
+    readonly Open: "OPEN";
+    readonly Resolved: "RESOLVED";
+    readonly Waiting: "WAITING";
+};
+export type BrokerageWorkOrderStatus = (typeof brokerageWorkOrderStatus)[keyof typeof brokerageWorkOrderStatus];
+export declare const brokerageWorkOrderSubjectType: {
+    readonly Consignment: "CONSIGNMENT";
+    readonly ConsignmentGreenLightFinding: "CONSIGNMENT_GREEN_LIGHT_FINDING";
+    readonly Consolidation: "CONSOLIDATION";
+    readonly DutyDispute: "DUTY_DISPUTE";
+    readonly Entry: "ENTRY";
+    readonly ManifestLine: "MANIFEST_LINE";
+};
+export type BrokerageWorkOrderSubjectType = (typeof brokerageWorkOrderSubjectType)[keyof typeof brokerageWorkOrderSubjectType];
+export declare const brokerageWorkOrderType: {
+    readonly AdcvdReview: "ADCVD_REVIEW";
+    readonly CbpCancelled: "CBP_CANCELLED";
+    readonly CbpExam: "CBP_EXAM";
+    readonly CbpHold: "CBP_HOLD";
+    readonly CustomsDescriptionReview: "CUSTOMS_DESCRIPTION_REVIEW";
+    readonly DeniedPartyReview: "DENIED_PARTY_REVIEW";
+    readonly DutyDisputeReview: "DUTY_DISPUTE_REVIEW";
+    readonly EntryRejected: "ENTRY_REJECTED";
+    readonly HsCodeReview: "HS_CODE_REVIEW";
+    readonly PgaHold: "PGA_HOLD";
+    readonly SubmissionFailed: "SUBMISSION_FAILED";
+    readonly Unfileable: "UNFILEABLE";
+    readonly ValidationBlocked: "VALIDATION_BLOCKED";
+    readonly ValueReview: "VALUE_REVIEW";
+};
+export type BrokerageWorkOrderType = (typeof brokerageWorkOrderType)[keyof typeof brokerageWorkOrderType];
 export declare const bulkJobStatus: {
     readonly Error: "ERROR";
     readonly FileSaved: "FILE_SAVED";
@@ -686,6 +1249,11 @@ export declare const bulkJobStatus: {
     readonly Processing: "PROCESSING";
 };
 export type BulkJobStatus = (typeof bulkJobStatus)[keyof typeof bulkJobStatus];
+export declare const bundleImportMode: {
+    readonly BundleOnly: "BUNDLE_ONLY";
+    readonly BundleWithItems: "BUNDLE_WITH_ITEMS";
+};
+export type BundleImportMode = (typeof bundleImportMode)[keyof typeof bundleImportMode];
 export declare const calculationMethodPriority: {
     readonly Dap: "DAP";
     readonly Ddp: "DDP";
@@ -699,8 +1267,11 @@ export declare const carrierAccountApiUsage: {
 export type CarrierAccountApiUsage = (typeof carrierAccountApiUsage)[keyof typeof carrierAccountApiUsage];
 export declare const carrierAccountCode: {
     readonly Apc: "APC";
+    readonly Asendia: "ASENDIA";
     readonly Dhl: "DHL";
+    readonly DhlEcommerce: "DHL_ECOMMERCE";
     readonly Fedex: "FEDEX";
+    readonly JapanPost: "JAPAN_POST";
     readonly Ups: "UPS";
 };
 export type CarrierAccountCode = (typeof carrierAccountCode)[keyof typeof carrierAccountCode];
@@ -733,6 +1304,23 @@ export declare const carrierApiAccountProvider: {
     readonly Organization: "ORGANIZATION";
 };
 export type CarrierApiAccountProvider = (typeof carrierApiAccountProvider)[keyof typeof carrierApiAccountProvider];
+export declare const carrierApiCredentialTypeCode: {
+    readonly AccessKey: "ACCESS_KEY";
+    readonly AccessLicenseNumber: "ACCESS_LICENSE_NUMBER";
+    readonly AccountNumber: "ACCOUNT_NUMBER";
+    readonly ApiKey: "API_KEY";
+    readonly ApiPassword: "API_PASSWORD";
+    readonly ApiToken: "API_TOKEN";
+    readonly BearerToken: "BEARER_TOKEN";
+    readonly CustomerId: "CUSTOMER_ID";
+    readonly MeterNumber: "METER_NUMBER";
+    readonly PaymentCountryCode: "PAYMENT_COUNTRY_CODE";
+    readonly SenderLocation: "SENDER_LOCATION";
+    readonly ShipperNumber: "SHIPPER_NUMBER";
+    readonly SiteId: "SITE_ID";
+    readonly UserId: "USER_ID";
+};
+export type CarrierApiCredentialTypeCode = (typeof carrierApiCredentialTypeCode)[keyof typeof carrierApiCredentialTypeCode];
 export declare const carrierApiRateTypeCode: {
     readonly Negotiated: "NEGOTIATED";
     readonly Retail: "RETAIL";
@@ -813,10 +1401,13 @@ export declare const carrierBillingInvoiceStatus: {
 export type CarrierBillingInvoiceStatus = (typeof carrierBillingInvoiceStatus)[keyof typeof carrierBillingInvoiceStatus];
 export declare const carrierCode: {
     readonly Apc: "APC";
+    readonly Asendia: "ASENDIA";
+    readonly AustraliaPost: "AUSTRALIA_POST";
     readonly BermudaPost: "BERMUDA_POST";
     readonly CanadaPost: "CANADA_POST";
     readonly CyprusPost: "CYPRUS_POST";
     readonly Dhl: "DHL";
+    readonly DhlEcommerce: "DHL_ECOMMERCE";
     readonly DirectLink: "DIRECT_LINK";
     readonly Ehub: "EHUB";
     readonly Envia: "ENVIA";
@@ -830,17 +1421,22 @@ export declare const carrierCode: {
 };
 export type CarrierCode = (typeof carrierCode)[keyof typeof carrierCode];
 export declare const carrierCredentialTypeCode: {
+    readonly AccessKey: "ACCESS_KEY";
     readonly AccessLicenseNumber: "ACCESS_LICENSE_NUMBER";
     readonly AccountNumber: "ACCOUNT_NUMBER";
     readonly ApiKey: "API_KEY";
     readonly ApiPassword: "API_PASSWORD";
     readonly ApiToken: "API_TOKEN";
+    readonly BearerToken: "BEARER_TOKEN";
     readonly CustomerId: "CUSTOMER_ID";
     readonly MeterNumber: "METER_NUMBER";
     readonly PaymentCountryCode: "PAYMENT_COUNTRY_CODE";
+    readonly RefreshToken: "REFRESH_TOKEN";
     readonly SenderLocation: "SENDER_LOCATION";
     readonly ShipperNumber: "SHIPPER_NUMBER";
     readonly SiteId: "SITE_ID";
+    readonly TrackingEmail: "TRACKING_EMAIL";
+    readonly TrackingPassword: "TRACKING_PASSWORD";
     readonly UserId: "USER_ID";
 };
 export type CarrierCredentialTypeCode = (typeof carrierCredentialTypeCode)[keyof typeof carrierCredentialTypeCode];
@@ -860,6 +1456,13 @@ export declare const carrierInvoiceLineItemChargeType: {
     readonly Shipping: "SHIPPING";
 };
 export type CarrierInvoiceLineItemChargeType = (typeof carrierInvoiceLineItemChargeType)[keyof typeof carrierInvoiceLineItemChargeType];
+export declare const carrierLabelType: {
+    readonly Outbound: "OUTBOUND";
+    readonly ReturnEmail: "RETURN_EMAIL";
+    readonly ReturnPickup: "RETURN_PICKUP";
+    readonly ReturnPrintLabel: "RETURN_PRINT_LABEL";
+};
+export type CarrierLabelType = (typeof carrierLabelType)[keyof typeof carrierLabelType];
 export declare const carrierMultiFactorAuthMethod: {
     readonly CallPin: "CALL_PIN";
     readonly EmailPin: "EMAIL_PIN";
@@ -900,6 +1503,7 @@ export declare const cartType: {
     readonly InvoiceCollect: "INVOICE_COLLECT";
     readonly LabelCollect: "LABEL_COLLECT";
     readonly PrepayCollect: "PREPAY_COLLECT";
+    readonly Quote: "QUOTE";
 };
 export type CartType = (typeof cartType)[keyof typeof cartType];
 export declare const cartonEfficiencyInterval: {
@@ -946,19 +1550,30 @@ export declare const cashflowEmailType: {
     readonly PostalInvoiceReady: "POSTAL_INVOICE_READY";
 };
 export type CashflowEmailType = (typeof cashflowEmailType)[keyof typeof cashflowEmailType];
+export declare const catalogCsvColumnStrategy: {
+    readonly Attribute: "ATTRIBUTE";
+    readonly Field: "FIELD";
+    readonly Ignore: "IGNORE";
+    readonly Metadata: "METADATA";
+};
+export type CatalogCsvColumnStrategy = (typeof catalogCsvColumnStrategy)[keyof typeof catalogCsvColumnStrategy];
+export declare const catalogCsvMappingFieldRequirement: {
+    readonly Optional: "OPTIONAL";
+    readonly Required: "REQUIRED";
+    readonly RequiredOneOf: "REQUIRED_ONE_OF";
+};
+export type CatalogCsvMappingFieldRequirement = (typeof catalogCsvMappingFieldRequirement)[keyof typeof catalogCsvMappingFieldRequirement];
 export declare const catalogItemExportJobAction: {
     readonly Email: "EMAIL";
     readonly None: "NONE";
 };
 export type CatalogItemExportJobAction = (typeof catalogItemExportJobAction)[keyof typeof catalogItemExportJobAction];
-export declare const catalogItemInclusivePriceStatus: {
-    readonly Active: "ACTIVE";
-    readonly Archived: "ARCHIVED";
-    readonly Failed: "FAILED";
-    readonly Ignored: "IGNORED";
-    readonly Pending: "PENDING";
+export declare const catalogItemMatchBehavior: {
+    readonly Optional: "OPTIONAL";
+    readonly Required: "REQUIRED";
+    readonly RequiredForSubOrgs: "REQUIRED_FOR_SUB_ORGS";
 };
-export type CatalogItemInclusivePriceStatus = (typeof catalogItemInclusivePriceStatus)[keyof typeof catalogItemInclusivePriceStatus];
+export type CatalogItemMatchBehavior = (typeof catalogItemMatchBehavior)[keyof typeof catalogItemMatchBehavior];
 export declare const catalogItemSource: {
     readonly Classification: "CLASSIFICATION";
     readonly LegacyMigration: "LEGACY_MIGRATION";
@@ -980,11 +1595,36 @@ export declare const catalogStatus: {
     readonly Enabled: "ENABLED";
 };
 export type CatalogStatus = (typeof catalogStatus)[keyof typeof catalogStatus];
+export declare const categorySuggestionApplication: {
+    readonly Never: "NEVER";
+    readonly WhenWrong: "WHEN_WRONG";
+};
+export type CategorySuggestionApplication = (typeof categorySuggestionApplication)[keyof typeof categorySuggestionApplication];
+export declare const categoryValidationVerdict: {
+    readonly Correct: "CORRECT";
+    readonly Wrong: "WRONG";
+};
+export type CategoryValidationVerdict = (typeof categoryValidationVerdict)[keyof typeof categoryValidationVerdict];
 export declare const cbpBatchType: {
     readonly Filed: "FILED";
     readonly Paid: "PAID";
 };
 export type CbpBatchType = (typeof cbpBatchType)[keyof typeof cbpBatchType];
+export declare const cbpSubmissionJobStatus: {
+    readonly BlockedClassification: "BLOCKED_CLASSIFICATION";
+    readonly Delivered: "DELIVERED";
+    readonly Failed: "FAILED";
+    readonly NoSubmissions: "NO_SUBMISSIONS";
+    readonly Queued: "QUEUED";
+    readonly ReadyForReview: "READY_FOR_REVIEW";
+    readonly Running: "RUNNING";
+};
+export type CbpSubmissionJobStatus = (typeof cbpSubmissionJobStatus)[keyof typeof cbpSubmissionJobStatus];
+export declare const cbpSubmissionReportType: {
+    readonly InternationalMailDuty: "INTERNATIONAL_MAIL_DUTY";
+    readonly LegacyCsv: "LEGACY_CSV";
+};
+export type CbpSubmissionReportType = (typeof cbpSubmissionReportType)[keyof typeof cbpSubmissionReportType];
 export declare const cbpSubmissionStatus: {
     readonly Failed: "FAILED";
     readonly Filed: "FILED";
@@ -995,6 +1635,63 @@ export declare const cbpSubmissionStatus: {
     readonly Skipped: "SKIPPED";
 };
 export type CbpSubmissionStatus = (typeof cbpSubmissionStatus)[keyof typeof cbpSubmissionStatus];
+export declare const channelConnectionStatus: {
+    readonly Active: "ACTIVE";
+    readonly Disabled: "DISABLED";
+    readonly Error: "ERROR";
+    readonly Pending: "PENDING";
+};
+export type ChannelConnectionStatus = (typeof channelConnectionStatus)[keyof typeof channelConnectionStatus];
+export declare const channelOrderImportJobStatus: {
+    readonly Failed: "FAILED";
+    readonly Pending: "PENDING";
+    readonly Processing: "PROCESSING";
+    readonly Queued: "QUEUED";
+    readonly Succeeded: "SUCCEEDED";
+    readonly SucceededWithErrors: "SUCCEEDED_WITH_ERRORS";
+};
+export type ChannelOrderImportJobStatus = (typeof channelOrderImportJobStatus)[keyof typeof channelOrderImportJobStatus];
+export declare const channelOrderImportRowOutcome: {
+    readonly Created: "CREATED";
+    readonly Error: "ERROR";
+    readonly SkippedNoChange: "SKIPPED_NO_CHANGE";
+    readonly TrackingUpdated: "TRACKING_UPDATED";
+};
+export type ChannelOrderImportRowOutcome = (typeof channelOrderImportRowOutcome)[keyof typeof channelOrderImportRowOutcome];
+export declare const channelType: {
+    readonly Amazon: "AMAZON";
+    readonly Bigcommerce: "BIGCOMMERCE";
+    readonly CustomApi: "CUSTOM_API";
+    readonly CustomEmail: "CUSTOM_EMAIL";
+    readonly Ebay: "EBAY";
+    readonly Etsy: "ETSY";
+    readonly Magento: "MAGENTO";
+    readonly Mirakl: "MIRAKL";
+    readonly Shopify: "SHOPIFY";
+    readonly Squarespace: "SQUARESPACE";
+    readonly Walmart: "WALMART";
+    readonly Walmartca: "WALMARTCA";
+    readonly Wix: "WIX";
+    readonly Woocommerce: "WOOCOMMERCE";
+};
+export type ChannelType = (typeof channelType)[keyof typeof channelType];
+export declare const chargeAttemptOutcome: {
+    readonly HardDecline: "HARD_DECLINE";
+    readonly NetworkError: "NETWORK_ERROR";
+    readonly Pending: "PENDING";
+    readonly ProcessorError: "PROCESSOR_ERROR";
+    readonly Returned: "RETURNED";
+    readonly Settled: "SETTLED";
+    readonly SoftDecline: "SOFT_DECLINE";
+    readonly Submitted: "SUBMITTED";
+    readonly Succeeded: "SUCCEEDED";
+};
+export type ChargeAttemptOutcome = (typeof chargeAttemptOutcome)[keyof typeof chargeAttemptOutcome];
+export declare const checkoutCartType: {
+    readonly Checkout: "CHECKOUT";
+    readonly Collect: "COLLECT";
+};
+export type CheckoutCartType = (typeof checkoutCartType)[keyof typeof checkoutCartType];
 export declare const checkoutCompanyFieldsStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -1005,11 +1702,22 @@ export declare const checkoutMerchantOfRecordType: {
     readonly Zonos: "ZONOS";
 };
 export type CheckoutMerchantOfRecordType = (typeof checkoutMerchantOfRecordType)[keyof typeof checkoutMerchantOfRecordType];
+export declare const checkoutPaymentProcessorType: {
+    readonly Airwallex: "AIRWALLEX";
+    readonly Paypal: "PAYPAL";
+    readonly Stripe: "STRIPE";
+};
+export type CheckoutPaymentProcessorType = (typeof checkoutPaymentProcessorType)[keyof typeof checkoutPaymentProcessorType];
 export declare const checkoutPaypalOrderIntent: {
     readonly Authorize: "AUTHORIZE";
     readonly Capture: "CAPTURE";
 };
 export type CheckoutPaypalOrderIntent = (typeof checkoutPaypalOrderIntent)[keyof typeof checkoutPaypalOrderIntent];
+export declare const checkoutProcessor: {
+    readonly Airwallex: "AIRWALLEX";
+    readonly Stripe: "STRIPE";
+};
+export type CheckoutProcessor = (typeof checkoutProcessor)[keyof typeof checkoutProcessor];
 export declare const checkoutSessionCreationModeType: {
     readonly WithPaymentIntent: "WITH_PAYMENT_INTENT";
     readonly WithoutPaymentIntent: "WITHOUT_PAYMENT_INTENT";
@@ -1028,6 +1736,7 @@ export type CheckoutSessionStatus = (typeof checkoutSessionStatus)[keyof typeof 
 export declare const checkoutSessionType: {
     readonly Checkout: "CHECKOUT";
     readonly Collect: "COLLECT";
+    readonly DeclarationData: "DECLARATION_DATA";
     readonly Invoice: "INVOICE";
     readonly InvoiceCollect: "INVOICE_COLLECT";
     readonly LabelCollect: "LABEL_COLLECT";
@@ -1052,6 +1761,27 @@ export declare const checkoutSuccessBehavior: {
     readonly ZonosSuccessPage: "ZONOS_SUCCESS_PAGE";
 };
 export type CheckoutSuccessBehavior = (typeof checkoutSuccessBehavior)[keyof typeof checkoutSuccessBehavior];
+export declare const checkoutTaxExemptionReason: {
+    readonly Charitable: "CHARITABLE";
+    readonly DirectPay: "DIRECT_PAY";
+    readonly EducationalOrganization: "EDUCATIONAL_ORGANIZATION";
+    readonly FederalGovernment: "FEDERAL_GOVERNMENT";
+    readonly Other: "OTHER";
+    readonly ReligiousOrganization: "RELIGIOUS_ORGANIZATION";
+    readonly Resale: "RESALE";
+    readonly StateLocalGovernment: "STATE_LOCAL_GOVERNMENT";
+    readonly TribalGovernment: "TRIBAL_GOVERNMENT";
+    readonly Unspecified: "UNSPECIFIED";
+};
+export type CheckoutTaxExemptionReason = (typeof checkoutTaxExemptionReason)[keyof typeof checkoutTaxExemptionReason];
+export declare const checkoutTaxExemptionRejectionCode: {
+    readonly DuplicateJurisdiction: "DUPLICATE_JURISDICTION";
+    readonly InvalidDateRange: "INVALID_DATE_RANGE";
+    readonly MissingExemptionReference: "MISSING_EXEMPTION_REFERENCE";
+    readonly UnknownCustomer: "UNKNOWN_CUSTOMER";
+    readonly UnknownJurisdiction: "UNKNOWN_JURISDICTION";
+};
+export type CheckoutTaxExemptionRejectionCode = (typeof checkoutTaxExemptionRejectionCode)[keyof typeof checkoutTaxExemptionRejectionCode];
 export declare const checkoutVarianceTestStatus: {
     readonly Active: "ACTIVE";
     readonly Inactive: "INACTIVE";
@@ -1114,6 +1844,12 @@ export declare const classificationRequestField: {
     readonly Name: "NAME";
 };
 export type ClassificationRequestField = (typeof classificationRequestField)[keyof typeof classificationRequestField];
+export declare const classifierPromptReplyFormat: {
+    readonly Position: "POSITION";
+    readonly Text: "TEXT";
+    readonly Value: "VALUE";
+};
+export type ClassifierPromptReplyFormat = (typeof classifierPromptReplyFormat)[keyof typeof classifierPromptReplyFormat];
 export declare const classifyMissingHsCodesStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -1164,6 +1900,125 @@ export declare const commercialInvoiceImageCarrier: {
     readonly Ups: "UPS";
 };
 export type CommercialInvoiceImageCarrier = (typeof commercialInvoiceImageCarrier)[keyof typeof commercialInvoiceImageCarrier];
+export declare const commercialInvoiceItemMeasurementType: {
+    readonly AlcoholByVolume: "ALCOHOL_BY_VOLUME";
+    readonly Height: "HEIGHT";
+    readonly Length: "LENGTH";
+    readonly TotalWeight: "TOTAL_WEIGHT";
+    readonly Volume: "VOLUME";
+    readonly Weight: "WEIGHT";
+    readonly Width: "WIDTH";
+};
+export type CommercialInvoiceItemMeasurementType = (typeof commercialInvoiceItemMeasurementType)[keyof typeof commercialInvoiceItemMeasurementType];
+export declare const commercialInvoiceItemUnitOfMeasure: {
+    readonly Centimeter: "CENTIMETER";
+    readonly Foot: "FOOT";
+    readonly Gram: "GRAM";
+    readonly Inch: "INCH";
+    readonly Kilogram: "KILOGRAM";
+    readonly Liter: "LITER";
+    readonly Meter: "METER";
+    readonly Milliliter: "MILLILITER";
+    readonly Millimeter: "MILLIMETER";
+    readonly Ounce: "OUNCE";
+    readonly Percentage: "PERCENTAGE";
+    readonly Pound: "POUND";
+    readonly Yard: "YARD";
+};
+export type CommercialInvoiceItemUnitOfMeasure = (typeof commercialInvoiceItemUnitOfMeasure)[keyof typeof commercialInvoiceItemUnitOfMeasure];
+export declare const complianceAttributeSource: {
+    readonly Document: "DOCUMENT";
+    readonly Questionnaire: "QUESTIONNAIRE";
+};
+export type ComplianceAttributeSource = (typeof complianceAttributeSource)[keyof typeof complianceAttributeSource];
+export declare const complianceDocumentAttributeNamespace: {
+    readonly Composition: "COMPOSITION";
+    readonly TradeAgreement: "TRADE_AGREEMENT";
+};
+export type ComplianceDocumentAttributeNamespace = (typeof complianceDocumentAttributeNamespace)[keyof typeof complianceDocumentAttributeNamespace];
+export declare const complianceDocumentVerificationStatus: {
+    readonly Unspecified: "UNSPECIFIED";
+    readonly Unverified: "UNVERIFIED";
+    readonly Verified: "VERIFIED";
+};
+export type ComplianceDocumentVerificationStatus = (typeof complianceDocumentVerificationStatus)[keyof typeof complianceDocumentVerificationStatus];
+export declare const complianceObligationReason: {
+    readonly ContentChanged: "CONTENT_CHANGED";
+    readonly Expired: "EXPIRED";
+    readonly NewlyApplicable: "NEWLY_APPLICABLE";
+    readonly VersionRelease: "VERSION_RELEASE";
+};
+export type ComplianceObligationReason = (typeof complianceObligationReason)[keyof typeof complianceObligationReason];
+export declare const complianceObligationStatus: {
+    readonly Current: "CURRENT";
+    readonly InProgress: "IN_PROGRESS";
+    readonly NeedsReview: "NEEDS_REVIEW";
+    readonly Unanswered: "UNANSWERED";
+};
+export type ComplianceObligationStatus = (typeof complianceObligationStatus)[keyof typeof complianceObligationStatus];
+export declare const complianceProgramType: {
+    readonly Fta: "FTA";
+    readonly Other: "OTHER";
+    readonly Pga: "PGA";
+    readonly TariffMeasure: "TARIFF_MEASURE";
+};
+export type ComplianceProgramType = (typeof complianceProgramType)[keyof typeof complianceProgramType];
+export declare const complianceProvenance: {
+    readonly AgentAttested: "AGENT_ATTESTED";
+    readonly CopiedAttested: "COPIED_ATTESTED";
+    readonly InferredAttested: "INFERRED_ATTESTED";
+    readonly Manual: "MANUAL";
+};
+export type ComplianceProvenance = (typeof complianceProvenance)[keyof typeof complianceProvenance];
+export declare const complianceTranslationEntityType: {
+    readonly AnswerOption: "ANSWER_OPTION";
+    readonly Catalog: "CATALOG";
+    readonly ComplianceProgram: "COMPLIANCE_PROGRAM";
+    readonly Question: "QUESTION";
+};
+export type ComplianceTranslationEntityType = (typeof complianceTranslationEntityType)[keyof typeof complianceTranslationEntityType];
+export declare const complianceTranslationJobStatus: {
+    readonly Completed: "COMPLETED";
+    readonly Failed: "FAILED";
+    readonly InProgress: "IN_PROGRESS";
+    readonly Pending: "PENDING";
+};
+export type ComplianceTranslationJobStatus = (typeof complianceTranslationJobStatus)[keyof typeof complianceTranslationJobStatus];
+export declare const complianceUnitOfMeasure: {
+    readonly Centimeter: "CENTIMETER";
+    readonly Foot: "FOOT";
+    readonly Gram: "GRAM";
+    readonly Inch: "INCH";
+    readonly Kilogram: "KILOGRAM";
+    readonly Liter: "LITER";
+    readonly Meter: "METER";
+    readonly Milliliter: "MILLILITER";
+    readonly Millimeter: "MILLIMETER";
+    readonly Ounce: "OUNCE";
+    readonly Percentage: "PERCENTAGE";
+    readonly Pound: "POUND";
+    readonly Yard: "YARD";
+};
+export type ComplianceUnitOfMeasure = (typeof complianceUnitOfMeasure)[keyof typeof complianceUnitOfMeasure];
+export declare const compositionAttributeKey: {
+    readonly CountryOfCast: "COUNTRY_OF_CAST";
+    readonly CountryOfMeltAndPour: "COUNTRY_OF_MELT_AND_POUR";
+    readonly CountryOfOrigin: "COUNTRY_OF_ORIGIN";
+    readonly CountryOfPour: "COUNTRY_OF_POUR";
+    readonly CountryOfSmelt: "COUNTRY_OF_SMELT";
+    readonly MaterialOrigin: "MATERIAL_ORIGIN";
+};
+export type CompositionAttributeKey = (typeof compositionAttributeKey)[keyof typeof compositionAttributeKey];
+export declare const conditionOperator: {
+    readonly Answered: "ANSWERED";
+    readonly Equals: "EQUALS";
+    readonly Excludes: "EXCLUDES";
+    readonly IncludesAll: "INCLUDES_ALL";
+    readonly IncludesAny: "INCLUDES_ANY";
+    readonly NotAnswered: "NOT_ANSWERED";
+    readonly NotEquals: "NOT_EQUALS";
+};
+export type ConditionOperator = (typeof conditionOperator)[keyof typeof conditionOperator];
 export declare const confidenceScoreDisplayStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -1174,17 +2029,55 @@ export declare const connectTransferOriginType: {
     readonly Platform: "PLATFORM";
 };
 export type ConnectTransferOriginType = (typeof connectTransferOriginType)[keyof typeof connectTransferOriginType];
+export declare const consignmentGreenLightFindingState: {
+    readonly Open: "OPEN";
+    readonly Resolved: "RESOLVED";
+};
+export type ConsignmentGreenLightFindingState = (typeof consignmentGreenLightFindingState)[keyof typeof consignmentGreenLightFindingState];
+export declare const consignmentGreenLightResolutionOwner: {
+    readonly Operator: "OPERATOR";
+    readonly Shipper: "SHIPPER";
+};
+export type ConsignmentGreenLightResolutionOwner = (typeof consignmentGreenLightResolutionOwner)[keyof typeof consignmentGreenLightResolutionOwner];
+export declare const consignmentGreenLightValueJustificationReason: {
+    readonly DamagedOrRepaired: "DAMAGED_OR_REPAIRED";
+    readonly GiftNotRetail: "GIFT_NOT_RETAIL";
+    readonly Other: "OTHER";
+    readonly Sample: "SAMPLE";
+    readonly UsedSecondHand: "USED_SECOND_HAND";
+};
+export type ConsignmentGreenLightValueJustificationReason = (typeof consignmentGreenLightValueJustificationReason)[keyof typeof consignmentGreenLightValueJustificationReason];
+export declare const consignmentItemReadiness: {
+    readonly ActionRequired: "ACTION_REQUIRED";
+    readonly Pending: "PENDING";
+    readonly Ready: "READY";
+};
+export type ConsignmentItemReadiness = (typeof consignmentItemReadiness)[keyof typeof consignmentItemReadiness];
+export declare const consignmentReadinessProfile: {
+    readonly ComplianceInferred: "COMPLIANCE_INFERRED";
+    readonly GreenLightInferred: "GREEN_LIGHT_INFERRED";
+    readonly Standard: "STANDARD";
+};
+export type ConsignmentReadinessProfile = (typeof consignmentReadinessProfile)[keyof typeof consignmentReadinessProfile];
 export declare const consignmentStatus: {
     readonly Accepted: "ACCEPTED";
     readonly Archived: "ARCHIVED";
+    readonly Cancelled: "CANCELLED";
     readonly Candidate: "CANDIDATE";
     readonly Draft: "DRAFT";
+    readonly Error: "ERROR";
     readonly Filed: "FILED";
     readonly Filing: "FILING";
+    readonly Processing: "PROCESSING";
     readonly Ready: "READY";
     readonly Rejected: "REJECTED";
 };
 export type ConsignmentStatus = (typeof consignmentStatus)[keyof typeof consignmentStatus];
+export declare const consolidationSort: {
+    readonly ArrivalDateDesc: "ARRIVAL_DATE_DESC";
+    readonly CreatedAtDesc: "CREATED_AT_DESC";
+};
+export type ConsolidationSort = (typeof consolidationSort)[keyof typeof consolidationSort];
 export declare const consolidationStatus: {
     readonly Archived: "ARCHIVED";
     readonly Arrived: "ARRIVED";
@@ -1424,10 +2317,24 @@ export declare const constraintUnitCode: {
     readonly Zwl: "ZWL";
 };
 export type ConstraintUnitCode = (typeof constraintUnitCode)[keyof typeof constraintUnitCode];
+export declare const containerType: {
+    readonly CatalogItem: "CATALOG_ITEM";
+    readonly Consignment: "CONSIGNMENT";
+    readonly Consolidation: "CONSOLIDATION";
+    readonly Declaration: "DECLARATION";
+    readonly LandedCost: "LANDED_COST";
+};
+export type ContainerType = (typeof containerType)[keyof typeof containerType];
 export declare const contentType: {
     readonly Csv: "CSV";
 };
 export type ContentType = (typeof contentType)[keyof typeof contentType];
+export declare const controlTier: {
+    readonly DualUse: "DUAL_USE";
+    readonly Munitions: "MUNITIONS";
+    readonly Uncontrolled: "UNCONTROLLED";
+};
+export type ControlTier = (typeof controlTier)[keyof typeof controlTier];
 export declare const controlType: {
     readonly Carrier: "CARRIER";
     readonly Export: "EXPORT";
@@ -1680,6 +2587,7 @@ export declare const countryCode: {
     readonly Vu: "VU";
     readonly Wf: "WF";
     readonly Ws: "WS";
+    readonly Xk: "XK";
     readonly Ye: "YE";
     readonly Yt: "YT";
     readonly Za: "ZA";
@@ -1901,6 +2809,13 @@ export declare const currencySymbolLocation: {
     readonly Before: "BEFORE";
 };
 export type CurrencySymbolLocation = (typeof currencySymbolLocation)[keyof typeof currencySymbolLocation];
+export declare const customsDescriptionValidationStatus: {
+    readonly Incomplete: "INCOMPLETE";
+    readonly Ready: "READY";
+    readonly ReadyToSubheading: "READY_TO_SUBHEADING";
+    readonly Unrecognizable: "UNRECOGNIZABLE";
+};
+export type CustomsDescriptionValidationStatus = (typeof customsDescriptionValidationStatus)[keyof typeof customsDescriptionValidationStatus];
 export declare const customsDocumentCarrier: {
     readonly Dhl: "DHL";
     readonly Fedex: "FEDEX";
@@ -1951,23 +2866,6 @@ export declare const customsHoldReason: {
     readonly Unknown: "UNKNOWN";
 };
 export type CustomsHoldReason = (typeof customsHoldReason)[keyof typeof customsHoldReason];
-export declare const customsIntelBucketGranularity: {
-    readonly Day: "DAY";
-    readonly Hour: "HOUR";
-};
-export type CustomsIntelBucketGranularity = (typeof customsIntelBucketGranularity)[keyof typeof customsIntelBucketGranularity];
-export declare const customsIntelShipmentSortBy: {
-    readonly Date: "DATE";
-    readonly ItemCount: "ITEM_COUNT";
-    readonly RiskScore: "RISK_SCORE";
-    readonly ShipmentValue: "SHIPMENT_VALUE";
-};
-export type CustomsIntelShipmentSortBy = (typeof customsIntelShipmentSortBy)[keyof typeof customsIntelShipmentSortBy];
-export declare const customsIntelSortOrder: {
-    readonly Asc: "ASC";
-    readonly Desc: "DESC";
-};
-export type CustomsIntelSortOrder = (typeof customsIntelSortOrder)[keyof typeof customsIntelSortOrder];
 export declare const customsItemValueSource: {
     readonly ApiRequest: "API_REQUEST";
     readonly Catalog: "CATALOG";
@@ -2035,6 +2933,31 @@ export declare const customsStage: {
     readonly PreCustoms: "PRE_CUSTOMS";
 };
 export type CustomsStage = (typeof customsStage)[keyof typeof customsStage];
+export declare const dangerousGoodsAccessibility: {
+    readonly Accessible: "ACCESSIBLE";
+    readonly Inaccessible: "INACCESSIBLE";
+};
+export type DangerousGoodsAccessibility = (typeof dangerousGoodsAccessibility)[keyof typeof dangerousGoodsAccessibility];
+export declare const dangerousGoodsCategory: {
+    readonly BiologicalSubstance: "BIOLOGICAL_SUBSTANCE";
+    readonly ConsumerCommodity: "CONSUMER_COMMODITY";
+    readonly ExceptedQuantity: "EXCEPTED_QUANTITY";
+    readonly FullyRegulated: "FULLY_REGULATED";
+    readonly LimitedQuantity: "LIMITED_QUANTITY";
+    readonly MagnetizedMaterial: "MAGNETIZED_MATERIAL";
+    readonly NotRestrictedA02: "NOT_RESTRICTED_A02";
+    readonly NotRestrictedA67: "NOT_RESTRICTED_A67";
+    readonly NotRestrictedA70: "NOT_RESTRICTED_A70";
+};
+export type DangerousGoodsCategory = (typeof dangerousGoodsCategory)[keyof typeof dangerousGoodsCategory];
+export declare const dangerousGoodsOption: {
+    readonly HazardousMaterials: "HAZARDOUS_MATERIALS";
+    readonly LimitedQuantitiesCommodities: "LIMITED_QUANTITIES_COMMODITIES";
+    readonly OrmD: "ORM_D";
+    readonly ReportableQuantities: "REPORTABLE_QUANTITIES";
+    readonly SmallQuantityException: "SMALL_QUANTITY_EXCEPTION";
+};
+export type DangerousGoodsOption = (typeof dangerousGoodsOption)[keyof typeof dangerousGoodsOption];
 export declare const dashboardUnit: {
     readonly Imperial: "IMPERIAL";
     readonly Metric: "METRIC";
@@ -2072,6 +2995,12 @@ export declare const declarationPaymentStatus: {
     readonly Paid: "PAID";
 };
 export type DeclarationPaymentStatus = (typeof declarationPaymentStatus)[keyof typeof declarationPaymentStatus];
+export declare const declarationPreClearanceStatus: {
+    readonly ConditionalRequirementsPending: "CONDITIONAL_REQUIREMENTS_PENDING";
+    readonly MissingRequirements: "MISSING_REQUIREMENTS";
+    readonly Ready: "READY";
+};
+export type DeclarationPreClearanceStatus = (typeof declarationPreClearanceStatus)[keyof typeof declarationPreClearanceStatus];
 export declare const declarationSource: {
     readonly Direct: "DIRECT";
     readonly Post: "POST";
@@ -2112,6 +3041,11 @@ export declare const descriptionOverrideScope: {
     readonly Labels: "LABELS";
 };
 export type DescriptionOverrideScope = (typeof descriptionOverrideScope)[keyof typeof descriptionOverrideScope];
+export declare const detailCategoryStatus: {
+    readonly Active: "ACTIVE";
+    readonly Deleted: "DELETED";
+};
+export type DetailCategoryStatus = (typeof detailCategoryStatus)[keyof typeof detailCategoryStatus];
 export declare const detailCategoryTaxableType: {
     readonly SaasTax: "SAAS_TAX";
 };
@@ -2133,6 +3067,28 @@ export declare const detailGroupInputType: {
     readonly PostalOrderCancel: "POSTAL_ORDER_CANCEL";
 };
 export type DetailGroupInputType = (typeof detailGroupInputType)[keyof typeof detailGroupInputType];
+export declare const deviceClass: {
+    readonly ClassI: "CLASS_I";
+    readonly ClassIi: "CLASS_II";
+    readonly ClassIii: "CLASS_III";
+    readonly NotClassified: "NOT_CLASSIFIED";
+    readonly Unclassified: "UNCLASSIFIED";
+    readonly Unspecified: "UNSPECIFIED";
+};
+export type DeviceClass = (typeof deviceClass)[keyof typeof deviceClass];
+export declare const deviceEstablishmentRole: {
+    readonly ForeignExporter: "FOREIGN_EXPORTER";
+    readonly ForeignManufacturer: "FOREIGN_MANUFACTURER";
+    readonly UnitedStatesManufacturer: "UNITED_STATES_MANUFACTURER";
+};
+export type DeviceEstablishmentRole = (typeof deviceEstablishmentRole)[keyof typeof deviceEstablishmentRole];
+export declare const devicePremarketStatus: {
+    readonly Exempt: "EXEMPT";
+    readonly RequiredPma: "REQUIRED_PMA";
+    readonly Required_510K: "REQUIRED_510K";
+    readonly Unspecified: "UNSPECIFIED";
+};
+export type DevicePremarketStatus = (typeof devicePremarketStatus)[keyof typeof devicePremarketStatus];
 export declare const dimensionalUnitCode: {
     readonly Centimeter: "CENTIMETER";
     readonly Decimeter: "DECIMETER";
@@ -2153,11 +3109,42 @@ export declare const displayCurrency: {
     readonly StoreNative: "STORE_NATIVE";
 };
 export type DisplayCurrency = (typeof displayCurrency)[keyof typeof displayCurrency];
+export declare const disputeClaimReviewTrigger: {
+    readonly CitedCustomsRuling: "CITED_CUSTOMS_RULING";
+    readonly ConflictingEvidence: "CONFLICTING_EVIDENCE";
+    readonly UnreadableEvidence: "UNREADABLE_EVIDENCE";
+    readonly UnsettledClassification: "UNSETTLED_CLASSIFICATION";
+    readonly UnsupportedClaimType: "UNSUPPORTED_CLAIM_TYPE";
+};
+export type DisputeClaimReviewTrigger = (typeof disputeClaimReviewTrigger)[keyof typeof disputeClaimReviewTrigger];
+export declare const disputeClaimType: {
+    readonly CountryOfOrigin: "COUNTRY_OF_ORIGIN";
+    readonly DeclaredValue: "DECLARED_VALUE";
+    readonly Description: "DESCRIPTION";
+    readonly HsCode: "HS_CODE";
+    readonly Quantity: "QUANTITY";
+    readonly Questionnaire: "QUESTIONNAIRE";
+    readonly TariffLineNotApplicable: "TARIFF_LINE_NOT_APPLICABLE";
+    readonly TariffRateChanged: "TARIFF_RATE_CHANGED";
+    readonly TariffRateMiscalculated: "TARIFF_RATE_MISCALCULATED";
+    readonly Weight: "WEIGHT";
+};
+export type DisputeClaimType = (typeof disputeClaimType)[keyof typeof disputeClaimType];
+export declare const disputeClaimVerdict: {
+    readonly Accepted: "ACCEPTED";
+    readonly Denied: "DENIED";
+    readonly Review: "REVIEW";
+};
+export type DisputeClaimVerdict = (typeof disputeClaimVerdict)[keyof typeof disputeClaimVerdict];
+export declare const disputeEvidenceScope: {
+    readonly Item: "ITEM";
+    readonly Order: "ORDER";
+};
+export type DisputeEvidenceScope = (typeof disputeEvidenceScope)[keyof typeof disputeEvidenceScope];
 export declare const disputeStatus: {
     readonly Closed: "CLOSED";
     readonly Lost: "LOST";
     readonly Open: "OPEN";
-    readonly Prevented: "PREVENTED";
     readonly UnderReview: "UNDER_REVIEW";
     readonly Won: "WON";
 };
@@ -2169,11 +3156,27 @@ export declare const disputeType: {
     readonly PreArbitration: "PRE_ARBITRATION";
 };
 export type DisputeType = (typeof disputeType)[keyof typeof disputeType];
+export declare const documentExtractionStatus: {
+    readonly Active: "ACTIVE";
+    readonly Deleted: "DELETED";
+    readonly Failed: "FAILED";
+};
+export type DocumentExtractionStatus = (typeof documentExtractionStatus)[keyof typeof documentExtractionStatus];
 export declare const documentFilingType: {
     readonly Electronic: "ELECTRONIC";
     readonly HardCopy: "HARD_COPY";
 };
 export type DocumentFilingType = (typeof documentFilingType)[keyof typeof documentFilingType];
+export declare const documentReferenceType: {
+    readonly CatalogItem: "CATALOG_ITEM";
+    readonly Item: "ITEM";
+    readonly Order: "ORDER";
+    readonly Product: "PRODUCT";
+    readonly Shipment: "SHIPMENT";
+    readonly Sku: "SKU";
+    readonly TrackingNumber: "TRACKING_NUMBER";
+};
+export type DocumentReferenceType = (typeof documentReferenceType)[keyof typeof documentReferenceType];
 export declare const documentType: {
     readonly CertificateOfOrigin: "CERTIFICATE_OF_ORIGIN";
     readonly CommercialInvoice: "COMMERCIAL_INVOICE";
@@ -2189,6 +3192,12 @@ export declare const documentUsage: {
     readonly PricingDocuments: "PRICING_DOCUMENTS";
 };
 export type DocumentUsage = (typeof documentUsage)[keyof typeof documentUsage];
+export declare const documentVerdict: {
+    readonly Block: "BLOCK";
+    readonly NotEvaluated: "NOT_EVALUATED";
+    readonly Pass: "PASS";
+};
+export type DocumentVerdict = (typeof documentVerdict)[keyof typeof documentVerdict];
 export declare const domesticCheckoutStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -2201,6 +3210,21 @@ export declare const draftDetailEventTrigger: {
     readonly TrackingNumber: "TRACKING_NUMBER";
 };
 export type DraftDetailEventTrigger = (typeof draftDetailEventTrigger)[keyof typeof draftDetailEventTrigger];
+export declare const draftExportHsCodePreference: {
+    readonly Classification: "CLASSIFICATION";
+    readonly Provided: "PROVIDED";
+};
+export type DraftExportHsCodePreference = (typeof draftExportHsCodePreference)[keyof typeof draftExportHsCodePreference];
+export declare const draftHsCodePreference: {
+    readonly Classification: "CLASSIFICATION";
+    readonly Provided: "PROVIDED";
+};
+export type DraftHsCodePreference = (typeof draftHsCodePreference)[keyof typeof draftHsCodePreference];
+export declare const drugListingType: {
+    readonly Finished: "FINISHED";
+    readonly Unfinished: "UNFINISHED";
+};
+export type DrugListingType = (typeof drugListingType)[keyof typeof drugListingType];
 export declare const dutyTaxFeeConfiguration: {
     readonly ExcludeAll: "EXCLUDE_ALL";
     readonly ExcludeDuty: "EXCLUDE_DUTY";
@@ -2215,6 +3239,11 @@ export declare const dynamicPackagingStatus: {
     readonly Enabled: "ENABLED";
 };
 export type DynamicPackagingStatus = (typeof dynamicPackagingStatus)[keyof typeof dynamicPackagingStatus];
+export declare const effectTarget: {
+    readonly ItemAttribute: "ITEM_ATTRIBUTE";
+    readonly ItemProductComposition: "ITEM_PRODUCT_COMPOSITION";
+};
+export type EffectTarget = (typeof effectTarget)[keyof typeof effectTarget];
 export declare const elementsUiStyle: {
     readonly Rounded: "ROUNDED";
     readonly Sharp: "SHARP";
@@ -2226,6 +3255,12 @@ export declare const elementsUiTheme: {
     readonly System: "SYSTEM";
 };
 export type ElementsUiTheme = (typeof elementsUiTheme)[keyof typeof elementsUiTheme];
+export declare const emailDomainAuthenticationStatus: {
+    readonly Failed: "FAILED";
+    readonly Pending: "PENDING";
+    readonly Verified: "VERIFIED";
+};
+export type EmailDomainAuthenticationStatus = (typeof emailDomainAuthenticationStatus)[keyof typeof emailDomainAuthenticationStatus];
 export declare const emailPreferenceCategory: {
     readonly AccountAndSecurity: "ACCOUNT_AND_SECURITY";
     readonly BetaAndResearch: "BETA_AND_RESEARCH";
@@ -2250,7 +3285,13 @@ export declare const emailRecordStatusFilter: {
     readonly Opened: "OPENED";
     readonly Pending: "PENDING";
     readonly SpamReported: "SPAM_REPORTED";
+    readonly Suppressed: "SUPPRESSED";
 };
+export declare const emailSendingStatus: {
+    readonly Disabled: "DISABLED";
+    readonly Enabled: "ENABLED";
+};
+export type EmailSendingStatus = (typeof emailSendingStatus)[keyof typeof emailSendingStatus];
 export declare const emailStatsInterval: {
     readonly Day: "DAY";
     readonly Week: "WEEK";
@@ -2269,7 +3310,9 @@ export type EmailTemplateStatus = (typeof emailTemplateStatus)[keyof typeof emai
 export declare const emailTemplateType: {
     readonly AbandonedCart: "ABANDONED_CART";
     readonly AccountOrderReceipt: "ACCOUNT_ORDER_RECEIPT";
+    readonly BrokerageBatchSubmitted: "BROKERAGE_BATCH_SUBMITTED";
     readonly CarrierAccountReconnect: "CARRIER_ACCOUNT_RECONNECT";
+    readonly CatalogComplianceCollect: "CATALOG_COMPLIANCE_COLLECT";
     readonly CatalogExport: "CATALOG_EXPORT";
     readonly CheckoutCollect: "CHECKOUT_COLLECT";
     readonly ClassificationExport: "CLASSIFICATION_EXPORT";
@@ -2297,6 +3340,7 @@ export declare const emailTemplateType: {
     readonly PrepayCollect: "PREPAY_COLLECT";
     readonly PrepayCollectMissingTracking: "PREPAY_COLLECT_MISSING_TRACKING";
     readonly ReportExport: "REPORT_EXPORT";
+    readonly ShipmentInfoCollect: "SHIPMENT_INFO_COLLECT";
     readonly Unknown: "UNKNOWN";
 };
 export type EmailTemplateType = (typeof emailTemplateType)[keyof typeof emailTemplateType];
@@ -2337,6 +3381,7 @@ export type EntityType = (typeof entityType)[keyof typeof entityType];
 export declare const entryStatus: {
     readonly Accepted: "ACCEPTED";
     readonly Archived: "ARCHIVED";
+    readonly Cancelled: "CANCELLED";
     readonly Draft: "DRAFT";
     readonly Error: "ERROR";
     readonly Filed: "FILED";
@@ -2344,22 +3389,54 @@ export declare const entryStatus: {
     readonly Submitted: "SUBMITTED";
 };
 export type EntryStatus = (typeof entryStatus)[keyof typeof entryStatus];
-export declare const errorDetail: {
-    readonly DeadlineExceeded: "DEADLINE_EXCEEDED";
-    readonly EnhanceYourCalm: "ENHANCE_YOUR_CALM";
-    readonly FieldNotFound: "FIELD_NOT_FOUND";
-    readonly InvalidArgument: "INVALID_ARGUMENT";
-    readonly InvalidCursor: "INVALID_CURSOR";
-    readonly MissingResource: "MISSING_RESOURCE";
-    readonly ServiceError: "SERVICE_ERROR";
-    readonly TcpFailure: "TCP_FAILURE";
-    readonly ThrottledConcurrency: "THROTTLED_CONCURRENCY";
-    readonly ThrottledCpu: "THROTTLED_CPU";
-    readonly TooManyRequests: "TOO_MANY_REQUESTS";
-    readonly Unimplemented: "UNIMPLEMENTED";
-    readonly Unknown: "UNKNOWN";
+export declare const entryType: {
+    readonly Imdw: "IMDW";
+    readonly Type_11: "TYPE_11";
+    readonly Type_13: "TYPE_13";
 };
-export type ErrorDetail = (typeof errorDetail)[keyof typeof errorDetail];
+export type EntryType = (typeof entryType)[keyof typeof entryType];
+export declare const entryTypeExclusionCategory: {
+    readonly Alcohol: "ALCOHOL";
+    readonly AntiDumping: "ANTI_DUMPING";
+    readonly Countervailing: "COUNTERVAILING";
+    readonly OrderValueLimit: "ORDER_VALUE_LIMIT";
+    readonly Other: "OTHER";
+    readonly Quota: "QUOTA";
+    readonly Tobacco: "TOBACCO";
+};
+export type EntryTypeExclusionCategory = (typeof entryTypeExclusionCategory)[keyof typeof entryTypeExclusionCategory];
+export declare const entryTypeExclusionConditionType: {
+    readonly ItemHsCountry: "ITEM_HS_COUNTRY";
+    readonly OrderValue: "ORDER_VALUE";
+};
+export type EntryTypeExclusionConditionType = (typeof entryTypeExclusionConditionType)[keyof typeof entryTypeExclusionConditionType];
+export declare const epaCertification: {
+    readonly Negative: "NEGATIVE";
+    readonly Positive: "POSITIVE";
+};
+export type EpaCertification = (typeof epaCertification)[keyof typeof epaCertification];
+export declare const epaDisclaimCode: {
+    readonly A: "A";
+    readonly B: "B";
+    readonly C: "C";
+    readonly D: "D";
+};
+export type EpaDisclaimCode = (typeof epaDisclaimCode)[keyof typeof epaDisclaimCode];
+export declare const epaFormType: {
+    readonly Form_3520_1: "FORM_3520_1";
+    readonly Form_3520_21: "FORM_3520_21";
+};
+export type EpaFormType = (typeof epaFormType)[keyof typeof epaFormType];
+export declare const epaProgram: {
+    readonly Hfc: "HFC";
+    readonly Ods: "ODS";
+    readonly Ps1: "PS1";
+    readonly Ps2: "PS2";
+    readonly Ps3: "PS3";
+    readonly Ts1: "TS1";
+    readonly Vne: "VNE";
+};
+export type EpaProgram = (typeof epaProgram)[keyof typeof epaProgram];
 export declare const errorType: {
     readonly BadRequest: "BAD_REQUEST";
     readonly FailedPrecondition: "FAILED_PRECONDITION";
@@ -2371,8 +3448,24 @@ export declare const errorType: {
     readonly Unknown: "UNKNOWN";
 };
 export type ErrorType = (typeof errorType)[keyof typeof errorType];
+export declare const exchangeRateAmountType: {
+    readonly Discount: "DISCOUNT";
+    readonly Duty: "DUTY";
+    readonly Fee: "FEE";
+    readonly Item: "ITEM";
+    readonly Shipping: "SHIPPING";
+    readonly Tax: "TAX";
+};
+export type ExchangeRateAmountType = (typeof exchangeRateAmountType)[keyof typeof exchangeRateAmountType];
 export declare const exchangeRateSource: {
     readonly Cbp: "CBP";
+    readonly Ecb: "ECB";
+    readonly EuCustomsCzk: "EU_CUSTOMS_CZK";
+    readonly EuCustomsDkk: "EU_CUSTOMS_DKK";
+    readonly EuCustomsHuf: "EU_CUSTOMS_HUF";
+    readonly EuCustomsPln: "EU_CUSTOMS_PLN";
+    readonly EuCustomsRon: "EU_CUSTOMS_RON";
+    readonly EuCustomsSek: "EU_CUSTOMS_SEK";
     readonly Fixer: "FIXER";
     readonly Static: "STATIC";
 };
@@ -2419,6 +3512,102 @@ export declare const externalServiceTokenType: {
     readonly StripePublishableToken: "STRIPE_PUBLISHABLE_TOKEN";
 };
 export type ExternalServiceTokenType = (typeof externalServiceTokenType)[keyof typeof externalServiceTokenType];
+export declare const fccEquipmentAuthorizationInferenceStatus: {
+    readonly ComponentsMatched: "COMPONENTS_MATCHED";
+    readonly InsufficientInformation: "INSUFFICIENT_INFORMATION";
+    readonly Matched: "MATCHED";
+    readonly NoMatch: "NO_MATCH";
+    readonly NotRegulated: "NOT_REGULATED";
+};
+export type FccEquipmentAuthorizationInferenceStatus = (typeof fccEquipmentAuthorizationInferenceStatus)[keyof typeof fccEquipmentAuthorizationInferenceStatus];
+export declare const fccEquipmentAuthorizationRelationship: {
+    readonly ComponentOfProduct: "COMPONENT_OF_PRODUCT";
+    readonly DifferentProduct: "DIFFERENT_PRODUCT";
+    readonly RelatedProduct: "RELATED_PRODUCT";
+    readonly SameProduct: "SAME_PRODUCT";
+    readonly Unknown: "UNKNOWN";
+};
+export type FccEquipmentAuthorizationRelationship = (typeof fccEquipmentAuthorizationRelationship)[keyof typeof fccEquipmentAuthorizationRelationship];
+export declare const fccEquipmentAuthorizationValidationVerdict: {
+    readonly DefinitelyNotSame: "DEFINITELY_NOT_SAME";
+    readonly DefinitelySame: "DEFINITELY_SAME";
+    readonly Indeterminate: "INDETERMINATE";
+    readonly LikelySame: "LIKELY_SAME";
+    readonly UnlikelySame: "UNLIKELY_SAME";
+};
+export type FccEquipmentAuthorizationValidationVerdict = (typeof fccEquipmentAuthorizationValidationVerdict)[keyof typeof fccEquipmentAuthorizationValidationVerdict];
+export declare const fccIdStatus: {
+    readonly Malformed: "MALFORMED";
+    readonly NotOnRecord: "NOT_ON_RECORD";
+    readonly OnRecord: "ON_RECORD";
+    readonly UnknownGrantee: "UNKNOWN_GRANTEE";
+};
+export type FccIdStatus = (typeof fccIdStatus)[keyof typeof fccIdStatus];
+export declare const fccRadioType: {
+    readonly Cellular: "CELLULAR";
+    readonly Nfc: "NFC";
+    readonly Other: "OTHER";
+    readonly WifiBluetooth: "WIFI_BLUETOOTH";
+};
+export type FccRadioType = (typeof fccRadioType)[keyof typeof fccRadioType];
+export declare const fccReferenceDataImportStatus: {
+    readonly Failed: "FAILED";
+    readonly Pending: "PENDING";
+    readonly Running: "RUNNING";
+    readonly Succeeded: "SUCCEEDED";
+};
+export type FccReferenceDataImportStatus = (typeof fccReferenceDataImportStatus)[keyof typeof fccReferenceDataImportStatus];
+export declare const fdaAffirmationCategory: {
+    readonly Entity: "ENTITY";
+    readonly Product: "PRODUCT";
+    readonly Transport: "TRANSPORT";
+};
+export type FdaAffirmationCategory = (typeof fdaAffirmationCategory)[keyof typeof fdaAffirmationCategory];
+export declare const fdaAffirmationConditionField: {
+    readonly CountryOfOrigin: "COUNTRY_OF_ORIGIN";
+    readonly EntityRole: "ENTITY_ROLE";
+    readonly ImpactResistantLens: "IMPACT_RESISTANT_LENS";
+    readonly IntendedUseCode: "INTENDED_USE_CODE";
+    readonly ModeOfTransport: "MODE_OF_TRANSPORT";
+    readonly ProcessingCode: "PROCESSING_CODE";
+    readonly ProductCodeIndustry: "PRODUCT_CODE_INDUSTRY";
+    readonly ProductCodePic: "PRODUCT_CODE_PIC";
+    readonly ProductCodeSubclass: "PRODUCT_CODE_SUBCLASS";
+    readonly Program: "PROGRAM";
+    readonly RadiationStandard: "RADIATION_STANDARD";
+};
+export type FdaAffirmationConditionField = (typeof fdaAffirmationConditionField)[keyof typeof fdaAffirmationConditionField];
+export declare const fdaCollapseMode: {
+    readonly Disabled: "DISABLED";
+    readonly Enabled: "ENABLED";
+};
+export type FdaCollapseMode = (typeof fdaCollapseMode)[keyof typeof fdaCollapseMode];
+export declare const fdaProductCodeFragmentType: {
+    readonly Class: "CLASS";
+    readonly Industry: "INDUSTRY";
+    readonly Product: "PRODUCT";
+    readonly ProductIndicatorCode: "PRODUCT_INDICATOR_CODE";
+    readonly Subclass: "SUBCLASS";
+};
+export type FdaProductCodeFragmentType = (typeof fdaProductCodeFragmentType)[keyof typeof fdaProductCodeFragmentType];
+export declare const fdaProductCodeLevel: {
+    readonly Class: "CLASS";
+    readonly Pic: "PIC";
+    readonly Subclass: "SUBCLASS";
+};
+export type FdaProductCodeLevel = (typeof fdaProductCodeLevel)[keyof typeof fdaProductCodeLevel];
+export declare const fdaRadiationStandardStatus: {
+    readonly Applicable: "APPLICABLE";
+    readonly NonApplicable: "NON_APPLICABLE";
+    readonly Unknown: "UNKNOWN";
+};
+export type FdaRadiationStandardStatus = (typeof fdaRadiationStandardStatus)[keyof typeof fdaRadiationStandardStatus];
+export declare const fdaTissueRegistrationStatus: {
+    readonly Inactive: "INACTIVE";
+    readonly PreRegistered: "PRE_REGISTERED";
+    readonly Registered: "REGISTERED";
+};
+export type FdaTissueRegistrationStatus = (typeof fdaTissueRegistrationStatus)[keyof typeof fdaTissueRegistrationStatus];
 export declare const fedExCategoryCode: {
     readonly Shipping: "SHIPPING";
 };
@@ -2448,13 +3637,77 @@ export declare const fulfillmentCenterType: {
     readonly Standard: "STANDARD";
 };
 export type FulfillmentCenterType = (typeof fulfillmentCenterType)[keyof typeof fulfillmentCenterType];
+export declare const fwsCitesAppendix: {
+    readonly I: "I";
+    readonly Ii: "II";
+    readonly Iii: "III";
+    readonly None: "NONE";
+};
+export type FwsCitesAppendix = (typeof fwsCitesAppendix)[keyof typeof fwsCitesAppendix];
+export declare const fwsDisclaimCode: {
+    readonly Exempt: "EXEMPT";
+    readonly NoWildlife: "NO_WILDLIFE";
+};
+export type FwsDisclaimCode = (typeof fwsDisclaimCode)[keyof typeof fwsDisclaimCode];
+export declare const fwsItemType: {
+    readonly Component: "COMPONENT";
+    readonly Product: "PRODUCT";
+};
+export type FwsItemType = (typeof fwsItemType)[keyof typeof fwsItemType];
+export declare const fwsPurposeCode: {
+    readonly B: "B";
+    readonly E: "E";
+    readonly G: "G";
+    readonly H: "H";
+    readonly L: "L";
+    readonly M: "M";
+    readonly N: "N";
+    readonly P: "P";
+    readonly Q: "Q";
+    readonly S: "S";
+    readonly T: "T";
+    readonly Z: "Z";
+};
+export type FwsPurposeCode = (typeof fwsPurposeCode)[keyof typeof fwsPurposeCode];
+export declare const fwsSourceCode: {
+    readonly A: "A";
+    readonly C: "C";
+    readonly D: "D";
+    readonly F: "F";
+    readonly I: "I";
+    readonly O: "O";
+    readonly R: "R";
+    readonly U: "U";
+    readonly W: "W";
+    readonly X: "X";
+};
+export type FwsSourceCode = (typeof fwsSourceCode)[keyof typeof fwsSourceCode];
+export declare const fwsUnitOfMeasure: {
+    readonly Cm: "CM";
+    readonly G: "G";
+    readonly Kg: "KG";
+    readonly L: "L";
+    readonly M: "M";
+    readonly M2: "M2";
+    readonly M3: "M3";
+    readonly Ml: "ML";
+    readonly No: "NO";
+};
+export type FwsUnitOfMeasure = (typeof fwsUnitOfMeasure)[keyof typeof fwsUnitOfMeasure];
 export declare const generalAdjustmentRecordCreateType: {
     readonly ConnectAccountAdjustment: "CONNECT_ACCOUNT_ADJUSTMENT";
     readonly InvoiceLineRecord: "INVOICE_LINE_RECORD";
 };
 export type GeneralAdjustmentRecordCreateType = (typeof generalAdjustmentRecordCreateType)[keyof typeof generalAdjustmentRecordCreateType];
+export declare const generativeRole: {
+    readonly Assistant: "ASSISTANT";
+    readonly System: "SYSTEM";
+    readonly User: "USER";
+};
+export type GenerativeRole = (typeof generativeRole)[keyof typeof generativeRole];
 export declare const greenLightCheck: {
     readonly CountryOfOriginValidation: "COUNTRY_OF_ORIGIN_VALIDATION";
+    readonly CustomsDescriptionValidation: "CUSTOMS_DESCRIPTION_VALIDATION";
     readonly DeniedPartyScreening: "DENIED_PARTY_SCREENING";
     readonly HsCodeCoherence: "HS_CODE_COHERENCE";
     readonly RegulationCheck: "REGULATION_CHECK";
@@ -2462,6 +3715,24 @@ export declare const greenLightCheck: {
     readonly ValueValidation: "VALUE_VALIDATION";
 };
 export type GreenLightCheck = (typeof greenLightCheck)[keyof typeof greenLightCheck];
+export declare const greenLightCustomsDescriptionStatus: {
+    readonly Incomplete: "INCOMPLETE";
+    readonly Ready: "READY";
+    readonly ReadyToSubheading: "READY_TO_SUBHEADING";
+    readonly Unrecognizable: "UNRECOGNIZABLE";
+};
+export type GreenLightCustomsDescriptionStatus = (typeof greenLightCustomsDescriptionStatus)[keyof typeof greenLightCustomsDescriptionStatus];
+export declare const greenLightRestrictionCategory: {
+    readonly Cost: "COST";
+    readonly DangerousGoods: "DANGEROUS_GOODS";
+    readonly DocumentationRequired: "DOCUMENTATION_REQUIRED";
+    readonly Information: "INFORMATION";
+    readonly PermitRequired: "PERMIT_REQUIRED";
+    readonly ProductCompliance: "PRODUCT_COMPLIANCE";
+    readonly Prohibited: "PROHIBITED";
+    readonly Quota: "QUOTA";
+};
+export type GreenLightRestrictionCategory = (typeof greenLightRestrictionCategory)[keyof typeof greenLightRestrictionCategory];
 export declare const helloCountryDisplayBehavior: {
     readonly All: "ALL";
     readonly OnlyShippable: "ONLY_SHIPPABLE";
@@ -2573,27 +3844,6 @@ export declare const imageSlot: {
     readonly Image_5: "IMAGE_5";
 };
 export type ImageSlot = (typeof imageSlot)[keyof typeof imageSlot];
-export declare const inclusivePriceCalculateJobStatus: {
-    readonly Cancelled: "CANCELLED";
-    readonly Completed: "COMPLETED";
-    readonly CompletedWithErrors: "COMPLETED_WITH_ERRORS";
-    readonly Failed: "FAILED";
-    readonly InProgress: "IN_PROGRESS";
-};
-export type InclusivePriceCalculateJobStatus = (typeof inclusivePriceCalculateJobStatus)[keyof typeof inclusivePriceCalculateJobStatus];
-export declare const inclusivePriceCatalogValidationJobCompletionStatus: {
-    readonly Archived: "ARCHIVED";
-    readonly Completed: "COMPLETED";
-    readonly Error: "ERROR";
-    readonly InProgress: "IN_PROGRESS";
-};
-export type InclusivePriceCatalogValidationJobCompletionStatus = (typeof inclusivePriceCatalogValidationJobCompletionStatus)[keyof typeof inclusivePriceCatalogValidationJobCompletionStatus];
-export declare const inclusivePriceCatalogValidationJobComplianceStatus: {
-    readonly Compliant: "COMPLIANT";
-    readonly NonCompliant: "NON_COMPLIANT";
-    readonly Pending: "PENDING";
-};
-export type InclusivePriceCatalogValidationJobComplianceStatus = (typeof inclusivePriceCatalogValidationJobComplianceStatus)[keyof typeof inclusivePriceCatalogValidationJobComplianceStatus];
 export declare const inclusivePriceCheckoutStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -2604,20 +3854,6 @@ export declare const inclusivePriceConfigurationStatus: {
     readonly Enabled: "ENABLED";
 };
 export type InclusivePriceConfigurationStatus = (typeof inclusivePriceConfigurationStatus)[keyof typeof inclusivePriceConfigurationStatus];
-export declare const inclusivePriceExportJobStatus: {
-    readonly Completed: "COMPLETED";
-    readonly Error: "ERROR";
-    readonly Initialized: "INITIALIZED";
-    readonly Processing: "PROCESSING";
-};
-export type InclusivePriceExportJobStatus = (typeof inclusivePriceExportJobStatus)[keyof typeof inclusivePriceExportJobStatus];
-export declare const inclusivePriceHistoryCsvJobStatus: {
-    readonly Completed: "COMPLETED";
-    readonly Error: "ERROR";
-    readonly Initialized: "INITIALIZED";
-    readonly Processing: "PROCESSING";
-};
-export type InclusivePriceHistoryCsvJobStatus = (typeof inclusivePriceHistoryCsvJobStatus)[keyof typeof inclusivePriceHistoryCsvJobStatus];
 export declare const inclusivePriceSettingAdjustmentStatus: {
     readonly Excluded: "EXCLUDED";
     readonly Included: "INCLUDED";
@@ -2673,6 +3909,13 @@ export declare const intendedAudience: {
     readonly Child: "CHILD";
 };
 export type IntendedAudience = (typeof intendedAudience)[keyof typeof intendedAudience];
+export declare const intendedUseType: {
+    readonly Commercial: "COMMERCIAL";
+    readonly Consumer: "CONSUMER";
+    readonly Personal: "PERSONAL";
+    readonly Research: "RESEARCH";
+};
+export type IntendedUseType = (typeof intendedUseType)[keyof typeof intendedUseType];
 export declare const invoiceAmountSubtotalType: {
     readonly Adjustment: "ADJUSTMENT";
     readonly Discount: "DISCOUNT";
@@ -2680,8 +3923,10 @@ export declare const invoiceAmountSubtotalType: {
     readonly Fee: "FEE";
     readonly Item: "ITEM";
     readonly Other: "OTHER";
+    readonly SecurityDeposit: "SECURITY_DEPOSIT";
     readonly SetupFee: "SETUP_FEE";
     readonly Shipping: "SHIPPING";
+    readonly StoreCredit: "STORE_CREDIT";
     readonly Subscription: "SUBSCRIPTION";
     readonly Tax: "TAX";
     readonly TaxDutyCarrierCountry: "TAX_DUTY_CARRIER_COUNTRY";
@@ -2722,6 +3967,8 @@ export declare const invoiceDetailCategoryInputType: {
     readonly AdditionalTariffLines: "ADDITIONAL_TARIFF_LINES";
     readonly Adjustment: "ADJUSTMENT";
     readonly Advancement: "ADVANCEMENT";
+    readonly AirlineRecoveryFee: "AIRLINE_RECOVERY_FEE";
+    readonly AirwallexTransferFee: "AIRWALLEX_TRANSFER_FEE";
     readonly AnnualPlatformFee: "ANNUAL_PLATFORM_FEE";
     readonly ApiAnnualFlat: "API_ANNUAL_FLAT";
     readonly ApiAnnualMonthlyFlat: "API_ANNUAL_MONTHLY_FLAT";
@@ -2769,6 +4016,8 @@ export declare const invoiceDetailCategoryInputType: {
     readonly CanadaRemittanceFee: "CANADA_REMITTANCE_FEE";
     readonly CaymanIslandsDisbursementFee: "CAYMAN_ISLANDS_DISBURSEMENT_FEE";
     readonly CaymanIslandsRemittanceFee: "CAYMAN_ISLANDS_REMITTANCE_FEE";
+    readonly CbpCentralizedExaminationStationFee: "CBP_CENTRALIZED_EXAMINATION_STATION_FEE";
+    readonly CbpHoldManagementFee: "CBP_HOLD_MANAGEMENT_FEE";
     readonly CbpReassessment: "CBP_REASSESSMENT";
     readonly CbpTradeSolutionPilot: "CBP_TRADE_SOLUTION_PILOT";
     readonly Chargeback: "CHARGEBACK";
@@ -2819,6 +4068,9 @@ export declare const invoiceDetailCategoryInputType: {
     readonly CyprusPrepayPercent: "CYPRUS_PREPAY_PERCENT";
     readonly CyprusPrepayPhotoDiscount: "CYPRUS_PREPAY_PHOTO_DISCOUNT";
     readonly CyprusRemittanceFee: "CYPRUS_REMITTANCE_FEE";
+    readonly CzechDisbursementFee: "CZECH_DISBURSEMENT_FEE";
+    readonly CzechGuaranteeOrder: "CZECH_GUARANTEE_ORDER";
+    readonly CzechRemittanceFee: "CZECH_REMITTANCE_FEE";
     readonly DashboardLite: "DASHBOARD_LITE";
     readonly DdpServiceFee: "DDP_SERVICE_FEE";
     readonly DdpServiceFeeBuffer: "DDP_SERVICE_FEE_BUFFER";
@@ -2828,9 +4080,46 @@ export declare const invoiceDetailCategoryInputType: {
     readonly Discount: "DISCOUNT";
     readonly DuplicatePayment: "DUPLICATE_PAYMENT";
     readonly Duty: "DUTY";
+    readonly DutyBrokerageUs: "DUTY_BROKERAGE_US";
     readonly DutyFx: "DUTY_FX";
     readonly DutyRemittance: "DUTY_REMITTANCE";
+    readonly DutyRemittanceAt: "DUTY_REMITTANCE_AT";
+    readonly DutyRemittanceAx: "DUTY_REMITTANCE_AX";
+    readonly DutyRemittanceBe: "DUTY_REMITTANCE_BE";
+    readonly DutyRemittanceBg: "DUTY_REMITTANCE_BG";
+    readonly DutyRemittanceCy: "DUTY_REMITTANCE_CY";
+    readonly DutyRemittanceCz: "DUTY_REMITTANCE_CZ";
+    readonly DutyRemittanceDe: "DUTY_REMITTANCE_DE";
+    readonly DutyRemittanceDk: "DUTY_REMITTANCE_DK";
+    readonly DutyRemittanceEe: "DUTY_REMITTANCE_EE";
+    readonly DutyRemittanceEs: "DUTY_REMITTANCE_ES";
+    readonly DutyRemittanceFi: "DUTY_REMITTANCE_FI";
+    readonly DutyRemittanceFr: "DUTY_REMITTANCE_FR";
+    readonly DutyRemittanceGb: "DUTY_REMITTANCE_GB";
+    readonly DutyRemittanceGf: "DUTY_REMITTANCE_GF";
+    readonly DutyRemittanceGp: "DUTY_REMITTANCE_GP";
+    readonly DutyRemittanceGr: "DUTY_REMITTANCE_GR";
+    readonly DutyRemittanceHr: "DUTY_REMITTANCE_HR";
+    readonly DutyRemittanceHu: "DUTY_REMITTANCE_HU";
+    readonly DutyRemittanceIc: "DUTY_REMITTANCE_IC";
+    readonly DutyRemittanceIe: "DUTY_REMITTANCE_IE";
+    readonly DutyRemittanceIt: "DUTY_REMITTANCE_IT";
+    readonly DutyRemittanceLt: "DUTY_REMITTANCE_LT";
+    readonly DutyRemittanceLu: "DUTY_REMITTANCE_LU";
+    readonly DutyRemittanceLv: "DUTY_REMITTANCE_LV";
+    readonly DutyRemittanceMc: "DUTY_REMITTANCE_MC";
+    readonly DutyRemittanceMq: "DUTY_REMITTANCE_MQ";
+    readonly DutyRemittanceMt: "DUTY_REMITTANCE_MT";
+    readonly DutyRemittanceNl: "DUTY_REMITTANCE_NL";
+    readonly DutyRemittancePl: "DUTY_REMITTANCE_PL";
+    readonly DutyRemittancePt: "DUTY_REMITTANCE_PT";
+    readonly DutyRemittanceRe: "DUTY_REMITTANCE_RE";
+    readonly DutyRemittanceRo: "DUTY_REMITTANCE_RO";
+    readonly DutyRemittanceSe: "DUTY_REMITTANCE_SE";
+    readonly DutyRemittanceSi: "DUTY_REMITTANCE_SI";
+    readonly DutyRemittanceSk: "DUTY_REMITTANCE_SK";
     readonly DutyRemittanceUs: "DUTY_REMITTANCE_US";
+    readonly DutyRemittanceYt: "DUTY_REMITTANCE_YT";
     readonly DutyTaxBuffer: "DUTY_TAX_BUFFER";
     readonly DutyTaxFee: "DUTY_TAX_FEE";
     readonly EmiratesDisbursementFee: "EMIRATES_DISBURSEMENT_FEE";
@@ -2852,15 +4141,18 @@ export declare const invoiceDetailCategoryInputType: {
     readonly HaypostDisbursementFee: "HAYPOST_DISBURSEMENT_FEE";
     readonly HaypostRemittanceFee: "HAYPOST_REMITTANCE_FEE";
     readonly IglobalLandedCostGuaranteeBuffer: "IGLOBAL_LANDED_COST_GUARANTEE_BUFFER";
+    readonly ImportServiceCharge: "IMPORT_SERVICE_CHARGE";
     readonly InclusivePricing: "INCLUSIVE_PRICING";
     readonly InvoiceForeignExchange: "INVOICE_FOREIGN_EXCHANGE";
     readonly IsraelDisbursementFee: "ISRAEL_DISBURSEMENT_FEE";
     readonly IsraelRemittanceFee: "ISRAEL_REMITTANCE_FEE";
     readonly ItalianeRemittanceFee: "ITALIANE_REMITTANCE_FEE";
     readonly Item: "ITEM";
+    readonly JapanDisbursementFee: "JAPAN_DISBURSEMENT_FEE";
     readonly JapanPrepayFee: "JAPAN_PREPAY_FEE";
     readonly JapanPrepayPercent: "JAPAN_PREPAY_PERCENT";
     readonly JapanPrepayPhotoDiscount: "JAPAN_PREPAY_PHOTO_DISCOUNT";
+    readonly JapanRemittanceFee: "JAPAN_REMITTANCE_FEE";
     readonly KazpostDisbursementFee: "KAZPOST_DISBURSEMENT_FEE";
     readonly KazpostPrepayFee: "KAZPOST_PREPAY_FEE";
     readonly KazpostPrepayPercent: "KAZPOST_PREPAY_PERCENT";
@@ -2894,6 +4186,10 @@ export declare const invoiceDetailCategoryInputType: {
     readonly LiberiaRemittanceFee: "LIBERIA_REMITTANCE_FEE";
     readonly LiechtensteinischeDisbursementFee: "LIECHTENSTEINISCHE_DISBURSEMENT_FEE";
     readonly LiechtensteinischeRemittanceFee: "LIECHTENSTEINISCHE_REMITTANCE_FEE";
+    readonly MaltaDisbursementFee: "MALTA_DISBURSEMENT_FEE";
+    readonly MaltaGuaranteeOrder: "MALTA_GUARANTEE_ORDER";
+    readonly MaltaRemittanceFee: "MALTA_REMITTANCE_FEE";
+    readonly MerchandiseProcessingFee: "MERCHANDISE_PROCESSING_FEE";
     readonly MerchantProcessing: "MERCHANT_PROCESSING";
     readonly MongolDisbursementFee: "MONGOL_DISBURSEMENT_FEE";
     readonly MongolGuaranteeOrder: "MONGOL_GUARANTEE_ORDER";
@@ -2904,6 +4200,8 @@ export declare const invoiceDetailCategoryInputType: {
     readonly NetparcelRemittanceFee: "NETPARCEL_REMITTANCE_FEE";
     readonly NewZealandDisbursementFee: "NEW_ZEALAND_DISBURSEMENT_FEE";
     readonly NewZealandRemittanceFee: "NEW_ZEALAND_REMITTANCE_FEE";
+    readonly NigerDisbursementFee: "NIGER_DISBURSEMENT_FEE";
+    readonly NigerRemittanceFee: "NIGER_REMITTANCE_FEE";
     readonly NigeriaDisbursementFee: "NIGERIA_DISBURSEMENT_FEE";
     readonly NigeriaRemittanceFee: "NIGERIA_REMITTANCE_FEE";
     readonly NonGuaranteeAdditionalTariffLines: "NON_GUARANTEE_ADDITIONAL_TARIFF_LINES";
@@ -2927,11 +4225,18 @@ export declare const invoiceDetailCategoryInputType: {
     readonly OmnivaRemittanceFee: "OMNIVA_REMITTANCE_FEE";
     readonly OrderError: "ORDER_ERROR";
     readonly Other: "OTHER";
+    readonly PalletFee: "PALLET_FEE";
     readonly PartnerReferralRevenueShare: "PARTNER_REFERRAL_REVENUE_SHARE";
     readonly PaymentNoOrder: "PAYMENT_NO_ORDER";
     readonly PeruBondFee: "PERU_BOND_FEE";
     readonly PeruDisbursementFee: "PERU_DISBURSEMENT_FEE";
     readonly PeruRemittanceFee: "PERU_REMITTANCE_FEE";
+    readonly PgaAmsProcessing: "PGA_AMS_PROCESSING";
+    readonly PgaAphis: "PGA_APHIS";
+    readonly PgaBtaPriorNotice: "PGA_BTA_PRIOR_NOTICE";
+    readonly PgaDisclaim: "PGA_DISCLAIM";
+    readonly PgaDot: "PGA_DOT";
+    readonly PgaFdaClearance: "PGA_FDA_CLEARANCE";
     readonly PlatformFee: "PLATFORM_FEE";
     readonly PostalOperator: "POSTAL_OPERATOR";
     readonly PostalOperatorMinimum: "POSTAL_OPERATOR_MINIMUM";
@@ -2973,9 +4278,11 @@ export declare const invoiceDetailCategoryInputType: {
     readonly SierraLeoneDisbursementFee: "SIERRA_LEONE_DISBURSEMENT_FEE";
     readonly SierraLeoneRemittanceFee: "SIERRA_LEONE_REMITTANCE_FEE";
     readonly SingaporeRemittanceFee: "SINGAPORE_REMITTANCE_FEE";
+    readonly SortationFee: "SORTATION_FEE";
     readonly SriLankaDisbursementFee: "SRI_LANKA_DISBURSEMENT_FEE";
     readonly SriLankaGuaranteeOrder: "SRI_LANKA_GUARANTEE_ORDER";
     readonly SriLankaRemittanceFee: "SRI_LANKA_REMITTANCE_FEE";
+    readonly StopDeliveryFee: "STOP_DELIVERY_FEE";
     readonly StorageFee: "STORAGE_FEE";
     readonly StoreCredit: "STORE_CREDIT";
     readonly StripeBalanceCurrencyConversion: "STRIPE_BALANCE_CURRENCY_CONVERSION";
@@ -2999,6 +4306,12 @@ export declare const invoiceDetailCategoryInputType: {
     readonly TurkishDisbursementFee: "TURKISH_DISBURSEMENT_FEE";
     readonly TurkishGuaranteeOrder: "TURKISH_GUARANTEE_ORDER";
     readonly TurkishRemittanceFee: "TURKISH_REMITTANCE_FEE";
+    readonly Type_01EntryFee: "TYPE_01_ENTRY_FEE";
+    readonly Type_01HtsClassificationFee: "TYPE_01_HTS_CLASSIFICATION_FEE";
+    readonly Type_01PerLineFee: "TYPE_01_PER_LINE_FEE";
+    readonly Type_11EntryFee: "TYPE_11_ENTRY_FEE";
+    readonly Type_11EntryFeeMinimum: "TYPE_11_ENTRY_FEE_MINIMUM";
+    readonly Type_11EntryFeePga: "TYPE_11_ENTRY_FEE_PGA";
     readonly UgandaPrepayFee: "UGANDA_PREPAY_FEE";
     readonly UgandaPrepayPercent: "UGANDA_PREPAY_PERCENT";
     readonly UgandaPrepayPhotoDiscount: "UGANDA_PREPAY_PHOTO_DISCOUNT";
@@ -3157,6 +4470,13 @@ export declare const itemAmountTargetType: {
     readonly ZonosBase: "ZONOS_BASE";
 };
 export type ItemAmountTargetType = (typeof itemAmountTargetType)[keyof typeof itemAmountTargetType];
+export declare const itemAttributeSource: {
+    readonly Catalog: "CATALOG";
+    readonly CatalogVerified: "CATALOG_VERIFIED";
+    readonly CheckoutVerified: "CHECKOUT_VERIFIED";
+    readonly UserProvided: "USER_PROVIDED";
+};
+export type ItemAttributeSource = (typeof itemAttributeSource)[keyof typeof itemAttributeSource];
 export declare const itemKeyPreference: {
     readonly None: "NONE";
     readonly ProductId: "PRODUCT_ID";
@@ -3165,8 +4485,11 @@ export declare const itemKeyPreference: {
 export type ItemKeyPreference = (typeof itemKeyPreference)[keyof typeof itemKeyPreference];
 export declare const itemMeasurementType: {
     readonly AlcoholByVolume: "ALCOHOL_BY_VOLUME";
+    readonly Area: "AREA";
+    readonly Count: "COUNT";
     readonly Height: "HEIGHT";
     readonly Length: "LENGTH";
+    readonly TotalWeight: "TOTAL_WEIGHT";
     readonly Volume: "VOLUME";
     readonly Weight: "WEIGHT";
     readonly Width: "WIDTH";
@@ -3180,6 +4503,7 @@ export declare const itemRestrictionAction: {
 };
 export type ItemRestrictionAction = (typeof itemRestrictionAction)[keyof typeof itemRestrictionAction];
 export declare const itemRestrictionCarrier: {
+    readonly AustraliaPost: "AUSTRALIA_POST";
     readonly Dhl: "DHL";
     readonly Fedex: "FEDEX";
     readonly Other: "OTHER";
@@ -3219,8 +4543,11 @@ export declare const itemType: {
 export type ItemType = (typeof itemType)[keyof typeof itemType];
 export declare const itemUnitOfMeasure: {
     readonly Centimeter: "CENTIMETER";
+    readonly Dozen: "DOZEN";
+    readonly Each: "EACH";
     readonly Foot: "FOOT";
     readonly Gram: "GRAM";
+    readonly Gross: "GROSS";
     readonly Inch: "INCH";
     readonly Kilogram: "KILOGRAM";
     readonly Liter: "LITER";
@@ -3228,8 +4555,12 @@ export declare const itemUnitOfMeasure: {
     readonly Milliliter: "MILLILITER";
     readonly Millimeter: "MILLIMETER";
     readonly Ounce: "OUNCE";
+    readonly Pair: "PAIR";
     readonly Percentage: "PERCENTAGE";
+    readonly PolarizationDegree: "POLARIZATION_DEGREE";
     readonly Pound: "POUND";
+    readonly ProofLiter: "PROOF_LITER";
+    readonly SquareMeter: "SQUARE_METER";
     readonly Yard: "YARD";
 };
 export type ItemUnitOfMeasure = (typeof itemUnitOfMeasure)[keyof typeof itemUnitOfMeasure];
@@ -3240,6 +4571,7 @@ export declare const itemValueSource: {
     readonly ClassifyOnTheFly: "CLASSIFY_ON_THE_FLY";
     readonly Fallback: "FALLBACK";
     readonly Hybrid: "HYBRID";
+    readonly Inferred: "INFERRED";
     readonly OrganizationSetting: "ORGANIZATION_SETTING";
     readonly TariffCompleted: "TARIFF_COMPLETED";
     readonly UserProvided: "USER_PROVIDED";
@@ -3280,8 +4612,11 @@ export declare const labelBrokerType: {
 export type LabelBrokerType = (typeof labelBrokerType)[keyof typeof labelBrokerType];
 export declare const labelCarrierCode: {
     readonly Apc: "APC";
+    readonly Asendia: "ASENDIA";
+    readonly AustraliaPost: "AUSTRALIA_POST";
     readonly CanadaPost: "CANADA_POST";
     readonly Dhl: "DHL";
+    readonly DhlEcommerce: "DHL_ECOMMERCE";
     readonly DirectLink: "DIRECT_LINK";
     readonly Ehub: "EHUB";
     readonly Envia: "ENVIA";
@@ -3334,6 +4669,18 @@ export declare const labelDangerousGoodsAccessibility: {
     readonly Inaccessible: "INACCESSIBLE";
 };
 export type LabelDangerousGoodsAccessibility = (typeof labelDangerousGoodsAccessibility)[keyof typeof labelDangerousGoodsAccessibility];
+export declare const labelDangerousGoodsCategory: {
+    readonly BiologicalSubstance: "BIOLOGICAL_SUBSTANCE";
+    readonly ConsumerCommodity: "CONSUMER_COMMODITY";
+    readonly ExceptedQuantity: "EXCEPTED_QUANTITY";
+    readonly FullyRegulated: "FULLY_REGULATED";
+    readonly LimitedQuantity: "LIMITED_QUANTITY";
+    readonly MagnetizedMaterial: "MAGNETIZED_MATERIAL";
+    readonly NotRestrictedA02: "NOT_RESTRICTED_A02";
+    readonly NotRestrictedA67: "NOT_RESTRICTED_A67";
+    readonly NotRestrictedA70: "NOT_RESTRICTED_A70";
+};
+export type LabelDangerousGoodsCategory = (typeof labelDangerousGoodsCategory)[keyof typeof labelDangerousGoodsCategory];
 export declare const labelDangerousGoodsOption: {
     readonly HazardousMaterials: "HAZARDOUS_MATERIALS";
     readonly LimitedQuantitiesCommodities: "LIMITED_QUANTITIES_COMMODITIES";
@@ -3573,6 +4920,7 @@ export declare const labelTaxIdType: {
     readonly Cnp: "CNP";
     readonly Cpf: "CPF";
     readonly Cuil: "CUIL";
+    readonly Curp: "CURP";
     readonly Dan: "DAN";
     readonly Dni: "DNI";
     readonly Dtf: "DTF";
@@ -3588,6 +4936,7 @@ export declare const labelTaxIdType: {
     readonly Hmrc: "HMRC";
     readonly Ioss: "IOSS";
     readonly Lvg: "LVG";
+    readonly Npwp: "NPWP";
     readonly Osr: "OSR";
     readonly Pan: "PAN";
     readonly Pcc: "PCC";
@@ -3598,6 +4947,7 @@ export declare const labelTaxIdType: {
     readonly Ssn: "SSN";
     readonly Sta: "STA";
     readonly Tan: "TAN";
+    readonly Tin: "TIN";
     readonly Trn: "TRN";
     readonly UaeTrn: "UAE_TRN";
     readonly Voec: "VOEC";
@@ -3659,8 +5009,12 @@ export declare const landedCostBillingRuleDetailCategoryIdCreateType: {
     readonly CheckoutMerchantProcessing: "CHECKOUT_MERCHANT_PROCESSING";
     readonly CheckoutShippingIglobal: "CHECKOUT_SHIPPING_IGLOBAL";
     readonly CheckoutTransactionPercent: "CHECKOUT_TRANSACTION_PERCENT";
+    readonly CollectGuaranteeOrder: "COLLECT_GUARANTEE_ORDER";
+    readonly CollectGuaranteePercent: "COLLECT_GUARANTEE_PERCENT";
     readonly CollectOrder: "COLLECT_ORDER";
     readonly CollectPercent: "COLLECT_PERCENT";
+    readonly CollectTransactionOrder: "COLLECT_TRANSACTION_ORDER";
+    readonly DutyRemittanceUs: "DUTY_REMITTANCE_US";
     readonly EtsyGuaranteeOrder: "ETSY_GUARANTEE_ORDER";
     readonly EtsyGuaranteePercent: "ETSY_GUARANTEE_PERCENT";
     readonly EtsyMerchantFeePercent: "ETSY_MERCHANT_FEE_PERCENT";
@@ -3692,6 +5046,12 @@ export declare const landedCostEndUse: {
     readonly Return: "RETURN";
 };
 export type LandedCostEndUse = (typeof landedCostEndUse)[keyof typeof landedCostEndUse];
+export declare const landedCostEntryTypeExclusionCategory: {
+    readonly AntiDumping: "ANTI_DUMPING";
+    readonly Countervailing: "COUNTERVAILING";
+    readonly Quota: "QUOTA";
+};
+export type LandedCostEntryTypeExclusionCategory = (typeof landedCostEntryTypeExclusionCategory)[keyof typeof landedCostEntryTypeExclusionCategory];
 export declare const landedCostFeeType: {
     readonly AdditionalTariffLines: "ADDITIONAL_TARIFF_LINES";
     readonly Adjustment: "ADJUSTMENT";
@@ -3721,6 +5081,7 @@ export declare const landedCostFeeType: {
     readonly LandedCost: "LANDED_COST";
     readonly Other: "OTHER";
     readonly PartnerRevShare: "PARTNER_REV_SHARE";
+    readonly PddpSurcharge: "PDDP_SURCHARGE";
     readonly PrepayDisbursement: "PREPAY_DISBURSEMENT";
     readonly PrepayDisbursementFee: "PREPAY_DISBURSEMENT_FEE";
     readonly PrepayFee: "PREPAY_FEE";
@@ -3741,11 +5102,16 @@ export declare const landedCostFeeType: {
 export type LandedCostFeeType = (typeof landedCostFeeType)[keyof typeof landedCostFeeType];
 export declare const landedCostGuaranteeCode: {
     readonly CollectRemittance: "COLLECT_REMITTANCE";
+    readonly Guaranteed: "GUARANTEED";
+    readonly GuaranteedImport: "GUARANTEED_IMPORT";
+    readonly GuaranteedRemit: "GUARANTEED_REMIT";
     readonly InclusivePrice: "INCLUSIVE_PRICE";
     readonly NotApplicable: "NOT_APPLICABLE";
     readonly PostalDdp: "POSTAL_DDP";
     readonly PostalDdpInclusivePrice: "POSTAL_DDP_INCLUSIVE_PRICE";
     readonly Zonos: "ZONOS";
+    readonly ZonosImport: "ZONOS_IMPORT";
+    readonly ZonosRemit: "ZONOS_REMIT";
 };
 export type LandedCostGuaranteeCode = (typeof landedCostGuaranteeCode)[keyof typeof landedCostGuaranteeCode];
 export declare const landedCostGuaranteeType: {
@@ -3761,6 +5127,7 @@ export declare const landedCostMethod: {
 };
 export type LandedCostMethod = (typeof landedCostMethod)[keyof typeof landedCostMethod];
 export declare const landedCostPaymentProcessor: {
+    readonly Airwallex: "AIRWALLEX";
     readonly Paypal: "PAYPAL";
     readonly Stripe: "STRIPE";
 };
@@ -3769,8 +5136,10 @@ export declare const landedCostQuoteType: {
     readonly Api: "API";
     readonly Auditing: "AUDITING";
     readonly CarrierPay: "CARRIER_PAY";
+    readonly CbpAssessed: "CBP_ASSESSED";
     readonly Checkout: "CHECKOUT";
     readonly Collect: "COLLECT";
+    readonly DeclarationData: "DECLARATION_DATA";
     readonly Draft: "DRAFT";
     readonly Hello: "HELLO";
     readonly InclusiveConfiguration: "INCLUSIVE_CONFIGURATION";
@@ -3782,6 +5151,20 @@ export declare const landedCostQuoteType: {
     readonly PrepayInvoice: "PREPAY_INVOICE";
 };
 export type LandedCostQuoteType = (typeof landedCostQuoteType)[keyof typeof landedCostQuoteType];
+export declare const landedCostSettingsEntryTypeExclusionCategory: {
+    readonly AntiDumping: "ANTI_DUMPING";
+    readonly Countervailing: "COUNTERVAILING";
+    readonly Quota: "QUOTA";
+};
+export type LandedCostSettingsEntryTypeExclusionCategory = (typeof landedCostSettingsEntryTypeExclusionCategory)[keyof typeof landedCostSettingsEntryTypeExclusionCategory];
+export declare const landedCostSettingsHsCodeConsolidationType: {
+    readonly Hs10: "HS10";
+    readonly Hs10Coo: "HS10_COO";
+    readonly Hs6: "HS6";
+    readonly Hs6Coo: "HS6_COO";
+    readonly None: "NONE";
+};
+export type LandedCostSettingsHsCodeConsolidationType = (typeof landedCostSettingsHsCodeConsolidationType)[keyof typeof landedCostSettingsHsCodeConsolidationType];
 export declare const landedCostTariffRate: {
     readonly Exact: "EXACT";
     readonly Maximum: "MAXIMUM";
@@ -3790,6 +5173,11 @@ export declare const landedCostTariffRate: {
     readonly ZonosPreferred: "ZONOS_PREFERRED";
 };
 export type LandedCostTariffRate = (typeof landedCostTariffRate)[keyof typeof landedCostTariffRate];
+export declare const landedCostTaxRemittanceCalculationType: {
+    readonly NoRemittance: "NO_REMITTANCE";
+    readonly Remittance: "REMITTANCE";
+};
+export type LandedCostTaxRemittanceCalculationType = (typeof landedCostTaxRemittanceCalculationType)[keyof typeof landedCostTaxRemittanceCalculationType];
 export declare const landedCostWeightUnit: {
     readonly Cg: "CG";
     readonly Ct: "CT";
@@ -3801,6 +5189,35 @@ export declare const landedCostWeightUnit: {
     readonly T: "T";
 };
 export type LandedCostWeightUnit = (typeof landedCostWeightUnit)[keyof typeof landedCostWeightUnit];
+export declare const laneRuleAccess: {
+    readonly Ddp: "DDP";
+    readonly LcGuarantee: "LC_GUARANTEE";
+    readonly PostalOperator: "POSTAL_OPERATOR";
+    readonly PostalOperatorMerchant: "POSTAL_OPERATOR_MERCHANT";
+};
+export type LaneRuleAccess = (typeof laneRuleAccess)[keyof typeof laneRuleAccess];
+export declare const laneRuleOperator: {
+    readonly Eq: "EQ";
+    readonly Gt: "GT";
+    readonly Gte: "GTE";
+    readonly Lt: "LT";
+    readonly Lte: "LTE";
+    readonly Neq: "NEQ";
+};
+export type LaneRuleOperator = (typeof laneRuleOperator)[keyof typeof laneRuleOperator];
+export declare const laneRuleSubject: {
+    readonly Cif: "CIF";
+    readonly Cost: "COST";
+    readonly Duty: "DUTY";
+    readonly ItemsTotal: "ITEMS_TOTAL";
+    readonly Tax: "TAX";
+};
+export type LaneRuleSubject = (typeof laneRuleSubject)[keyof typeof laneRuleSubject];
+export declare const laneThresholdType: {
+    readonly Duty: "DUTY";
+    readonly Tax: "TAX";
+};
+export type LaneThresholdType = (typeof laneThresholdType)[keyof typeof laneThresholdType];
 export declare const languageCode: {
     readonly Af: "AF";
     readonly Am: "AM";
@@ -3929,6 +5346,16 @@ export declare const linkType: {
     readonly AccountUpdate: "ACCOUNT_UPDATE";
 };
 export type LinkType = (typeof linkType)[keyof typeof linkType];
+export declare const locationValidationStatus: {
+    readonly PartiallyVerified: "PARTIALLY_VERIFIED";
+    readonly Unverified: "UNVERIFIED";
+    readonly Verified: "VERIFIED";
+};
+export type LocationValidationStatus = (typeof locationValidationStatus)[keyof typeof locationValidationStatus];
+export declare const locationVerifier: {
+    readonly Melissa: "MELISSA";
+};
+export type LocationVerifier = (typeof locationVerifier)[keyof typeof locationVerifier];
 export declare const magentoStockStatus: {
     readonly InStock: "IN_STOCK";
     readonly OutOfStock: "OUT_OF_STOCK";
@@ -3942,6 +5369,42 @@ export declare const manifestDataSource: {
     readonly Resdit: "RESDIT";
 };
 export type ManifestDataSource = (typeof manifestDataSource)[keyof typeof manifestDataSource];
+export declare const manifestIncotermCode: {
+    readonly Dap: "DAP";
+    readonly Ddp: "DDP";
+};
+export type ManifestIncotermCode = (typeof manifestIncotermCode)[keyof typeof manifestIncotermCode];
+export declare const manifestItemMeasurementType: {
+    readonly AlcoholByVolume: "ALCOHOL_BY_VOLUME";
+    readonly Height: "HEIGHT";
+    readonly Length: "LENGTH";
+    readonly TotalWeight: "TOTAL_WEIGHT";
+    readonly Volume: "VOLUME";
+    readonly Weight: "WEIGHT";
+    readonly Width: "WIDTH";
+};
+export type ManifestItemMeasurementType = (typeof manifestItemMeasurementType)[keyof typeof manifestItemMeasurementType];
+export declare const manifestItemUnitOfMeasure: {
+    readonly Centimeter: "CENTIMETER";
+    readonly Foot: "FOOT";
+    readonly Gram: "GRAM";
+    readonly Inch: "INCH";
+    readonly Kilogram: "KILOGRAM";
+    readonly Liter: "LITER";
+    readonly Meter: "METER";
+    readonly Milliliter: "MILLILITER";
+    readonly Millimeter: "MILLIMETER";
+    readonly Ounce: "OUNCE";
+    readonly Percentage: "PERCENTAGE";
+    readonly Pound: "POUND";
+    readonly Yard: "YARD";
+};
+export type ManifestItemUnitOfMeasure = (typeof manifestItemUnitOfMeasure)[keyof typeof manifestItemUnitOfMeasure];
+export declare const manifestLineClearanceOwner: {
+    readonly Brokerage: "BROKERAGE";
+    readonly Manifest: "MANIFEST";
+};
+export type ManifestLineClearanceOwner = (typeof manifestLineClearanceOwner)[keyof typeof manifestLineClearanceOwner];
 export declare const manifestLineEndUse: {
     readonly Documents: "DOCUMENTS";
     readonly ForResale: "FOR_RESALE";
@@ -3950,6 +5413,12 @@ export declare const manifestLineEndUse: {
     readonly Return: "RETURN";
 };
 export type ManifestLineEndUse = (typeof manifestLineEndUse)[keyof typeof manifestLineEndUse];
+export declare const manifestLineEntryTypeExclusionCategory: {
+    readonly AntiDumping: "ANTI_DUMPING";
+    readonly Countervailing: "COUNTERVAILING";
+    readonly Quota: "QUOTA";
+};
+export type ManifestLineEntryTypeExclusionCategory = (typeof manifestLineEntryTypeExclusionCategory)[keyof typeof manifestLineEntryTypeExclusionCategory];
 export declare const manifestPartyType: {
     readonly Destination: "DESTINATION";
     readonly Origin: "ORIGIN";
@@ -3961,11 +5430,17 @@ export declare const manifestSource: {
     readonly Api: "API";
     readonly Ipc: "IPC";
     readonly Other: "OTHER";
+    readonly PddpReconciliation: "PDDP_RECONCILIATION";
     readonly Post: "POST";
     readonly Upu: "UPU";
     readonly Usps: "USPS";
 };
 export type ManifestSource = (typeof manifestSource)[keyof typeof manifestSource];
+export declare const manifestType: {
+    readonly Brokerage: "BROKERAGE";
+    readonly Standard: "STANDARD";
+};
+export type ManifestType = (typeof manifestType)[keyof typeof manifestType];
 export declare const manualClassificationBulkJobStatus: {
     readonly Cancelled: "CANCELLED";
     readonly Completed: "COMPLETED";
@@ -4009,6 +5484,16 @@ export declare const manualClassificationStatus: {
     readonly Archived: "ARCHIVED";
 };
 export type ManualClassificationStatus = (typeof manualClassificationStatus)[keyof typeof manualClassificationStatus];
+export declare const manualCredentialFieldRequirement: {
+    readonly Optional: "OPTIONAL";
+    readonly Required: "REQUIRED";
+};
+export type ManualCredentialFieldRequirement = (typeof manualCredentialFieldRequirement)[keyof typeof manualCredentialFieldRequirement];
+export declare const manualCredentialFieldType: {
+    readonly Password: "PASSWORD";
+    readonly Text: "TEXT";
+};
+export type ManualCredentialFieldType = (typeof manualCredentialFieldType)[keyof typeof manualCredentialFieldType];
 export declare const markDraftPendingAtMonthStartStatus: {
     readonly Disabled: "DISABLED";
     readonly Enabled: "ENABLED";
@@ -4035,24 +5520,6 @@ export declare const merchantOfRecordType: {
     readonly Zonos: "ZONOS";
 };
 export type MerchantOfRecordType = (typeof merchantOfRecordType)[keyof typeof merchantOfRecordType];
-export declare const milestoneType: {
-    readonly Arrived: "ARRIVED";
-    readonly AssignedToConsolidation: "ASSIGNED_TO_CONSOLIDATION";
-    readonly AssignedToEntry: "ASSIGNED_TO_ENTRY";
-    readonly CarrierPickup: "CARRIER_PICKUP";
-    readonly CbpAccepted: "CBP_ACCEPTED";
-    readonly CbpExam: "CBP_EXAM";
-    readonly CbpHeld: "CBP_HELD";
-    readonly CbpRejected: "CBP_REJECTED";
-    readonly CbpReleased: "CBP_RELEASED";
-    readonly Created: "CREATED";
-    readonly Delivered: "DELIVERED";
-    readonly Exception: "EXCEPTION";
-    readonly InTransit: "IN_TRANSIT";
-    readonly SubmittedToCbp: "SUBMITTED_TO_CBP";
-    readonly Validated: "VALIDATED";
-};
-export type MilestoneType = (typeof milestoneType)[keyof typeof milestoneType];
 export declare const mode: {
     readonly Live: "LIVE";
     readonly Test: "TEST";
@@ -4073,6 +5540,17 @@ export declare const notificationActiveStatus: {
     readonly Enabled: "ENABLED";
 };
 export type NotificationActiveStatus = (typeof notificationActiveStatus)[keyof typeof notificationActiveStatus];
+export declare const notificationChannel: {
+    readonly Email: "EMAIL";
+    readonly Text: "TEXT";
+    readonly Whatsapp: "WHATSAPP";
+};
+export type NotificationChannel = (typeof notificationChannel)[keyof typeof notificationChannel];
+export declare const notificationFrequency: {
+    readonly Daily: "DAILY";
+    readonly Weekly: "WEEKLY";
+};
+export type NotificationFrequency = (typeof notificationFrequency)[keyof typeof notificationFrequency];
 export declare const onboardSubscriptionType: {
     readonly DashboardLite: "DASHBOARD_LITE";
     readonly FreeTrial: "FREE_TRIAL";
@@ -4141,9 +5619,9 @@ export declare const orderMerchantOfRecordType: {
 };
 export type OrderMerchantOfRecordType = (typeof orderMerchantOfRecordType)[keyof typeof orderMerchantOfRecordType];
 export declare const orderModificationStatus: {
-    readonly NoPaymentRequired: "NO_PAYMENT_REQUIRED";
-    readonly Paid: "PAID";
-    readonly PendingPayment: "PENDING_PAYMENT";
+    readonly Committed: "COMMITTED";
+    readonly Pending: "PENDING";
+    readonly Voided: "VOIDED";
 };
 export type OrderModificationStatus = (typeof orderModificationStatus)[keyof typeof orderModificationStatus];
 export declare const orderNoteType: {
@@ -4176,6 +5654,49 @@ export declare const orderRefundSubtotalType: {
     readonly StoreCredit: "STORE_CREDIT";
 };
 export type OrderRefundSubtotalType = (typeof orderRefundSubtotalType)[keyof typeof orderRefundSubtotalType];
+export declare const orderRelationType: {
+    readonly Combination: "COMBINATION";
+    readonly Replacement: "REPLACEMENT";
+};
+export type OrderRelationType = (typeof orderRelationType)[keyof typeof orderRelationType];
+export declare const orderReturnIneligibleReason: {
+    readonly NotDomestic: "NOT_DOMESTIC";
+    readonly NotFulfilled: "NOT_FULFILLED";
+};
+export type OrderReturnIneligibleReason = (typeof orderReturnIneligibleReason)[keyof typeof orderReturnIneligibleReason];
+export declare const orderReturnLabelSource: {
+    readonly External: "EXTERNAL";
+    readonly None: "NONE";
+    readonly ZonosGenerated: "ZONOS_GENERATED";
+};
+export type OrderReturnLabelSource = (typeof orderReturnLabelSource)[keyof typeof orderReturnLabelSource];
+export declare const orderReturnLineDisposition: {
+    readonly Damaged: "DAMAGED";
+    readonly Destroy: "DESTROY";
+    readonly Restock: "RESTOCK";
+};
+export type OrderReturnLineDisposition = (typeof orderReturnLineDisposition)[keyof typeof orderReturnLineDisposition];
+export declare const orderReturnLineReason: {
+    readonly ChangedMind: "CHANGED_MIND";
+    readonly DamagedInTransit: "DAMAGED_IN_TRANSIT";
+    readonly Defective: "DEFECTIVE";
+    readonly NotAsDescribed: "NOT_AS_DESCRIBED";
+    readonly Other: "OTHER";
+    readonly WrongItem: "WRONG_ITEM";
+};
+export type OrderReturnLineReason = (typeof orderReturnLineReason)[keyof typeof orderReturnLineReason];
+export declare const orderReturnStatus: {
+    readonly Approved: "APPROVED";
+    readonly Canceled: "CANCELED";
+    readonly Completed: "COMPLETED";
+    readonly InTransit: "IN_TRANSIT";
+    readonly Inspected: "INSPECTED";
+    readonly LabelIssued: "LABEL_ISSUED";
+    readonly Received: "RECEIVED";
+    readonly Rejected: "REJECTED";
+    readonly Requested: "REQUESTED";
+};
+export type OrderReturnStatus = (typeof orderReturnStatus)[keyof typeof orderReturnStatus];
 export declare const orderStatus: {
     readonly Canceled: "CANCELED";
     readonly Combined: "COMBINED";
@@ -4204,6 +5725,7 @@ export declare const orderType: {
     readonly CarrierPay: "CARRIER_PAY";
     readonly Checkout: "CHECKOUT";
     readonly Collect: "COLLECT";
+    readonly DeclarationData: "DECLARATION_DATA";
     readonly Draft: "DRAFT";
     readonly Invoice: "INVOICE";
     readonly InvoiceCollect: "INVOICE_COLLECT";
@@ -4222,6 +5744,7 @@ export declare const organizationFeePricingExclusion: {
     readonly QualifiedGift: "QUALIFIED_GIFT";
     readonly Return: "RETURN";
     readonly ZeroDuty: "ZERO_DUTY";
+    readonly ZeroDutyTaxFee: "ZERO_DUTY_TAX_FEE";
     readonly ZeroFee: "ZERO_FEE";
 };
 export type OrganizationFeePricingExclusion = (typeof organizationFeePricingExclusion)[keyof typeof organizationFeePricingExclusion];
@@ -4231,6 +5754,7 @@ export declare const organizationFeePricingQualifierType: {
     readonly ParentRevShare: "PARENT_REV_SHARE";
     readonly PrepayCollect: "PREPAY_COLLECT";
     readonly PrepayCollectPhotoDiscount: "PREPAY_COLLECT_PHOTO_DISCOUNT";
+    readonly RevShare: "REV_SHARE";
 };
 export type OrganizationFeePricingQualifierType = (typeof organizationFeePricingQualifierType)[keyof typeof organizationFeePricingQualifierType];
 export declare const organizationStatus: {
@@ -4252,9 +5776,11 @@ export declare const organizationType: {
     readonly Government: "GOVERNMENT";
     readonly Integrator: "INTEGRATOR";
     readonly Logistics: "LOGISTICS";
+    readonly LogisticsCollect: "LOGISTICS_COLLECT";
     readonly Marketplace: "MARKETPLACE";
     readonly MarketplaceSeller: "MARKETPLACE_SELLER";
     readonly OnlineStore: "ONLINE_STORE";
+    readonly OnlineStoreFedex: "ONLINE_STORE_FEDEX";
     readonly Other: "OTHER";
     readonly Partner: "PARTNER";
     readonly Platform: "PLATFORM";
@@ -4287,11 +5813,6 @@ export declare const packagingOptionBulkJobStatus: {
     readonly Initialized: "INITIALIZED";
 };
 export type PackagingOptionBulkJobStatus = (typeof packagingOptionBulkJobStatus)[keyof typeof packagingOptionBulkJobStatus];
-export declare const packagingOptionDeleteAction: {
-    readonly Delete: "DELETE";
-    readonly Disable: "DISABLE";
-};
-export type PackagingOptionDeleteAction = (typeof packagingOptionDeleteAction)[keyof typeof packagingOptionDeleteAction];
 export declare const packagingOptionOptimizationType: {
     readonly CarrierFee: "CARRIER_FEE";
     readonly PackagingOption: "PACKAGING_OPTION";
@@ -4321,6 +5842,12 @@ export declare const packagingType: {
     readonly Tube: "TUBE";
 };
 export type PackagingType = (typeof packagingType)[keyof typeof packagingType];
+export declare const packingGroup: {
+    readonly I: "I";
+    readonly Ii: "II";
+    readonly Iii: "III";
+};
+export type PackingGroup = (typeof packingGroup)[keyof typeof packingGroup];
 export declare const packingPreference: {
     readonly AssignedBox: "ASSIGNED_BOX";
     readonly Consolidated: "CONSOLIDATED";
@@ -4353,16 +5880,79 @@ export declare const partyType: {
     readonly Origin: "ORIGIN";
     readonly Payee: "PAYEE";
     readonly Payor: "PAYOR";
+    readonly PortOfEntry: "PORT_OF_ENTRY";
     readonly UltimateConsignee: "ULTIMATE_CONSIGNEE";
 };
 export type PartyType = (typeof partyType)[keyof typeof partyType];
+export declare const paymentAttributionSource: {
+    readonly InvoiceDetailReference: "INVOICE_DETAIL_REFERENCE";
+    readonly InvoicePaymentMethod: "INVOICE_PAYMENT_METHOD";
+    readonly OrderDetailReference: "ORDER_DETAIL_REFERENCE";
+};
+export type PaymentAttributionSource = (typeof paymentAttributionSource)[keyof typeof paymentAttributionSource];
+export declare const paymentInstrumentAccountHolderType: {
+    readonly Company: "COMPANY";
+    readonly Individual: "INDIVIDUAL";
+};
+export type PaymentInstrumentAccountHolderType = (typeof paymentInstrumentAccountHolderType)[keyof typeof paymentInstrumentAccountHolderType];
+export declare const paymentInstrumentAccountType: {
+    readonly Checking: "CHECKING";
+    readonly Other: "OTHER";
+    readonly Savings: "SAVINGS";
+};
+export type PaymentInstrumentAccountType = (typeof paymentInstrumentAccountType)[keyof typeof paymentInstrumentAccountType];
+export declare const paymentInstrumentStatus: {
+    readonly Active: "ACTIVE";
+    readonly Disabled: "DISABLED";
+    readonly Expired: "EXPIRED";
+};
+export type PaymentInstrumentStatus = (typeof paymentInstrumentStatus)[keyof typeof paymentInstrumentStatus];
+export declare const paymentInstrumentType: {
+    readonly BankAccount: "BANK_ACCOUNT";
+    readonly Card: "CARD";
+};
+export type PaymentInstrumentType = (typeof paymentInstrumentType)[keyof typeof paymentInstrumentType];
+export declare const paymentInstrumentVaultProvider: {
+    readonly BasisTheory: "BASIS_THEORY";
+};
+export type PaymentInstrumentVaultProvider = (typeof paymentInstrumentVaultProvider)[keyof typeof paymentInstrumentVaultProvider];
+export declare const paymentInstrumentVaultStatus: {
+    readonly Completed: "COMPLETED";
+    readonly RequiresCustomerAction: "REQUIRES_CUSTOMER_ACTION";
+};
+export type PaymentInstrumentVaultStatus = (typeof paymentInstrumentVaultStatus)[keyof typeof paymentInstrumentVaultStatus];
+export declare const paymentMethodRemoveType: {
+    readonly Airwallex: "AIRWALLEX";
+    readonly Stripe_1: "STRIPE_1";
+    readonly Stripe_2: "STRIPE_2";
+};
+export type PaymentMethodRemoveType = (typeof paymentMethodRemoveType)[keyof typeof paymentMethodRemoveType];
+export declare const paymentNetworkTokenStatus: {
+    readonly Active: "ACTIVE";
+    readonly Disabled: "DISABLED";
+    readonly Suspended: "SUSPENDED";
+};
+export type PaymentNetworkTokenStatus = (typeof paymentNetworkTokenStatus)[keyof typeof paymentNetworkTokenStatus];
 export declare const paymentProcessorCode: {
+    readonly Airwallex: "AIRWALLEX";
     readonly Paypal: "PAYPAL";
     readonly StoreCredit: "STORE_CREDIT";
     readonly Stripe: "STRIPE";
     readonly StripeTransfer: "STRIPE_TRANSFER";
 };
 export type PaymentProcessorCode = (typeof paymentProcessorCode)[keyof typeof paymentProcessorCode];
+export declare const paymentProcessorTokenStatus: {
+    readonly Active: "ACTIVE";
+    readonly Disabled: "DISABLED";
+};
+export type PaymentProcessorTokenStatus = (typeof paymentProcessorTokenStatus)[keyof typeof paymentProcessorTokenStatus];
+export declare const paymentTokenProvider: {
+    readonly AirwallexAu: "AIRWALLEX_AU";
+    readonly AirwallexUs: "AIRWALLEX_US";
+    readonly Stripe_1: "STRIPE_1";
+    readonly Stripe_2: "STRIPE_2";
+};
+export type PaymentTokenProvider = (typeof paymentTokenProvider)[keyof typeof paymentTokenProvider];
 export declare const paymentType: {
     readonly Card: "CARD";
     readonly UsBankAccount: "US_BANK_ACCOUNT";
@@ -4433,6 +6023,25 @@ export declare const personTaxIdentifierType: {
     readonly Other: "OTHER";
 };
 export type PersonTaxIdentifierType = (typeof personTaxIdentifierType)[keyof typeof personTaxIdentifierType];
+export declare const pgaAgency: {
+    readonly UsCpsc: "US_CPSC";
+    readonly UsDot: "US_DOT";
+    readonly UsEpa: "US_EPA";
+    readonly UsFcc: "US_FCC";
+    readonly UsFda: "US_FDA";
+    readonly UsNmfs: "US_NMFS";
+    readonly UsTtb: "US_TTB";
+    readonly UsUsda: "US_USDA";
+    readonly UsUsfws: "US_USFWS";
+};
+export type PgaAgency = (typeof pgaAgency)[keyof typeof pgaAgency];
+export declare const pgaFilingStatus: {
+    readonly Accepted: "ACCEPTED";
+    readonly Pending: "PENDING";
+    readonly Rejected: "REJECTED";
+    readonly Submitted: "SUBMITTED";
+};
+export type PgaFilingStatus = (typeof pgaFilingStatus)[keyof typeof pgaFilingStatus];
 export declare const pgaRequirementStrictness: {
     readonly Conditional: "CONDITIONAL";
     readonly Required: "REQUIRED";
@@ -4926,10 +6535,22 @@ export declare const processingStatusCode: {
 };
 export type ProcessingStatusCode = (typeof processingStatusCode)[keyof typeof processingStatusCode];
 export declare const processorCode: {
+    readonly Airwallex: "AIRWALLEX";
     readonly Paypal: "PAYPAL";
     readonly Stripe: "STRIPE";
 };
 export type ProcessorCode = (typeof processorCode)[keyof typeof processorCode];
+export declare const programStatus: {
+    readonly Active: "ACTIVE";
+    readonly Deprecated: "DEPRECATED";
+    readonly Draft: "DRAFT";
+};
+export type ProgramStatus = (typeof programStatus)[keyof typeof programStatus];
+export declare const programStrictness: {
+    readonly Conditional: "CONDITIONAL";
+    readonly Required: "REQUIRED";
+};
+export type ProgramStrictness = (typeof programStrictness)[keyof typeof programStrictness];
 export declare const proofOfDeliveryType: {
     readonly Document: "DOCUMENT";
     readonly NoSignatureRequired: "NO_SIGNATURE_REQUIRED";
@@ -4952,11 +6573,30 @@ export declare const providedHsCodeVisibilityStatus: {
     readonly Visible: "VISIBLE";
 };
 export type ProvidedHsCodeVisibilityStatus = (typeof providedHsCodeVisibilityStatus)[keyof typeof providedHsCodeVisibilityStatus];
-export declare const quoteStatus: {
-    readonly Ordered: "ORDERED";
-    readonly Quoted: "QUOTED";
+export declare const questionRequirement: {
+    readonly Optional: "OPTIONAL";
+    readonly Preferred: "PREFERRED";
+    readonly Required: "REQUIRED";
 };
-export type QuoteStatus = (typeof quoteStatus)[keyof typeof quoteStatus];
+export type QuestionRequirement = (typeof questionRequirement)[keyof typeof questionRequirement];
+export declare const questionnaireInferState: {
+    readonly NotInferred: "NOT_INFERRED";
+    readonly Partial: "PARTIAL";
+    readonly ReadyToAttest: "READY_TO_ATTEST";
+};
+export type QuestionnaireInferState = (typeof questionnaireInferState)[keyof typeof questionnaireInferState];
+export declare const questionnaireReleaseImpact: {
+    readonly Compatible: "COMPATIBLE";
+    readonly Reanswer: "REANSWER";
+    readonly Reattest: "REATTEST";
+};
+export type QuestionnaireReleaseImpact = (typeof questionnaireReleaseImpact)[keyof typeof questionnaireReleaseImpact];
+export declare const questionnaireStatus: {
+    readonly Active: "ACTIVE";
+    readonly Deprecated: "DEPRECATED";
+    readonly Draft: "DRAFT";
+};
+export type QuestionnaireStatus = (typeof questionnaireStatus)[keyof typeof questionnaireStatus];
 export declare const rateLimitUsageInterval: {
     readonly Day: "DAY";
     readonly Hour: "HOUR";
@@ -4978,6 +6618,12 @@ export declare const recalculatorExchangeRateLogging: {
     readonly Enabled: "ENABLED";
 };
 export type RecalculatorExchangeRateLogging = (typeof recalculatorExchangeRateLogging)[keyof typeof recalculatorExchangeRateLogging];
+export declare const relationshipType: {
+    readonly Complementary: "COMPLEMENTARY";
+    readonly Parent: "PARENT";
+    readonly Sibling: "SIBLING";
+};
+export type RelationshipType = (typeof relationshipType)[keyof typeof relationshipType];
 export declare const reportExportJobNotificationBehavior: {
     readonly EmailOnCompletion: "EMAIL_ON_COMPLETION";
     readonly None: "NONE";
@@ -4996,6 +6642,16 @@ export declare const reportExportJobType: {
     readonly RemittanceNotInvoiced: "REMITTANCE_NOT_INVOICED";
 };
 export type ReportExportJobType = (typeof reportExportJobType)[keyof typeof reportExportJobType];
+export declare const responseStatus: {
+    readonly Complete: "COMPLETE";
+    readonly Superseded: "SUPERSEDED";
+};
+export type ResponseStatus = (typeof responseStatus)[keyof typeof responseStatus];
+export declare const responseTargetType: {
+    readonly CatalogItem: "CATALOG_ITEM";
+    readonly Item: "ITEM";
+};
+export type ResponseTargetType = (typeof responseTargetType)[keyof typeof responseTargetType];
 export declare const restrictedItemAction: {
     readonly Block: "BLOCK";
     readonly BlockAll: "BLOCK_ALL";
@@ -5019,8 +6675,14 @@ export declare const restrictionBulkJobTarget: {
     readonly RestrictionEmbedding: "RESTRICTION_EMBEDDING";
 };
 export type RestrictionBulkJobTarget = (typeof restrictionBulkJobTarget)[keyof typeof restrictionBulkJobTarget];
+export declare const restrictionCarrier: {
+    readonly AustraliaPost: "AUSTRALIA_POST";
+};
+export type RestrictionCarrier = (typeof restrictionCarrier)[keyof typeof restrictionCarrier];
 export declare const restrictionCategory: {
     readonly Cost: "COST";
+    readonly DangerousGoods: "DANGEROUS_GOODS";
+    readonly Deforestation: "DEFORESTATION";
     readonly DocumentationRequired: "DOCUMENTATION_REQUIRED";
     readonly Information: "INFORMATION";
     readonly PermitRequired: "PERMIT_REQUIRED";
@@ -5035,6 +6697,10 @@ export declare const restrictionConfidence: {
     readonly Medium: "MEDIUM";
 };
 export type RestrictionConfidence = (typeof restrictionConfidence)[keyof typeof restrictionConfidence];
+export declare const restrictionOverrideTriggerType: {
+    readonly EntryTypeIneligible: "ENTRY_TYPE_INELIGIBLE";
+};
+export type RestrictionOverrideTriggerType = (typeof restrictionOverrideTriggerType)[keyof typeof restrictionOverrideTriggerType];
 export declare const result: {
     readonly Failure: "FAILURE";
     readonly Success: "SUCCESS";
@@ -5077,26 +6743,6 @@ export declare const scope: {
     readonly Websites: "WEBSITES";
 };
 export type Scope = (typeof scope)[keyof typeof scope];
-export declare const searchAmountDetailTarget: {
-    readonly BillingCompany: "BILLING_COMPANY";
-    readonly MerchantBase: "MERCHANT_BASE";
-    readonly MerchantProvided: "MERCHANT_PROVIDED";
-    readonly MerchantSettled: "MERCHANT_SETTLED";
-    readonly ShopperPresented: "SHOPPER_PRESENTED";
-    readonly ZonosBase: "ZONOS_BASE";
-};
-export type SearchAmountDetailTarget = (typeof searchAmountDetailTarget)[keyof typeof searchAmountDetailTarget];
-export declare const searchIndex: {
-    readonly Catalog: "CATALOG";
-    readonly CatalogRecent: "CATALOG_RECENT";
-    readonly Orders: "ORDERS";
-    readonly OrdersRecent: "ORDERS_RECENT";
-    readonly Quotes: "QUOTES";
-    readonly QuotesRecent: "QUOTES_RECENT";
-    readonly Shipments: "SHIPMENTS";
-    readonly ShipmentsRecent: "SHIPMENTS_RECENT";
-};
-export type SearchIndex = (typeof searchIndex)[keyof typeof searchIndex];
 export declare const serviceLevelAvailability: {
     readonly Contracted: "CONTRACTED";
     readonly Disabled: "DISABLED";
@@ -5123,6 +6769,19 @@ export declare const serviceLevelCountryDeliveryDuty: {
     readonly None: "NONE";
 };
 export type ServiceLevelCountryDeliveryDuty = (typeof serviceLevelCountryDeliveryDuty)[keyof typeof serviceLevelCountryDeliveryDuty];
+export declare const sessionLineStatus: {
+    readonly Completed: "COMPLETED";
+    readonly InProgress: "IN_PROGRESS";
+    readonly ReadyForAttestation: "READY_FOR_ATTESTATION";
+};
+export type SessionLineStatus = (typeof sessionLineStatus)[keyof typeof sessionLineStatus];
+export declare const sessionStatus: {
+    readonly Abandoned: "ABANDONED";
+    readonly Completed: "COMPLETED";
+    readonly InProgress: "IN_PROGRESS";
+    readonly ReadyForAttestation: "READY_FOR_ATTESTATION";
+};
+export type SessionStatus = (typeof sessionStatus)[keyof typeof sessionStatus];
 export declare const settingsCopyType: {
     readonly CarrierAccount: "CARRIER_ACCOUNT";
     readonly LandedCostBillingRule: "LANDED_COST_BILLING_RULE";
@@ -5174,24 +6833,34 @@ export declare const shipmentCartonSpecialService: {
 };
 export type ShipmentCartonSpecialService = (typeof shipmentCartonSpecialService)[keyof typeof shipmentCartonSpecialService];
 export declare const shipmentConsolidationCarrier: {
+    readonly AustraliaPost: "AUSTRALIA_POST";
     readonly CanadaPost: "CANADA_POST";
+    readonly JapanPost: "JAPAN_POST";
 };
 export type ShipmentConsolidationCarrier = (typeof shipmentConsolidationCarrier)[keyof typeof shipmentConsolidationCarrier];
 export declare const shipmentConsolidationStatus: {
     readonly Closed: "CLOSED";
     readonly ManifestCreated: "MANIFEST_CREATED";
     readonly Open: "OPEN";
+    readonly Voided: "VOIDED";
 };
 export type ShipmentConsolidationStatus = (typeof shipmentConsolidationStatus)[keyof typeof shipmentConsolidationStatus];
 export declare const shipmentContentsType: {
+    readonly CommercialGoods: "COMMERCIAL_GOODS";
     readonly CommercialSample: "COMMERCIAL_SAMPLE";
     readonly Documents: "DOCUMENTS";
+    readonly EcommerceGoods: "ECOMMERCE_GOODS";
     readonly Gift: "GIFT";
     readonly Other: "OTHER";
     readonly ReturnedGoods: "RETURNED_GOODS";
     readonly SaleOfGoods: "SALE_OF_GOODS";
 };
 export type ShipmentContentsType = (typeof shipmentContentsType)[keyof typeof shipmentContentsType];
+export declare const shipmentDirection: {
+    readonly Outbound: "OUTBOUND";
+    readonly Return: "RETURN";
+};
+export type ShipmentDirection = (typeof shipmentDirection)[keyof typeof shipmentDirection];
 export declare const shipmentDocumentType: {
     readonly CustomsDocuments: "CUSTOMS_DOCUMENTS";
     readonly Labels: "LABELS";
@@ -5314,6 +6983,11 @@ export declare const shipmentRatingConfigurationStatus: {
     readonly Enabled: "ENABLED";
 };
 export type ShipmentRatingConfigurationStatus = (typeof shipmentRatingConfigurationStatus)[keyof typeof shipmentRatingConfigurationStatus];
+export declare const shipmentRatingDirection: {
+    readonly Outbound: "OUTBOUND";
+    readonly Return: "RETURN";
+};
+export type ShipmentRatingDirection = (typeof shipmentRatingDirection)[keyof typeof shipmentRatingDirection];
 export declare const shipmentRatingPriority: {
     readonly BestValue: "BEST_VALUE";
     readonly Price: "PRICE";
@@ -5445,8 +7119,11 @@ export declare const storeFeeRuleDetailCategoryIdCreateType: {
     readonly CheckoutGuaranteeOrderLegacy: "CHECKOUT_GUARANTEE_ORDER_LEGACY";
     readonly CheckoutGuaranteePercent: "CHECKOUT_GUARANTEE_PERCENT";
     readonly Cod: "COD";
+    readonly CollectGuaranteeOrder: "COLLECT_GUARANTEE_ORDER";
+    readonly CollectGuaranteePercent: "COLLECT_GUARANTEE_PERCENT";
     readonly CollectOrder: "COLLECT_ORDER";
     readonly CollectPercent: "COLLECT_PERCENT";
+    readonly CollectTransactionOrder: "COLLECT_TRANSACTION_ORDER";
     readonly Country: "COUNTRY";
     readonly CrossDockBuffer: "CROSS_DOCK_BUFFER";
     readonly CurrencyConversionFee: "CURRENCY_CONVERSION_FEE";
@@ -5464,6 +7141,12 @@ export declare const storeFeeRuleDetailCategoryIdCreateType: {
     readonly MagentoCrossDockingBuffer: "MAGENTO_CROSS_DOCKING_BUFFER";
     readonly MagentoGuaranteeOrder: "MAGENTO_GUARANTEE_ORDER";
     readonly MagentoGuaranteePercent: "MAGENTO_GUARANTEE_PERCENT";
+    readonly PgaAmsProcessing: "PGA_AMS_PROCESSING";
+    readonly PgaAphis: "PGA_APHIS";
+    readonly PgaBtaPriorNotice: "PGA_BTA_PRIOR_NOTICE";
+    readonly PgaDisclaim: "PGA_DISCLAIM";
+    readonly PgaDot: "PGA_DOT";
+    readonly PgaFdaClearance: "PGA_FDA_CLEARANCE";
     readonly ShippingFee: "SHIPPING_FEE";
     readonly ShopifyCrossDockingBuffer: "SHOPIFY_CROSS_DOCKING_BUFFER";
     readonly ShopifyDutyTaxBuffer: "SHOPIFY_DUTY_TAX_BUFFER";
@@ -5583,13 +7266,6 @@ export declare const stripeTrialEndBehavior: {
     readonly Pause: "PAUSE";
 };
 export type StripeTrialEndBehavior = (typeof stripeTrialEndBehavior)[keyof typeof stripeTrialEndBehavior];
-export declare const subscriptionInterval: {
-    readonly Daily: "DAILY";
-    readonly Monthly: "MONTHLY";
-    readonly Weekly: "WEEKLY";
-    readonly Yearly: "YEARLY";
-};
-export type SubscriptionInterval = (typeof subscriptionInterval)[keyof typeof subscriptionInterval];
 export declare const taxCalculationType: {
     readonly Cif: "CIF";
     readonly Custom: "CUSTOM";
@@ -5599,6 +7275,7 @@ export type TaxCalculationType = (typeof taxCalculationType)[keyof typeof taxCal
 export declare const taxIdType: {
     readonly Cnp: "CNP";
     readonly Cuil: "CUIL";
+    readonly Curp: "CURP";
     readonly Dan: "DAN";
     readonly Dni: "DNI";
     readonly Dtf: "DTF";
@@ -5622,6 +7299,7 @@ export declare const taxIdType: {
     readonly Ssn: "SSN";
     readonly Sta: "STA";
     readonly Tan: "TAN";
+    readonly Tin: "TIN";
     readonly Trn: "TRN";
     readonly Voec: "VOEC";
 };
@@ -5635,11 +7313,21 @@ export declare const taxMethodType: {
     readonly SellerOfRecord: "SELLER_OF_RECORD";
 };
 export type TaxMethodType = (typeof taxMethodType)[keyof typeof taxMethodType];
+export declare const taxonKingdom: {
+    readonly Animalia: "ANIMALIA";
+    readonly Fungi: "FUNGI";
+    readonly Plantae: "PLANTAE";
+};
+export type TaxonKingdom = (typeof taxonKingdom)[keyof typeof taxonKingdom];
 export declare const termEndAction: {
     readonly Charge: "CHARGE";
     readonly Email: "EMAIL";
 };
 export type TermEndAction = (typeof termEndAction)[keyof typeof termEndAction];
+export declare const testingPartyType: {
+    readonly Lab: "LAB";
+};
+export type TestingPartyType = (typeof testingPartyType)[keyof typeof testingPartyType];
 export declare const thirdPartyAccountType: {
     readonly Dhl: "DHL";
     readonly Fedex: "FEDEX";
@@ -5652,14 +7340,6 @@ export declare const tokenTypeCategory: {
     readonly Functional: "FUNCTIONAL";
 };
 export type TokenTypeCategory = (typeof tokenTypeCategory)[keyof typeof tokenTypeCategory];
-export declare const trackingEventTypeCode: {
-    readonly Canceled: "CANCELED";
-    readonly InTransit: "IN_TRANSIT";
-    readonly OutForDelivery: "OUT_FOR_DELIVERY";
-    readonly PickedUp: "PICKED_UP";
-    readonly PreTransit: "PRE_TRANSIT";
-};
-export type TrackingEventTypeCode = (typeof trackingEventTypeCode)[keyof typeof trackingEventTypeCode];
 export declare const trackingStatusType: {
     readonly Cancelled: "CANCELLED";
     readonly Created: "CREATED";
@@ -5706,9 +7386,11 @@ export declare const transmissionStatus: {
 export type TransmissionStatus = (typeof transmissionStatus)[keyof typeof transmissionStatus];
 export declare const transmissionType: {
     readonly Amendment: "AMENDMENT";
+    readonly Cancellation: "CANCELLATION";
     readonly CargoRelease: "CARGO_RELEASE";
     readonly Delete: "DELETE";
     readonly EntrySummary: "ENTRY_SUMMARY";
+    readonly Resend: "RESEND";
     readonly StatusQuery: "STATUS_QUERY";
 };
 export type TransmissionType = (typeof transmissionType)[keyof typeof transmissionType];
@@ -5797,20 +7479,6 @@ export declare const usageRecordTypeCode: {
     readonly TrialAccess: "TRIAL_ACCESS";
 };
 export type UsageRecordTypeCode = (typeof usageRecordTypeCode)[keyof typeof usageRecordTypeCode];
-export declare const usageType: {
-    readonly Carton: "CARTON";
-    readonly Catalog: "CATALOG";
-    readonly Classify: "CLASSIFY";
-    readonly Label: "LABEL";
-    readonly LandedCost: "LANDED_COST";
-    readonly Order: "ORDER";
-    readonly Restrict: "RESTRICT";
-    readonly Rule: "RULE";
-    readonly Shipment: "SHIPMENT";
-    readonly ShipmentRating: "SHIPMENT_RATING";
-    readonly User: "USER";
-};
-export type UsageType = (typeof usageType)[keyof typeof usageType];
 export declare const userAccessLevel: {
     readonly Admin: "ADMIN";
     readonly Custom: "CUSTOM";
@@ -5818,47 +7486,27 @@ export declare const userAccessLevel: {
     readonly None: "NONE";
 };
 export type UserAccessLevel = (typeof userAccessLevel)[keyof typeof userAccessLevel];
+export declare const valueOperator: {
+    readonly GreaterThan: "GREATER_THAN";
+    readonly GreaterThanOrEqual: "GREATER_THAN_OR_EQUAL";
+};
+export type ValueOperator = (typeof valueOperator)[keyof typeof valueOperator];
+export declare const vaultProvider: {
+    readonly BasisTheory: "BASIS_THEORY";
+    readonly Processor: "PROCESSOR";
+};
+export type VaultProvider = (typeof vaultProvider)[keyof typeof vaultProvider];
+export declare const vendorUserAccessLevel: {
+    readonly Admin: "ADMIN";
+    readonly Member: "MEMBER";
+};
+export type VendorUserAccessLevel = (typeof vendorUserAccessLevel)[keyof typeof vendorUserAccessLevel];
 export declare const visibilityCode: {
     readonly Hide: "HIDE";
     readonly Optional: "OPTIONAL";
     readonly Required: "REQUIRED";
 };
 export type VisibilityCode = (typeof visibilityCode)[keyof typeof visibilityCode];
-export declare const volumeUnitCode: {
-    readonly BarrelPetroleum: "BARREL_PETROLEUM";
-    readonly BushelUk: "BUSHEL_UK";
-    readonly BushelUsDry: "BUSHEL_US_DRY";
-    readonly CentiliterCl: "CENTILITER_CL";
-    readonly CubicCentimeter: "CUBIC_CENTIMETER";
-    readonly CubicDecimeter: "CUBIC_DECIMETER";
-    readonly CubicFoot: "CUBIC_FOOT";
-    readonly CubicInch: "CUBIC_INCH";
-    readonly CubicMeter: "CUBIC_METER";
-    readonly CubicMillimeter: "CUBIC_MILLIMETER";
-    readonly CubicYard: "CUBIC_YARD";
-    readonly DecaliterDal: "DECALITER_DAL";
-    readonly Deciliter: "DECILITER";
-    readonly FluidDramFlDr: "FLUID_DRAM_FL_DR";
-    readonly FluidOunceFlOz: "FLUID_OUNCE_FL_OZ";
-    readonly FluidOunceUk: "FLUID_OUNCE_UK";
-    readonly GallonFluid: "GALLON_FLUID";
-    readonly GallonUk: "GALLON_UK";
-    readonly GillGi: "GILL_GI";
-    readonly Hectoliter: "HECTOLITER";
-    readonly Kiloliter: "KILOLITER";
-    readonly Liter: "LITER";
-    readonly Microliter: "MICROLITER";
-    readonly MilliliterMl: "MILLILITER_ML";
-    readonly MinimMin: "MINIM_MIN";
-    readonly PeckUsDry: "PECK_US_DRY";
-    readonly PintFluid: "PINT_FLUID";
-    readonly PintUk: "PINT_UK";
-    readonly PintUsDry: "PINT_US_DRY";
-    readonly QuartFluid: "QUART_FLUID";
-    readonly QuartUk: "QUART_UK";
-    readonly QuartUsDry: "QUART_US_DRY";
-};
-export type VolumeUnitCode = (typeof volumeUnitCode)[keyof typeof volumeUnitCode];
 export declare const watchStatus: {
     readonly Active: "ACTIVE";
     readonly Completed: "COMPLETED";
@@ -5891,9 +7539,12 @@ export declare const webhookStatus: {
 export type WebhookStatus = (typeof webhookStatus)[keyof typeof webhookStatus];
 export declare const webhookType: {
     readonly CollectEmailSent: "COLLECT_EMAIL_SENT";
+    readonly CollectEmailSentFailed: "COLLECT_EMAIL_SENT_FAILED";
     readonly CollectPaymentFailed: "COLLECT_PAYMENT_FAILED";
+    readonly CollectPaymentLinkExpired: "COLLECT_PAYMENT_LINK_EXPIRED";
     readonly CollectPaymentLinkOpened: "COLLECT_PAYMENT_LINK_OPENED";
     readonly CollectPaymentSucceeded: "COLLECT_PAYMENT_SUCCEEDED";
+    readonly ComplianceCollectRequest: "COMPLIANCE_COLLECT_REQUEST";
     readonly InclusivePriceConfigurationChanged: "INCLUSIVE_PRICE_CONFIGURATION_CHANGED";
     readonly InclusivePriceConfigurationCreated: "INCLUSIVE_PRICE_CONFIGURATION_CREATED";
     readonly InclusivePriceConfigurationDeleted: "INCLUSIVE_PRICE_CONFIGURATION_DELETED";
@@ -5902,9 +7553,17 @@ export declare const webhookType: {
     readonly InventoryCheck: "INVENTORY_CHECK";
     readonly InventoryRefund: "INVENTORY_REFUND";
     readonly IpSettingStatusChanged: "IP_SETTING_STATUS_CHANGED";
+    readonly LandedCostComplianceReady: "LANDED_COST_COMPLIANCE_READY";
     readonly OrderCanceled: "ORDER_CANCELED";
     readonly OrderCombined: "ORDER_COMBINED";
     readonly OrderCreated: "ORDER_CREATED";
+    readonly OrderModificationCommitted: "ORDER_MODIFICATION_COMMITTED";
+    readonly OrderModificationCreated: "ORDER_MODIFICATION_CREATED";
+    readonly OrderModificationStatusChanged: "ORDER_MODIFICATION_STATUS_CHANGED";
+    readonly OrderPayoutDetailsReady: "ORDER_PAYOUT_DETAILS_READY";
+    readonly OrderReturnCompleted: "ORDER_RETURN_COMPLETED";
+    readonly OrderReturnCreated: "ORDER_RETURN_CREATED";
+    readonly OrderReturnStatusChanged: "ORDER_RETURN_STATUS_CHANGED";
     readonly OrderShipping: "ORDER_SHIPPING";
     readonly OrderStatusChanged: "ORDER_STATUS_CHANGED";
     readonly OrderUpdated: "ORDER_UPDATED";
@@ -5958,7 +7617,12 @@ export declare const zonosInvoiceCollectionMethod: {
 };
 export type ZonosInvoiceCollectionMethod = (typeof zonosInvoiceCollectionMethod)[keyof typeof zonosInvoiceCollectionMethod];
 export declare const zonosInvoiceFeatureFlagKey: {
+    readonly RedisAppCbpExchangeEnabled: "REDIS_APP_CBP_EXCHANGE_ENABLED";
+    readonly RedisCcProcessingFeeEnabled: "REDIS_CC_PROCESSING_FEE_ENABLED";
     readonly RedisInvoiceFeesEnabled: "REDIS_INVOICE_FEES_ENABLED";
+    readonly RedisInvoiceRolloverEnabled: "REDIS_INVOICE_ROLLOVER_ENABLED";
+    readonly RedisLateFeesEnabled: "REDIS_LATE_FEES_ENABLED";
+    readonly RedisSaasTaxEnabled: "REDIS_SAAS_TAX_ENABLED";
     readonly RedisZonosInvoiceProcessorEnabled: "REDIS_ZONOS_INVOICE_PROCESSOR_ENABLED";
 };
 export type ZonosInvoiceFeatureFlagKey = (typeof zonosInvoiceFeatureFlagKey)[keyof typeof zonosInvoiceFeatureFlagKey];
@@ -5967,10 +7631,12 @@ export declare const zonosInvoiceFinalizeAndChargeOutcome: {
     readonly Charged: "CHARGED";
     readonly Failed: "FAILED";
     readonly InvoiceSent: "INVOICE_SENT";
+    readonly NoDraftsFound: "NO_DRAFTS_FOUND";
     readonly VoidedZeroAmount: "VOIDED_ZERO_AMOUNT";
 };
 export type ZonosInvoiceFinalizeAndChargeOutcome = (typeof zonosInvoiceFinalizeAndChargeOutcome)[keyof typeof zonosInvoiceFinalizeAndChargeOutcome];
 export declare const zonosInvoiceInternalExclusionType: {
+    readonly TerminalFinality: "TERMINAL_FINALITY";
     readonly ZeroAmount: "ZERO_AMOUNT";
 };
 export type ZonosInvoiceInternalExclusionType = (typeof zonosInvoiceInternalExclusionType)[keyof typeof zonosInvoiceInternalExclusionType];
@@ -6005,6 +7671,11 @@ export declare const zonosInvoiceReprocessProcessingMode: {
     readonly Skip: "SKIP";
 };
 export type ZonosInvoiceReprocessProcessingMode = (typeof zonosInvoiceReprocessProcessingMode)[keyof typeof zonosInvoiceReprocessProcessingMode];
+export declare const zonosInvoiceStatusFinality: {
+    readonly NonTerminal: "NON_TERMINAL";
+    readonly Terminal: "TERMINAL";
+};
+export type ZonosInvoiceStatusFinality = (typeof zonosInvoiceStatusFinality)[keyof typeof zonosInvoiceStatusFinality];
 export declare const zonosInvoiceStatusUpdateInputType: {
     readonly Created: "CREATED";
     readonly Dispute: "DISPUTE";
@@ -6019,6 +7690,11 @@ export declare const zonosInvoiceStatusUpdateInputType: {
 export type ZonosInvoiceStatusUpdateInputType = (typeof zonosInvoiceStatusUpdateInputType)[keyof typeof zonosInvoiceStatusUpdateInputType];
 export type CartCreateMutation = {
     cartCreate: {
+        id: string;
+        organizationId: string;
+        createdAt: string;
+        expiresAt: string | null;
+        type: CartType | null;
         adjustments: Array<{
             amount: number;
             currencyCode: CurrencyCode;
@@ -6027,46 +7703,46 @@ export type CartCreateMutation = {
             sku: string | null;
             type: CartAdjustmentType;
         }>;
-        createdAt: string;
-        expiresAt: string | null;
-        id: string;
         items: Array<{
+            id: string;
             amount: number;
+            name: string | null;
+            currencyCode: CurrencyCode;
+            description: string | null;
+            imageUrl: string | null;
+            quantity: number;
+            sku: string | null;
+            productId: string;
+            restriction: {
+                reason: string;
+                action: RestrictedItemAction;
+            } | null;
             attributes: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            currencyCode: CurrencyCode;
-            description: string | null;
-            id: string;
-            imageUrl: string | null;
             metadata: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            name: string | null;
-            productId: string;
-            quantity: number;
-            restriction: {
-                action: RestrictedItemAction;
-                reason: string;
-            } | null;
-            sku: string | null;
         }>;
-        metadata: Array<{
-            key: string;
-            value: string;
-        }>;
-        organizationId: string;
         references: {
             checkoutSessionId: string | null;
             landedCostId: string | null;
         } | null;
-        type: CartType | null;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }>;
     };
 };
 export type CartUpdateMutation = {
     cartUpdate: {
+        id: string;
+        organizationId: string;
+        createdAt: string;
+        expiresAt: string | null;
+        type: CartType | null;
         adjustments: Array<{
             amount: number;
             currencyCode: CurrencyCode;
@@ -6075,46 +7751,46 @@ export type CartUpdateMutation = {
             sku: string | null;
             type: CartAdjustmentType;
         }>;
-        createdAt: string;
-        expiresAt: string | null;
-        id: string;
         items: Array<{
+            id: string;
             amount: number;
+            name: string | null;
+            currencyCode: CurrencyCode;
+            description: string | null;
+            imageUrl: string | null;
+            quantity: number;
+            sku: string | null;
+            productId: string;
+            restriction: {
+                reason: string;
+                action: RestrictedItemAction;
+            } | null;
             attributes: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            currencyCode: CurrencyCode;
-            description: string | null;
-            id: string;
-            imageUrl: string | null;
             metadata: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            name: string | null;
-            productId: string;
-            quantity: number;
-            restriction: {
-                action: RestrictedItemAction;
-                reason: string;
-            } | null;
-            sku: string | null;
         }>;
-        metadata: Array<{
-            key: string;
-            value: string;
-        }>;
-        organizationId: string;
         references: {
             checkoutSessionId: string | null;
             landedCostId: string | null;
         } | null;
-        type: CartType | null;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }>;
     };
 };
 export type CartByIdQuery = {
     cart: {
+        id: string;
+        organizationId: string;
+        createdAt: string;
+        expiresAt: string | null;
+        type: CartType | null;
         adjustments: Array<{
             amount: number;
             currencyCode: CurrencyCode;
@@ -6123,45 +7799,45 @@ export type CartByIdQuery = {
             sku: string | null;
             type: CartAdjustmentType;
         }>;
-        createdAt: string;
-        expiresAt: string | null;
-        id: string;
         items: Array<{
+            id: string;
             amount: number;
+            name: string | null;
+            currencyCode: CurrencyCode;
+            description: string | null;
+            imageUrl: string | null;
+            quantity: number;
+            sku: string | null;
+            productId: string;
+            restriction: {
+                reason: string;
+                action: RestrictedItemAction;
+            } | null;
             attributes: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            currencyCode: CurrencyCode;
-            description: string | null;
-            id: string;
-            imageUrl: string | null;
             metadata: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            name: string | null;
-            productId: string;
-            quantity: number;
-            restriction: {
-                action: RestrictedItemAction;
-                reason: string;
-            } | null;
-            sku: string | null;
         }>;
-        metadata: Array<{
-            key: string;
-            value: string;
-        }>;
-        organizationId: string;
         references: {
             checkoutSessionId: string | null;
             landedCostId: string | null;
         } | null;
-        type: CartType | null;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }>;
     } | null;
 };
 export type CartFragmentFragment = {
+    id: string;
+    organizationId: string;
+    createdAt: string;
+    expiresAt: string | null;
+    type: CartType | null;
     adjustments: Array<{
         amount: number;
         currencyCode: CurrencyCode;
@@ -6170,47 +7846,42 @@ export type CartFragmentFragment = {
         sku: string | null;
         type: CartAdjustmentType;
     }>;
-    createdAt: string;
-    expiresAt: string | null;
-    id: string;
     items: Array<{
+        id: string;
         amount: number;
+        name: string | null;
+        currencyCode: CurrencyCode;
+        description: string | null;
+        imageUrl: string | null;
+        quantity: number;
+        sku: string | null;
+        productId: string;
+        restriction: {
+            reason: string;
+            action: RestrictedItemAction;
+        } | null;
         attributes: Array<{
             key: string | null;
             value: string | null;
         } | null> | null;
-        currencyCode: CurrencyCode;
-        description: string | null;
-        id: string;
-        imageUrl: string | null;
         metadata: Array<{
             key: string | null;
             value: string | null;
         } | null> | null;
-        name: string | null;
-        productId: string;
-        quantity: number;
-        restriction: {
-            action: RestrictedItemAction;
-            reason: string;
-        } | null;
-        sku: string | null;
     }>;
-    metadata: Array<{
-        key: string;
-        value: string;
-    }>;
-    organizationId: string;
     references: {
         checkoutSessionId: string | null;
         landedCostId: string | null;
     } | null;
-    type: CartType | null;
+    metadata: Array<{
+        key: string;
+        value: string;
+    }>;
 };
 export type OrganizationQuery = {
     organization: {
-        id: string;
         name: string;
+        id: string;
         references: {
             storeId: number | null;
         } | null;
@@ -6218,73 +7889,70 @@ export type OrganizationQuery = {
 };
 export type CheckoutCustomerProfileAuthenticateMutation = {
     checkoutCustomerProfileAuthenticate: {
-        customerId: string;
         email: string | null;
+        customerId: string;
+        organizationId: string;
+        name: string | null;
+        phone: string | null;
+        oneTimePassword: string | null;
         locations: Array<{
-            administrativeArea: string;
-            countryCode: CountryCode;
             email: string | null;
-            line1: string;
-            line2: string | null;
-            locality: string;
             name: string | null;
             phone: string | null;
+            administrativeArea: string;
+            countryCode: CountryCode;
+            locality: string;
+            line1: string;
+            line2: string | null;
             postalCode: string;
         }> | null;
-        name: string | null;
-        oneTimePassword: string | null;
-        organizationId: string;
-        phone: string | null;
     };
 };
 export type CreateCollectQuoteMutation = {
+    partyCreateWorkflow: Array<{
+        id: string;
+    }>;
+    itemCreateWorkflow: Array<{
+        id: string;
+        amount: number;
+        amountInclusive: number | null;
+        hsCode: string | null;
+        name: string | null;
+        catalogItem: {
+            id: string;
+        } | null;
+    }>;
     cartonizeWorkflow: Array<{
         id: string;
     } | null> | null;
-    itemCreateWorkflow: Array<{
-        amount: number;
-        amountInclusive: number | null;
-        catalogItem: {
-            id: string;
-            inclusivePrices: Array<{
-                amount: number | null;
-            }> | null;
-        } | null;
-        hsCode: string | null;
+    shipmentRatingCalculateWorkflow: Array<{
         id: string;
-        name: string | null;
     }>;
     landedCostCalculateWorkflow: Array<{
+        id: string;
+        quoteType: LandedCostQuoteType | null;
         duties: Array<{
+            amount: number;
+        }>;
+        taxes: Array<{
             amount: number;
         }>;
         fees: Array<{
             amount: number;
         }>;
-        id: string;
         links: Array<{
             key: string;
             url: string;
         }> | null;
-        quoteType: LandedCostQuoteType | null;
-        taxes: Array<{
-            amount: number;
-        }>;
     } | null> | null;
-    partyCreateWorkflow: Array<{
-        id: string;
-    }>;
-    shipmentRatingCalculateWorkflow: Array<{
-        id: string;
-    }>;
 };
 export type LandedCostDetailFragment = {
     id: string;
+    quoteType: LandedCostQuoteType | null;
     links: Array<{
         key: string;
         url: string;
     }> | null;
-    quoteType: LandedCostQuoteType | null;
 };
 export type GetCartInfoQuery = {
     cartCheckoutWorkflow: {
@@ -6298,34 +7966,34 @@ export type GetCartInfoQuery = {
 };
 export type StoreCreditAddCreditMutation = {
     storeCreditAddCredit: {
-        balance: number;
+        id: string;
         checkoutCustomerId: string;
         currencyCode: CurrencyCode;
-        id: string;
+        balance: number;
     };
 };
 export type StoreCreditRemoveCreditMutation = {
     storeCreditRemoveCredit: {
-        balance: number;
+        id: string;
         checkoutCustomerId: string;
         currencyCode: CurrencyCode;
-        id: string;
+        balance: number;
     };
 };
 export type StoreCreditsByCustomerQuery = {
     storeCreditsByCustomer: Array<{
-        balance: number;
+        id: string;
         checkoutCustomerId: string;
         currencyCode: CurrencyCode;
-        id: string;
+        balance: number;
     }>;
 };
 export type InclusivePriceConfigurationsSyncMutation = {
     inclusivePriceConfigurationsSync: Array<{
+        shipToCountry: CountryCode;
         dutyConfiguration: {
             status: InclusivePriceConfigurationStatus;
         } | null;
-        shipToCountry: CountryCode;
         taxConfiguration: {
             status: InclusivePriceConfigurationStatus;
         };
@@ -6335,8 +8003,8 @@ export type OrganizationByStoreIdQuery = {
     organizations: {
         edges: Array<{
             node: {
-                id: string;
                 name: string;
+                id: string;
             } | null;
         }>;
     } | null;
@@ -6345,219 +8013,226 @@ export type OrganizationsQuery = {
     organizations: {
         edges: Array<{
             node: {
-                id: string;
                 name: string;
+                id: string;
                 references: {
-                    companyId: number | null;
                     storeId: number | null;
+                    companyId: number | null;
                 } | null;
             } | null;
         }>;
     } | null;
 };
 export type CartCalculateLandedCostMutation = {
+    partyCreateWorkflow: Array<{
+        type: PartyType | null;
+        id: string;
+        organization: string;
+    }>;
     cartWorkflow: {
         id: string;
         items: Array<{
+            id: string;
             amount: number;
+            name: string | null;
+            description: string | null;
+            imageUrl: string | null;
+            quantity: number;
+            sku: string | null;
+            productId: string;
+            reverseAmountDetail: Array<{
+                inclusivePriceConfigurationId: string | null;
+            }> | null;
+            restriction: {
+                reason: string;
+                action: RestrictedItemAction;
+            } | null;
             attributes: Array<{
                 key: string | null;
                 value: string | null;
             } | null> | null;
-            description: string | null;
-            id: string;
-            imageUrl: string | null;
-            name: string | null;
-            productId: string;
-            quantity: number;
-            restriction: {
-                action: RestrictedItemAction;
-                reason: string;
-            } | null;
-            reverseAmountDetail: Array<{
-                inclusivePriceConfigurationId: string | null;
-            }> | null;
-            sku: string | null;
         }>;
     };
     cartonizeWorkflow: Array<{
         id: string;
+        type: PackagingType;
         items: Array<{
             item: {
                 id: string;
             };
         }> | null;
-        type: PackagingType;
     } | null> | null;
-    checkoutSessionWorkflow: Array<{
-        landedCostId: string;
-        subtotals: {
-            adjustments: number;
-            duties: number;
-            exchangeRate: {
-                id: string;
-                rate: number;
-                sourceCurrencyCode: CurrencyCode;
-                targetCurrencyCode: CurrencyCode;
-                type: ExchangeRateType;
-            };
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            presentmentCurrencyCode: CurrencyCode;
-            shipping: number;
-            taxes: number;
-            total: number;
-        };
-    }> | null;
-    landedCostCalculateWorkflow: Array<{
-        amountSubtotals: {
-            discounts: number | null;
-            items: number;
-            landedCostTotal: number;
-            shipping: number;
-        } | null;
-        appliedAdjustments: Array<{
-            adjustment: {
-                name: string | null;
-                source: AdjustmentSource | null;
-            } | null;
-            amount: number;
-            item: {
-                amount: number;
-            } | null;
-            type: LandedCostAdjustmentType | null;
-        }> | null;
-        deMinimis: Array<{
-            formula: string;
-            threshold: DeMinimisThreshold;
-            method: IncotermCode;
-            note: string;
-            type: DeMinimisType;
-        }>;
-        rootId: string;
+    shipmentRatingCalculateWorkflow: Array<{
         id: string;
-        fees: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-        }>;
-        landedCostGuaranteeCode: LandedCostGuaranteeCode;
+        displayName: string;
+        currencyCode: CurrencyCode;
+        amount: number;
+        shippingProfile: {
+            serviceLevel: {
+                deliveryType: DeliveryType | null;
+                code: string;
+            };
+            transitTime: {
+                min: number | null;
+                max: number | null;
+                guaranteedDelivery: string | null;
+                type: TransitTypeCode | null;
+            } | null;
+        } | null;
+    }>;
+    landedCostCalculateWorkflow: Array<{
+        id: string;
         method: IncotermCode;
+        rootId: string;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
+        amountSubtotals: {
+            landedCostTotal: number;
+            items: number;
+            shipping: number;
+            discounts: number | null;
+        } | null;
+        shipmentRating: {
+            id: string;
+        };
         remittance: Array<{
             amount: number;
             description: string;
+        }>;
+        deMinimis: Array<{
+            type: DeMinimisType;
+            threshold: DeMinimisThreshold;
+            method: IncotermCode;
+            note: string;
+            formula: string;
+        }>;
+        taxes: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
         }>;
         duties: Array<{
             amount: number;
             currencyCode: CurrencyCode;
         }>;
-        shipmentRating: {
-            id: string;
-        };
-        taxes: Array<{
+        fees: Array<{
             amount: number;
             currencyCode: CurrencyCode;
         }>;
-    } | null> | null;
-    partyCreateWorkflow: Array<{
-        id: string;
-        organization: string;
-        type: PartyType | null;
-    }>;
-    shipmentRatingCalculateWorkflow: Array<{
-        amount: number;
-        currencyCode: CurrencyCode;
-        displayName: string;
-        id: string;
-        shippingProfile: {
-            serviceLevel: {
-                code: string;
-            };
-            transitTime: {
-                guaranteedDelivery: string | null;
-                max: number | null;
-                min: number | null;
-                type: TransitTypeCode | null;
+        appliedAdjustments: Array<{
+            amount: number;
+            type: LandedCostAdjustmentType | null;
+            adjustment: {
+                source: AdjustmentSource | null;
+                name: string | null;
             } | null;
-        } | null;
-    }>;
-};
-export type CalculateLandedCostMutation = {
-    cartonizeWorkflow: Array<{
-        id: string;
-        items: Array<{
             item: {
-                id: string;
-            };
+                amount: number;
+            } | null;
         }> | null;
-        type: PackagingType;
     } | null> | null;
     checkoutSessionWorkflow: Array<{
         landedCostId: string;
         subtotals: {
-            adjustments: number;
-            duties: number;
-            exchangeRate: {
-                id: string;
-                rate: number;
-                sourceCurrencyCode: CurrencyCode;
-                targetCurrencyCode: CurrencyCode;
-                type: ExchangeRateType;
-            };
-            fees: number;
             items: number;
+            shipping: number;
+            duties: number;
+            taxes: number;
+            adjustments: number;
+            fees: number;
             landedCostTotal: number;
             presentmentCurrencyCode: CurrencyCode;
-            shipping: number;
-            taxes: number;
             total: number;
+            exchangeRate: {
+                id: string;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                rate: number;
+                type: ExchangeRateType;
+            };
         };
     }> | null;
+};
+export type CalculateLandedCostMutation = {
+    partyCreateWorkflow: Array<{
+        type: PartyType | null;
+        id: string;
+        organization: string;
+    }>;
     itemCreateWorkflow: Array<{
+        id: string;
         amount: number;
+        name: string | null;
+        description: string | null;
+        imageUrl: string | null;
+        quantity: number;
+        sku: string | null;
+        productId: string;
+        reverseAmountDetail: Array<{
+            inclusivePriceConfigurationId: string | null;
+        }> | null;
+        restriction: {
+            reason: string;
+            action: RestrictedItemAction;
+        } | null;
         attributes: Array<{
             key: string | null;
             value: string | null;
         } | null> | null;
-        description: string | null;
+    }>;
+    cartonizeWorkflow: Array<{
         id: string;
-        imageUrl: string | null;
-        name: string | null;
-        productId: string;
-        quantity: number;
-        restriction: {
-            action: RestrictedItemAction;
-            reason: string;
-        } | null;
-        reverseAmountDetail: Array<{
-            inclusivePriceConfigurationId: string | null;
+        type: PackagingType;
+        items: Array<{
+            item: {
+                id: string;
+            };
         }> | null;
-        sku: string | null;
+    } | null> | null;
+    shipmentRatingCalculateWorkflow: Array<{
+        id: string;
+        displayName: string;
+        currencyCode: CurrencyCode;
+        amount: number;
+        shippingProfile: {
+            serviceLevel: {
+                deliveryType: DeliveryType | null;
+                code: string;
+            };
+            transitTime: {
+                min: number | null;
+                max: number | null;
+                guaranteedDelivery: string | null;
+                type: TransitTypeCode | null;
+            } | null;
+        } | null;
     }>;
     landedCostCalculateWorkflow: Array<{
+        id: string;
+        method: IncotermCode;
+        rootId: string;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
         amountSubtotals: {
-            discounts: number | null;
-            items: number;
             landedCostTotal: number;
+            items: number;
             shipping: number;
+            discounts: number | null;
         } | null;
-        appliedAdjustments: Array<{
-            adjustment: {
-                name: string | null;
-                source: AdjustmentSource | null;
-            } | null;
+        shipmentRating: {
+            id: string;
+        };
+        remittance: Array<{
             amount: number;
-            item: {
-                amount: number;
-            } | null;
-            type: LandedCostAdjustmentType | null;
-        }> | null;
+            description: string;
+        }>;
         deMinimis: Array<{
-            formula: string;
+            type: DeMinimisType;
+            threshold: DeMinimisThreshold;
             method: IncotermCode;
             note: string;
-            threshold: DeMinimisThreshold;
-            type: DeMinimisType;
+            formula: string;
+        }>;
+        taxes: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
         }>;
         duties: Array<{
             amount: number;
@@ -6567,111 +8242,110 @@ export type CalculateLandedCostMutation = {
             amount: number;
             currencyCode: CurrencyCode;
         }>;
-        id: string;
-        landedCostGuaranteeCode: LandedCostGuaranteeCode;
-        method: IncotermCode;
-        remittance: Array<{
+        appliedAdjustments: Array<{
             amount: number;
-            description: string;
-        }>;
-        rootId: string;
-        shipmentRating: {
-            id: string;
-        };
-        taxes: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-        }>;
-    } | null> | null;
-    partyCreateWorkflow: Array<{
-        id: string;
-        organization: string;
-        type: PartyType | null;
-    }>;
-    shipmentRatingCalculateWorkflow: Array<{
-        amount: number;
-        currencyCode: CurrencyCode;
-        displayName: string;
-        id: string;
-        shippingProfile: {
-            serviceLevel: {
-                code: string;
-            };
-            transitTime: {
-                guaranteedDelivery: string | null;
-                max: number | null;
-                min: number | null;
-                type: TransitTypeCode | null;
+            type: LandedCostAdjustmentType | null;
+            adjustment: {
+                source: AdjustmentSource | null;
+                name: string | null;
             } | null;
-        } | null;
-    }>;
+            item: {
+                amount: number;
+            } | null;
+        }> | null;
+    } | null> | null;
+    checkoutSessionWorkflow: Array<{
+        landedCostId: string;
+        subtotals: {
+            items: number;
+            shipping: number;
+            duties: number;
+            taxes: number;
+            adjustments: number;
+            fees: number;
+            landedCostTotal: number;
+            presentmentCurrencyCode: CurrencyCode;
+            total: number;
+            exchangeRate: {
+                id: string;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                rate: number;
+                type: ExchangeRateType;
+            };
+        };
+    }> | null;
 };
 export type CartItemFragmentFragment = {
+    id: string;
     amount: number;
+    name: string | null;
+    description: string | null;
+    imageUrl: string | null;
+    quantity: number;
+    sku: string | null;
+    productId: string;
+    reverseAmountDetail: Array<{
+        inclusivePriceConfigurationId: string | null;
+    }> | null;
+    restriction: {
+        reason: string;
+        action: RestrictedItemAction;
+    } | null;
     attributes: Array<{
         key: string | null;
         value: string | null;
     } | null> | null;
-    description: string | null;
-    id: string;
-    imageUrl: string | null;
-    name: string | null;
-    productId: string;
-    quantity: number;
-    restriction: {
-        action: RestrictedItemAction;
-        reason: string;
-    } | null;
-    reverseAmountDetail: Array<{
-        inclusivePriceConfigurationId: string | null;
-    }> | null;
-    sku: string | null;
 };
 export type CheckoutPresentmentFragment = {
     landedCostId: string;
     subtotals: {
-        adjustments: number;
-        duties: number;
-        exchangeRate: {
-            id: string;
-            rate: number;
-            sourceCurrencyCode: CurrencyCode;
-            targetCurrencyCode: CurrencyCode;
-            type: ExchangeRateType;
-        };
-        fees: number;
         items: number;
+        shipping: number;
+        duties: number;
+        taxes: number;
+        adjustments: number;
+        fees: number;
         landedCostTotal: number;
         presentmentCurrencyCode: CurrencyCode;
-        shipping: number;
-        taxes: number;
         total: number;
+        exchangeRate: {
+            id: string;
+            sourceCurrencyCode: CurrencyCode;
+            targetCurrencyCode: CurrencyCode;
+            rate: number;
+            type: ExchangeRateType;
+        };
     };
 };
 export type LandedCostFragment = {
+    id: string;
+    method: IncotermCode;
+    rootId: string;
+    landedCostGuaranteeCode: LandedCostGuaranteeCode;
     amountSubtotals: {
-        discounts: number | null;
-        items: number;
         landedCostTotal: number;
+        items: number;
         shipping: number;
+        discounts: number | null;
     } | null;
-    appliedAdjustments: Array<{
-        adjustment: {
-            name: string | null;
-            source: AdjustmentSource | null;
-        } | null;
+    shipmentRating: {
+        id: string;
+    };
+    remittance: Array<{
         amount: number;
-        item: {
-            amount: number;
-        } | null;
-        type: LandedCostAdjustmentType | null;
-    }> | null;
+        description: string;
+    }>;
     deMinimis: Array<{
-        formula: string;
+        type: DeMinimisType;
+        threshold: DeMinimisThreshold;
         method: IncotermCode;
         note: string;
-        threshold: DeMinimisThreshold;
-        type: DeMinimisType;
+        formula: string;
+    }>;
+    taxes: Array<{
+        amount: number;
+        currencyCode: CurrencyCode;
     }>;
     duties: Array<{
         amount: number;
@@ -6681,92 +8355,89 @@ export type LandedCostFragment = {
         amount: number;
         currencyCode: CurrencyCode;
     }>;
-    id: string;
-    landedCostGuaranteeCode: LandedCostGuaranteeCode;
-    method: IncotermCode;
-    remittance: Array<{
+    appliedAdjustments: Array<{
         amount: number;
-        description: string;
-    }>;
-    rootId: string;
-    shipmentRating: {
-        id: string;
-    };
-    taxes: Array<{
-        amount: number;
-        currencyCode: CurrencyCode;
-    }>;
+        type: LandedCostAdjustmentType | null;
+        adjustment: {
+            source: AdjustmentSource | null;
+            name: string | null;
+        } | null;
+        item: {
+            amount: number;
+        } | null;
+    }> | null;
 };
 export type ShipmentRatingFragment = {
-    amount: number;
-    currencyCode: CurrencyCode;
-    displayName: string;
     id: string;
+    displayName: string;
+    currencyCode: CurrencyCode;
+    amount: number;
     shippingProfile: {
         serviceLevel: {
+            deliveryType: DeliveryType | null;
             code: string;
         };
         transitTime: {
-            guaranteedDelivery: string | null;
-            max: number | null;
             min: number | null;
+            max: number | null;
+            guaranteedDelivery: string | null;
             type: TransitTypeCode | null;
         } | null;
     } | null;
 };
 export type FulfillmentCenterQuery = {
-    fulfillmentCenters: Array<{
-        party: {
-            location: {
-                administrativeArea: string | null;
-                administrativeAreaCode: string | null;
-                countryCode: CountryCode;
-                line1: string | null;
-                locality: string | null;
-                postalCode: string | null;
-            } | null;
-        };
-        type: FulfillmentCenterType;
-    }> | null;
     shippingZones: Array<{
         countryCodes: Array<CountryCode> | null;
         fulfillmentCenter: {
+            type: FulfillmentCenterType;
             party: {
                 location: {
-                    administrativeArea: string | null;
-                    administrativeAreaCode: string | null;
-                    countryCode: CountryCode;
                     line1: string | null;
                     locality: string | null;
                     postalCode: string | null;
+                    administrativeArea: string | null;
+                    administrativeAreaCode: string | null;
+                    countryCode: CountryCode;
                 } | null;
             };
-            type: FulfillmentCenterType;
         } | null;
     } | null> | null;
+    fulfillmentCenters: Array<{
+        type: FulfillmentCenterType;
+        party: {
+            location: {
+                line1: string | null;
+                locality: string | null;
+                postalCode: string | null;
+                administrativeArea: string | null;
+                administrativeAreaCode: string | null;
+                countryCode: CountryCode;
+            } | null;
+        };
+    }> | null;
 };
 export type PartyInfoQuery = {
     party: {
-        location: {
-            administrativeArea: string | null;
-            administrativeAreaCode: string | null;
-            countryCode: CountryCode;
-            line1: string | null;
-            line2: string | null;
-            line3: string | null;
-            locality: string | null;
-            postalCode: string | null;
-        } | null;
         person: {
             companyName: string | null;
-            email: string | null;
             firstName: string | null;
             lastName: string | null;
+            phone: string | null;
+            email: string | null;
             metadata: Array<{
                 key: string;
                 value: string | null;
             } | null> | null;
-            phone: string | null;
+        } | null;
+        location: {
+            administrativeArea: string | null;
+            administrativeAreaCode: string | null;
+            line1: string | null;
+            line2: string | null;
+            line3: string | null;
+            postalCode: string | null;
+            countryCode: CountryCode;
+            locality: string | null;
         } | null;
     } | null;
 };
@@ -6781,15 +8452,15 @@ export type CheckItemRestrictionsMutation = {
     itemRestrictionApply: {
         id: string;
         items: Array<{
-            action: ItemRestrictionAction | null;
             id: string;
+            action: ItemRestrictionAction | null;
             itemDescription: string | null;
             itemRestrictions: Array<{
                 hsCode: string;
                 id: string;
                 note: string;
-                sources: Array<string | null> | null;
                 type: ItemRestrictionType;
+                sources: Array<string | null> | null;
             } | null> | null;
         } | null>;
     };
@@ -6797,17 +8468,26 @@ export type CheckItemRestrictionsMutation = {
 export type BulkClassifyMutation = {
     classificationsCalculate: Array<{
         description: string | null;
+        name: string;
         hsCode: {
             code: string;
         } | null;
-        name: string;
     }>;
+};
+export type GetAirwallexPaymentIntentQuery = {
+    airwallexPaymentIntent: {
+        amount: number | null;
+        currency: CurrencyCode | null;
+        status: string;
+    };
 };
 export type GetCollectCheckoutSessionQuery = {
     checkoutSession: {
-        clientSecret: string;
-        completedAt: string | null;
         id: string;
+        paymentIntentId: string | null;
+        completedAt: string | null;
+        clientSecret: string;
+        paymentProcessor: CheckoutPaymentProcessorType | null;
         landedCost: {
             id: string;
             shortId: string | null;
@@ -6820,8 +8500,19 @@ export type GetCollectCheckoutSessionQuery = {
 export type GetPartyInfoByLandedCostIdQuery = {
     landedCost: {
         id: string;
+        shortId: string | null;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }> | null;
         root: {
             parties: Array<{
+                type: PartyType | null;
+                person: {
+                    companyName: string | null;
+                    firstName: string | null;
+                    lastName: string | null;
+                } | null;
                 location: {
                     administrativeAreaCode: string | null;
                     countryCode: CountryCode;
@@ -6830,34 +8521,27 @@ export type GetPartyInfoByLandedCostIdQuery = {
                     locality: string | null;
                     postalCode: string | null;
                 } | null;
-                person: {
-                    companyName: string | null;
-                    firstName: string | null;
-                    lastName: string | null;
-                } | null;
-                type: PartyType | null;
             } | null> | null;
         } | null;
-        shortId: string | null;
     } | null;
 };
 export type GetTaxIdByCountryQuery = {
     taxIds: Array<{
-        administrativeAreaCode: string | null;
-        allowLowValueOrders: boolean | null;
-        countryCode: CountryCode;
         id: string;
         method: TaxMethodType;
         mode: Mode | null;
         sendEmails: boolean | null;
         taxIdNumber: string;
+        allowLowValueOrders: boolean | null;
+        countryCode: CountryCode;
+        administrativeAreaCode: string | null;
         type: TaxIdType;
     } | null> | null;
 };
 export type LandedCostSettingsQuery = {
     landedCostSettings: {
-        defaultNativeCurrency: CurrencyCode | null;
         landedCostGuarantee: LandedCostGuaranteeType | null;
+        defaultNativeCurrency: CurrencyCode | null;
     } | null;
 };
 export type PartyCreateMutation = {
@@ -6867,55 +8551,78 @@ export type PartyCreateMutation = {
 };
 export type CheckoutSessionCreateMutation = {
     checkoutSessionCreate: {
-        cartId: string | null;
+        id: string;
         clientSecret: string;
+        customerSessionClientSecret: string | null;
+        cartId: string | null;
         completedAt: string | null;
+        paymentProcessor: CheckoutPaymentProcessorType | null;
+        organizationId: string;
+        order: {
+            id: string;
+        } | null;
+        references: {
+            inclusivePriceConfigurationId: string | null;
+        } | null;
         customerProfile: {
+            name: string | null;
             email: string | null;
+            storeCreditBalance: number | null;
             locations: Array<{
+                name: string | null;
+                email: string | null;
+                phone: string | null;
                 administrativeArea: string;
                 countryCode: CountryCode;
-                email: string | null;
                 line1: string;
                 line2: string | null;
-                name: string | null;
-                phone: string | null;
                 locality: string;
                 postalCode: string;
             }> | null;
-            name: string | null;
-            storeCreditBalance: number | null;
         } | null;
-        customerSessionClientSecret: string | null;
-        id: string;
+        varianceTestResults: Array<{
+            selectedVariantKey: string;
+            testKey: string;
+        }> | null;
+        subtotals: {
+            items: number;
+            shipping: number;
+            duties: number;
+            adjustments: number;
+            taxes: number;
+            fees: number;
+            landedCostTotal: number;
+            presentmentCurrencyCode: CurrencyCode;
+            storeCredit: number;
+            total: number;
+            exchangeRate: {
+                id: string;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                rate: number;
+                type: ExchangeRateType;
+            };
+        };
         landedCost: {
-            amountSubtotals: {
-                discounts: number | null;
-                duties: number;
-                fees: number;
-                items: number;
-                landedCostTotal: number;
-                shipping: number;
-                taxes: number;
-            } | null;
-            appliedAdjustments: Array<{
-                adjustment: {
-                    name: string | null;
-                    source: AdjustmentSource | null;
-                } | null;
-                amount: number;
-                type: LandedCostAdjustmentType | null;
-                item: {
-                    amount: number;
-                } | null;
-            }> | null;
+            id: string;
+            method: IncotermCode;
+            rootId: string;
+            landedCostGuaranteeCode: LandedCostGuaranteeCode;
             currencyCode: CurrencyCode;
+            remittance: Array<{
+                amount: number;
+                description: string;
+            }>;
             deMinimis: Array<{
                 type: DeMinimisType;
                 threshold: DeMinimisThreshold;
                 method: IncotermCode;
                 note: string;
                 formula: string;
+            }>;
+            taxes: Array<{
+                amount: number;
+                currencyCode: CurrencyCode;
             }>;
             duties: Array<{
                 amount: number;
@@ -6925,120 +8632,125 @@ export type CheckoutSessionCreateMutation = {
                 amount: number;
                 currencyCode: CurrencyCode;
             }>;
-            landedCostGuaranteeCode: LandedCostGuaranteeCode;
-            id: string;
-            method: IncotermCode;
-            remittance: Array<{
+            appliedAdjustments: Array<{
                 amount: number;
-                description: string;
-            }>;
-            rootId: string;
+                type: LandedCostAdjustmentType | null;
+                adjustment: {
+                    source: AdjustmentSource | null;
+                    name: string | null;
+                } | null;
+                item: {
+                    amount: number;
+                } | null;
+            }> | null;
             shipmentRating: {
-                amount: number;
-                currencyCode: CurrencyCode;
-                displayName: string;
                 id: string;
+                displayName: string;
+                currencyCode: CurrencyCode;
+                amount: number;
                 shippingProfile: {
                     serviceLevel: {
+                        deliveryType: DeliveryType | null;
                         code: string;
                     };
                     transitTime: {
-                        guaranteedDelivery: string | null;
-                        max: number | null;
                         min: number | null;
+                        max: number | null;
+                        guaranteedDelivery: string | null;
                         type: TransitTypeCode | null;
                     } | null;
                 } | null;
             };
-            taxes: Array<{
-                amount: number;
-                currencyCode: CurrencyCode;
-            }>;
+            amountSubtotals: {
+                duties: number;
+                discounts: number | null;
+                fees: number;
+                taxes: number;
+                items: number;
+                shipping: number;
+                landedCostTotal: number;
+            } | null;
         } | null;
         metadata: Array<{
             key: string;
             value: string;
         } | null> | null;
-        organizationId: string;
-        references: {
-            inclusivePriceConfigurationId: string | null;
-        } | null;
-        subtotals: {
-            adjustments: number;
-            duties: number;
-            exchangeRate: {
-                id: string;
-                rate: number;
-                sourceCurrencyCode: CurrencyCode;
-                targetCurrencyCode: CurrencyCode;
-                type: ExchangeRateType;
-            };
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            presentmentCurrencyCode: CurrencyCode;
-            shipping: number;
-            storeCredit: number;
-            taxes: number;
-            total: number;
-        };
-        varianceTestResults: Array<{
-            selectedVariantKey: string;
-            testKey: string;
-        }> | null;
     };
 };
 export type CheckoutSessionPaymentIntentCreateMutation = {
     checkoutSessionPaymentIntentCreate: {
-        cartId: string | null;
+        id: string;
         clientSecret: string;
+        customerSessionClientSecret: string | null;
+        cartId: string | null;
         completedAt: string | null;
+        paymentProcessor: CheckoutPaymentProcessorType | null;
+        organizationId: string;
+        order: {
+            id: string;
+        } | null;
+        references: {
+            inclusivePriceConfigurationId: string | null;
+        } | null;
         customerProfile: {
+            name: string | null;
             email: string | null;
+            storeCreditBalance: number | null;
             locations: Array<{
+                name: string | null;
+                email: string | null;
+                phone: string | null;
                 administrativeArea: string;
                 countryCode: CountryCode;
-                email: string | null;
                 line1: string;
                 line2: string | null;
-                name: string | null;
-                phone: string | null;
                 locality: string;
                 postalCode: string;
             }> | null;
-            name: string | null;
-            storeCreditBalance: number | null;
         } | null;
-        customerSessionClientSecret: string | null;
-        id: string;
+        varianceTestResults: Array<{
+            selectedVariantKey: string;
+            testKey: string;
+        }> | null;
+        subtotals: {
+            items: number;
+            shipping: number;
+            duties: number;
+            adjustments: number;
+            taxes: number;
+            fees: number;
+            landedCostTotal: number;
+            presentmentCurrencyCode: CurrencyCode;
+            storeCredit: number;
+            total: number;
+            exchangeRate: {
+                id: string;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                rate: number;
+                type: ExchangeRateType;
+            };
+        };
         landedCost: {
-            amountSubtotals: {
-                discounts: number | null;
-                duties: number;
-                fees: number;
-                items: number;
-                landedCostTotal: number;
-                shipping: number;
-                taxes: number;
-            } | null;
-            appliedAdjustments: Array<{
-                adjustment: {
-                    name: string | null;
-                    source: AdjustmentSource | null;
-                } | null;
-                amount: number;
-                type: LandedCostAdjustmentType | null;
-                item: {
-                    amount: number;
-                } | null;
-            }> | null;
+            id: string;
+            method: IncotermCode;
+            rootId: string;
+            landedCostGuaranteeCode: LandedCostGuaranteeCode;
             currencyCode: CurrencyCode;
+            remittance: Array<{
+                amount: number;
+                description: string;
+            }>;
             deMinimis: Array<{
                 type: DeMinimisType;
                 threshold: DeMinimisThreshold;
                 method: IncotermCode;
                 note: string;
                 formula: string;
+            }>;
+            taxes: Array<{
+                amount: number;
+                currencyCode: CurrencyCode;
             }>;
             duties: Array<{
                 amount: number;
@@ -7048,67 +8760,49 @@ export type CheckoutSessionPaymentIntentCreateMutation = {
                 amount: number;
                 currencyCode: CurrencyCode;
             }>;
-            landedCostGuaranteeCode: LandedCostGuaranteeCode;
-            id: string;
-            method: IncotermCode;
-            remittance: Array<{
+            appliedAdjustments: Array<{
                 amount: number;
-                description: string;
-            }>;
-            rootId: string;
+                type: LandedCostAdjustmentType | null;
+                adjustment: {
+                    source: AdjustmentSource | null;
+                    name: string | null;
+                } | null;
+                item: {
+                    amount: number;
+                } | null;
+            }> | null;
             shipmentRating: {
-                amount: number;
-                currencyCode: CurrencyCode;
-                displayName: string;
                 id: string;
+                displayName: string;
+                currencyCode: CurrencyCode;
+                amount: number;
                 shippingProfile: {
                     serviceLevel: {
+                        deliveryType: DeliveryType | null;
                         code: string;
                     };
                     transitTime: {
-                        guaranteedDelivery: string | null;
-                        max: number | null;
                         min: number | null;
+                        max: number | null;
+                        guaranteedDelivery: string | null;
                         type: TransitTypeCode | null;
                     } | null;
                 } | null;
             };
-            taxes: Array<{
-                amount: number;
-                currencyCode: CurrencyCode;
-            }>;
+            amountSubtotals: {
+                duties: number;
+                discounts: number | null;
+                fees: number;
+                taxes: number;
+                items: number;
+                shipping: number;
+                landedCostTotal: number;
+            } | null;
         } | null;
         metadata: Array<{
             key: string;
             value: string;
         } | null> | null;
-        organizationId: string;
-        references: {
-            inclusivePriceConfigurationId: string | null;
-        } | null;
-        subtotals: {
-            adjustments: number;
-            duties: number;
-            exchangeRate: {
-                id: string;
-                rate: number;
-                sourceCurrencyCode: CurrencyCode;
-                targetCurrencyCode: CurrencyCode;
-                type: ExchangeRateType;
-            };
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            presentmentCurrencyCode: CurrencyCode;
-            shipping: number;
-            storeCredit: number;
-            taxes: number;
-            total: number;
-        };
-        varianceTestResults: Array<{
-            selectedVariantKey: string;
-            testKey: string;
-        }> | null;
     };
 };
 export type PaypalOrderCreateMutation = {
@@ -7118,96 +8812,45 @@ export type PaypalOrderCreateMutation = {
 };
 export type ExchangeRateCreateMutation = {
     exchangeRateCreate: {
-        expiresAt: string;
         rate: number;
+        type: ExchangeRateType;
+        expiresAt: string;
         targetFormat: {
             currencyCode: CurrencyCode;
             decimalDelimiter: string;
-            scale: number;
             symbol: string;
             symbolLocation: CurrencySymbolLocation | null;
             thousandsDelimiter: string;
+            scale: number;
         } | null;
-        type: ExchangeRateType;
     } | null;
 };
 export type CurrencyConversionCreateMutation = {
     currencyConversionCreate: {
         exchangeRate: {
-            expiresAt: string;
             rate: number;
+            type: ExchangeRateType;
+            expiresAt: string;
             targetFormat: {
                 currencyCode: CurrencyCode;
                 decimalDelimiter: string;
-                scale: number;
                 symbol: string;
                 symbolLocation: CurrencySymbolLocation | null;
                 thousandsDelimiter: string;
+                scale: number;
             } | null;
-            type: ExchangeRateType;
         };
     };
 };
 export type CartCheckoutWorkflowQuery = {
     cartCheckoutWorkflow: {
-        appearanceSettings: {
-            colorPrimary: string;
-            colorSecondary: string;
-            createdAt: string;
-            createdBy: string;
-            fontFamily: string;
-            id: string;
-            logoUrl: string;
-            mode: Mode;
-            organization: string;
-            style: ElementsUiStyle;
-            theme: ElementsUiTheme;
-            updatedAt: string;
-            updatedBy: string;
-            zonosAttribution: ZonosAttribution | null;
-        };
+        credentialTokenId: string;
+        organizationId: string;
         cart: {
-            adjustments: Array<{
-                amount: number;
-                currencyCode: CurrencyCode;
-                description: string | null;
-                productId: string | null;
-                sku: string | null;
-                type: CartAdjustmentType;
-            }>;
+            id: string;
+            type: CartType | null;
             createdAt: string;
             expiresAt: string | null;
-            id: string;
-            items: Array<{
-                amount: number;
-                attributes: Array<{
-                    key: string | null;
-                    value: string | null;
-                } | null> | null;
-                countryOfOrigin: CountryCode | null;
-                currencyCode: CurrencyCode;
-                description: string | null;
-                id: string;
-                imageUrl: string | null;
-                itemType: ItemType | null;
-                measurements: Array<{
-                    type: ItemMeasurementType;
-                    unitOfMeasure: ItemUnitOfMeasure;
-                    value: number;
-                } | null> | null;
-                metadata: Array<{
-                    key: string | null;
-                    value: string | null;
-                } | null> | null;
-                name: string | null;
-                productId: string;
-                quantity: number;
-                sku: string | null;
-            }>;
-            metadata: Array<{
-                key: string;
-                value: string;
-            }>;
             organization: {
                 id: string;
                 name: string;
@@ -7219,29 +8862,161 @@ export type CartCheckoutWorkflowQuery = {
                 checkoutSessionId: string | null;
                 landedCostId: string | null;
             } | null;
-            type: CartType | null;
+            adjustments: Array<{
+                amount: number;
+                currencyCode: CurrencyCode;
+                description: string | null;
+                productId: string | null;
+                sku: string | null;
+                type: CartAdjustmentType;
+            }>;
+            items: Array<{
+                id: string;
+                amount: number;
+                name: string | null;
+                description: string | null;
+                countryOfOrigin: CountryCode | null;
+                currencyCode: CurrencyCode;
+                itemType: ItemType | null;
+                imageUrl: string | null;
+                quantity: number;
+                sku: string | null;
+                productId: string;
+                measurements: Array<{
+                    type: ItemMeasurementType;
+                    unitOfMeasure: ItemUnitOfMeasure;
+                    value: number;
+                } | null> | null;
+                metadata: Array<{
+                    key: string | null;
+                    value: string | null;
+                } | null> | null;
+                attributes: Array<{
+                    key: string | null;
+                    value: string | null;
+                } | null> | null;
+            }>;
+            metadata: Array<{
+                key: string;
+                value: string;
+            }>;
         };
-        checkoutSettings: {
-            allowedCharacterSets: AllowedCharacterSets;
-            allowedSettlementCurrencies: AllowedSettlementCurrencies;
-            successBehavior: CheckoutSuccessBehavior;
-            captureDelay: number;
-            companyFieldsStatus: CheckoutCompanyFieldsStatus;
+        shippingZones: Array<{
+            countryCodes: Array<CountryCode> | null;
+        } | null> | null;
+        helloSettings: {
+            desktopLocation: HelloDesktopLocation;
+            allowedDomains: Array<string>;
+            anchorElementSelector: string;
+            cartUrlPattern: string | null;
+            currencyBehavior: HelloCurrencyBehavior;
+            currencyElementSelector: string;
+            excludedUrlPatterns: Array<string>;
+            countryOverrideBehavior: HelloCountryOverrideBehavior;
+            widgetSize: number | null;
+            id: string;
             createdAt: string;
             createdBy: string;
-            customHTML: string;
-            defaultCartExpiration: number;
-            disabledCountries: Array<CountryCode> | null;
-            externalPaymentMethods: Array<{
-                status: ExternalPaymentMethodStatus;
-                type: ExternalPaymentMethodType;
-            }> | null;
-            externalServiceTokens: Array<{
-                token: string;
-                type: ExternalServiceTokenType;
-            }>;
+            mobileLocation: HelloMobileLocation;
+            mode: Mode;
+            organization: string;
+            updatedAt: string;
+            updatedBy: string;
+            homepageUrlPattern: string | null;
+            productDetailUrlPattern: string | null;
+            productListUrlPattern: string | null;
+            peekMessageDelay: number;
+            peekMessageBehavior: HelloPeekMessageBehavior;
+            restrictionBehavior: HelloRestrictionBehavior;
+            dutyTaxEstimationBehavior: HelloEstimateBehavior;
+            productAddToCartElementSelector: string | null;
+            productDescriptionElementSelector: string | null;
+            productPriceElementSelector: string | null;
+            productTitleElementSelector: string | null;
+            visibilityStatus: HelloVisibilityStatus;
+            desktopLocationOverride: {
+                anchor: HelloDesktopLocation;
+                horizontalOffset: number;
+                verticalOffset: number;
+            } | null;
+            countryDisplayRules: {
+                countrySelector: {
+                    behavior: HelloCountryDisplayBehavior;
+                    excludedCountries: Array<CountryCode>;
+                    includedCountries: Array<CountryCode>;
+                };
+                widgetVisibility: {
+                    behavior: HelloCountryDisplayBehavior;
+                    excludedCountries: Array<CountryCode>;
+                    includedCountries: Array<CountryCode>;
+                };
+            };
+            mobileLocationOverride: {
+                anchor: HelloDesktopLocation;
+                horizontalOffset: number;
+                verticalOffset: number;
+            } | null;
+        };
+        appearanceSettings: {
+            colorPrimary: string;
+            colorSecondary: string;
+            fontFamily: string;
+            logoUrl: string;
+            style: ElementsUiStyle;
+            supportedLocales: Array<string> | null;
+            theme: ElementsUiTheme;
+            zonosAttribution: ZonosAttribution | null;
+            createdAt: string;
+            createdBy: string;
             id: string;
             mode: Mode;
+            organization: string;
+            updatedAt: string;
+            updatedBy: string;
+        };
+        checkoutSettings: {
+            disabledCountries: Array<CountryCode> | null;
+            allowedCharacterSets: AllowedCharacterSets;
+            captureDelay: number;
+            defaultCartExpiration: number;
+            companyFieldsStatus: CheckoutCompanyFieldsStatus;
+            domesticElementSelector: string | null;
+            allowedSettlementCurrencies: AllowedSettlementCurrencies;
+            successBehavior: CheckoutSuccessBehavior;
+            customHTML: string;
+            mode: Mode;
+            successRedirectUrl: string;
+            placeOrderButtonSelector: string | null;
+            createdAt: string;
+            createdBy: string;
+            updatedAt: string;
+            updatedBy: string;
+            id: string;
+            organization: string;
+            subscriptionStatus: CheckoutSubscriptionStatus;
+            visibilityStatus: CheckoutVisibilityStatus;
+            merchantPolicyLinks: {
+                termsAndConditions: {
+                    link: string | null;
+                } | null;
+                privacyPolicy: {
+                    link: string | null;
+                } | null;
+                refundPolicy: {
+                    link: string | null;
+                } | null;
+                shippingPolicy: {
+                    link: string | null;
+                } | null;
+                warrantyPolicy: {
+                    link: string | null;
+                } | null;
+                euWithdrawalPolicy: {
+                    maximumReturnShippingEstimate: number | null;
+                    currencyCode: CurrencyCode;
+                    status: NotificationActiveStatus | null;
+                } | null;
+            };
             orderNotifications: {
                 abandonedCart: {
                     delay: number;
@@ -7260,16 +9035,18 @@ export type CartCheckoutWorkflowQuery = {
                     sendCopiesTo: Array<string>;
                 };
             };
-            organization: string;
-            placeOrderButtonSelector: string | null;
-            subscriptionStatus: CheckoutSubscriptionStatus;
-            successRedirectUrl: string;
+            externalPaymentMethods: Array<{
+                status: ExternalPaymentMethodStatus;
+                type: ExternalPaymentMethodType;
+            }> | null;
             analyticsProviders: Array<{
                 status: AnalyticsProviderStatus;
                 type: AnalyticsProviderType;
             }>;
-            updatedAt: string;
-            updatedBy: string;
+            externalServiceTokens: Array<{
+                token: string;
+                type: ExternalServiceTokenType;
+            }>;
             varianceTestRegistrations: Array<{
                 testKey: string;
                 varianceAllocation: Array<{
@@ -7277,64 +9054,20 @@ export type CartCheckoutWorkflowQuery = {
                     variantKey: string;
                 }>;
             }> | null;
-            visibilityStatus: CheckoutVisibilityStatus;
-        };
-        credentialTokenId: string;
-        helloSettings: {
-            allowedDomains: Array<string>;
-            anchorElementSelector: string;
-            cartUrlPattern: string | null;
-            countryDisplayRules: {
-                countrySelector: {
-                    behavior: HelloCountryDisplayBehavior;
-                    excludedCountries: Array<CountryCode>;
-                    includedCountries: Array<CountryCode>;
-                };
-                widgetVisibility: {
-                    behavior: HelloCountryDisplayBehavior;
-                    excludedCountries: Array<CountryCode>;
-                    includedCountries: Array<CountryCode>;
+            plugins: {
+                bigcommerce: {
+                    allowBypassQuery: boolean;
                 };
             };
-            countryOverrideBehavior: HelloCountryOverrideBehavior;
-            createdAt: string;
-            createdBy: string;
-            currencyBehavior: HelloCurrencyBehavior;
-            currencyElementSelector: string;
-            desktopLocation: HelloDesktopLocation;
-            dutyTaxEstimationBehavior: HelloEstimateBehavior;
-            excludedUrlPatterns: Array<string>;
-            updatedBy: string;
-            id: string;
-            mobileLocation: HelloMobileLocation;
-            mode: Mode;
-            organization: string;
-            peekMessageBehavior: HelloPeekMessageBehavior;
-            peekMessageDelay: number;
-            productListUrlPattern: string | null;
-            productDetailUrlPattern: string | null;
-            homepageUrlPattern: string | null;
-            productDescriptionElementSelector: string | null;
-            productPriceElementSelector: string | null;
-            productTitleElementSelector: string | null;
-            restrictionBehavior: HelloRestrictionBehavior;
-            updatedAt: string;
-            productAddToCartElementSelector: string | null;
-            visibilityStatus: HelloVisibilityStatus;
-            widgetSize: number | null;
-        };
-        landedCostSettings: {
-            defaultNativeCurrency: CurrencyCode | null;
-            landedCostGuarantee: LandedCostGuaranteeType | null;
         };
         onlineStoreSettings: {
             allowedDomains: Array<string>;
             url: string;
         };
-        organizationId: string;
-        shippingZones: Array<{
-            countryCodes: Array<CountryCode> | null;
-        } | null> | null;
+        landedCostSettings: {
+            landedCostGuarantee: LandedCostGuaranteeType | null;
+            defaultNativeCurrency: CurrencyCode | null;
+        };
     };
 };
 export type RenewCartExpirationTokenMutation = {
@@ -7344,8 +9077,16 @@ export type RenewCartExpirationTokenMutation = {
 };
 export type GetCheckoutSessionQuery = {
     checkoutSession: {
+        clientSecret: string;
+        completedAt: string | null;
         customerProfile: {
             storeCreditBalance: number | null;
+        } | null;
+        subtotals: {
+            presentmentCurrencyCode: CurrencyCode;
+        };
+        order: {
+            id: string;
         } | null;
         landedCost: {
             id: string;
@@ -7355,12 +9096,6 @@ export type GetCheckoutSessionQuery = {
                 } | null> | null;
             } | null;
         } | null;
-        order: {
-            id: string;
-        } | null;
-        subtotals: {
-            presentmentCurrencyCode: CurrencyCode;
-        };
     };
 };
 export type PaypalOrderQuery = {
@@ -7378,21 +9113,21 @@ export type InclusivePriceConfigurationsQuery = {
     inclusivePriceConfigurations: {
         edges: Array<{
             node: {
+                id: string;
+                shipToCountry: CountryCode;
+                effectiveRate: number;
                 dutyConfiguration: {
                     rate: number;
                     status: InclusivePriceConfigurationStatus;
                 } | null;
-                effectiveRate: number;
-                feeConfiguration: {
-                    externalRate: number;
-                    internalRate: number;
-                } | null;
-                id: string;
-                shipToCountry: CountryCode;
                 taxConfiguration: {
                     rate: number;
                     status: InclusivePriceConfigurationStatus;
                 };
+                feeConfiguration: {
+                    externalRate: number;
+                    internalRate: number;
+                } | null;
             };
         }>;
     } | null;
@@ -7416,161 +9151,130 @@ export type CheckoutSessionOrderCreateMutation = {
 export type GetReceiptCheckoutSessionQuery = {
     checkoutSession: {
         id: string;
+        references: {
+            orderChargeId: string | null;
+        } | null;
         order: {
-            amountSubtotalsDetails: Array<{
-                amount: number;
-                amountUnrounded: number;
-                currencyCode: CurrencyCode;
-                orderChargeId: string | null;
-                targets: Array<AmountDetailTarget>;
-                type: AmountDetailSourceType | null;
-            }> | null;
-            charges: Array<{
-                cardDetail: {
-                    cardBrand: string | null;
-                    last4: string | null;
-                } | null;
-                createdAt: string;
-                id: string;
-                paymentMethods: Array<string> | null;
-                paymentProcessor: PaymentProcessorCode;
-                paymentStatus: OrderPaymentStatus;
-            }> | null;
-            currencyCode: CurrencyCode;
             id: string;
-            landedCosts: Array<{
-                shortId: string | null;
-            }> | null;
+            type: OrderType | null;
+            currencyCode: CurrencyCode;
             parties: Array<{
+                type: PartyType | null;
                 person: {
                     companyName: string | null;
                     email: string | null;
-                    firstName: string | null;
                     lastName: string | null;
+                    firstName: string | null;
                 } | null;
-                type: PartyType | null;
             }> | null;
-            type: OrderType | null;
-        } | null;
-        references: {
-            orderChargeId: string | null;
+            landedCosts: Array<{
+                shortId: string | null;
+            }> | null;
+            charges: Array<{
+                id: string;
+                paymentProcessor: PaymentProcessorCode;
+                createdAt: string;
+                paymentMethods: Array<string> | null;
+                paymentStatus: OrderPaymentStatus;
+                cardDetail: {
+                    last4: string | null;
+                    cardBrand: string | null;
+                } | null;
+            }> | null;
+            amountSubtotalsDetails: Array<{
+                currencyCode: CurrencyCode;
+                orderChargeId: string | null;
+                amount: number;
+                amountUnrounded: number;
+                type: AmountDetailSourceType | null;
+                targets: Array<AmountDetailTarget>;
+            }> | null;
         } | null;
     };
 };
 export type GetReceiptOrderQuery = {
     order: {
-        amountSubtotalsDetails: Array<{
-            amount: number;
-            amountUnrounded: number;
-            currencyCode: CurrencyCode;
-            orderChargeId: string | null;
-            targets: Array<AmountDetailTarget>;
-            type: AmountDetailSourceType | null;
-        }> | null;
-        charges: Array<{
-            cardDetail: {
-                cardBrand: string | null;
-                last4: string | null;
-            } | null;
-            createdAt: string;
-            id: string;
-            paymentMethods: Array<string> | null;
-            paymentProcessor: PaymentProcessorCode;
-            paymentStatus: OrderPaymentStatus;
-        }> | null;
-        currencyCode: CurrencyCode;
         id: string;
-        landedCosts: Array<{
-            shortId: string | null;
-        }> | null;
+        type: OrderType | null;
+        currencyCode: CurrencyCode;
         parties: Array<{
+            type: PartyType | null;
             person: {
                 companyName: string | null;
                 email: string | null;
-                firstName: string | null;
                 lastName: string | null;
+                firstName: string | null;
             } | null;
-            type: PartyType | null;
         }> | null;
-        type: OrderType | null;
+        landedCosts: Array<{
+            shortId: string | null;
+        }> | null;
+        charges: Array<{
+            id: string;
+            paymentProcessor: PaymentProcessorCode;
+            createdAt: string;
+            paymentMethods: Array<string> | null;
+            paymentStatus: OrderPaymentStatus;
+            cardDetail: {
+                last4: string | null;
+                cardBrand: string | null;
+            } | null;
+        }> | null;
+        amountSubtotalsDetails: Array<{
+            currencyCode: CurrencyCode;
+            orderChargeId: string | null;
+            amount: number;
+            amountUnrounded: number;
+            type: AmountDetailSourceType | null;
+            targets: Array<AmountDetailTarget>;
+        }> | null;
     } | null;
 };
 export type ReceiptOrderFragment = {
-    amountSubtotalsDetails: Array<{
-        amount: number;
-        amountUnrounded: number;
-        currencyCode: CurrencyCode;
-        orderChargeId: string | null;
-        targets: Array<AmountDetailTarget>;
-        type: AmountDetailSourceType | null;
-    }> | null;
-    charges: Array<{
-        cardDetail: {
-            cardBrand: string | null;
-            last4: string | null;
-        } | null;
-        createdAt: string;
-        id: string;
-        paymentMethods: Array<string> | null;
-        paymentProcessor: PaymentProcessorCode;
-        paymentStatus: OrderPaymentStatus;
-    }> | null;
-    currencyCode: CurrencyCode;
     id: string;
-    landedCosts: Array<{
-        shortId: string | null;
-    }> | null;
+    type: OrderType | null;
+    currencyCode: CurrencyCode;
     parties: Array<{
+        type: PartyType | null;
         person: {
             companyName: string | null;
             email: string | null;
-            firstName: string | null;
             lastName: string | null;
+            firstName: string | null;
         } | null;
-        type: PartyType | null;
     }> | null;
-    type: OrderType | null;
+    landedCosts: Array<{
+        shortId: string | null;
+    }> | null;
+    charges: Array<{
+        id: string;
+        paymentProcessor: PaymentProcessorCode;
+        createdAt: string;
+        paymentMethods: Array<string> | null;
+        paymentStatus: OrderPaymentStatus;
+        cardDetail: {
+            last4: string | null;
+            cardBrand: string | null;
+        } | null;
+    }> | null;
+    amountSubtotalsDetails: Array<{
+        currencyCode: CurrencyCode;
+        orderChargeId: string | null;
+        amount: number;
+        amountUnrounded: number;
+        type: AmountDetailSourceType | null;
+        targets: Array<AmountDetailTarget>;
+    }> | null;
 };
 export type GetCartForCollectReceiptQuery = {
     cartCheckoutWorkflow: {
+        credentialTokenId: string;
+        organizationId: string;
         cart: {
-            adjustments: Array<{
-                amount: number;
-                currencyCode: CurrencyCode;
-                description: string | null;
-                productId: string | null;
-                sku: string | null;
-                type: CartAdjustmentType;
-            }>;
+            id: string;
+            type: CartType | null;
             createdAt: string;
             expiresAt: string | null;
-            id: string;
-            items: Array<{
-                amount: number;
-                attributes: Array<{
-                    key: string | null;
-                    value: string | null;
-                } | null> | null;
-                countryOfOrigin: CountryCode | null;
-                currencyCode: CurrencyCode;
-                description: string | null;
-                id: string;
-                imageUrl: string | null;
-                itemType: ItemType | null;
-                measurements: Array<{
-                    type: ItemMeasurementType;
-                    unitOfMeasure: ItemUnitOfMeasure;
-                    value: number;
-                } | null> | null;
-                name: string | null;
-                productId: string;
-                quantity: number;
-                sku: string | null;
-            }>;
-            metadata: Array<{
-                key: string;
-                value: string;
-            }>;
             organization: {
                 id: string;
                 name: string;
@@ -7582,19 +9286,50 @@ export type GetCartForCollectReceiptQuery = {
                 checkoutSessionId: string | null;
                 landedCostId: string | null;
             } | null;
-            type: CartType | null;
+            adjustments: Array<{
+                amount: number;
+                currencyCode: CurrencyCode;
+                description: string | null;
+                productId: string | null;
+                sku: string | null;
+                type: CartAdjustmentType;
+            }>;
+            items: Array<{
+                id: string;
+                amount: number;
+                name: string | null;
+                description: string | null;
+                countryOfOrigin: CountryCode | null;
+                currencyCode: CurrencyCode;
+                itemType: ItemType | null;
+                imageUrl: string | null;
+                quantity: number;
+                sku: string | null;
+                productId: string;
+                measurements: Array<{
+                    type: ItemMeasurementType;
+                    unitOfMeasure: ItemUnitOfMeasure;
+                    value: number;
+                } | null> | null;
+                attributes: Array<{
+                    key: string | null;
+                    value: string | null;
+                } | null> | null;
+            }>;
+            metadata: Array<{
+                key: string;
+                value: string;
+            }>;
         };
-        credentialTokenId: string;
         onlineStoreSettings: {
             url: string;
         };
-        organizationId: string;
     };
 };
 export type SelectCheckoutVarianceTestMutation = {
     checkoutVarianceTestRegistrationSelect: Array<{
-        selectedVariantKey: string;
         testKey: string;
+        selectedVariantKey: string;
     }>;
 };
 export type ShippingZonesQuery = {
@@ -7639,11 +9374,11 @@ export type GetCheckoutSessionReferencesQuery = {
 };
 export type CheckoutSessionUpdateAttributesMutation = {
     checkoutSessionUpdate: {
+        id: string;
         attributes: Array<{
             key: string;
             value: string;
         }>;
-        id: string;
     };
 };
 export type CheckoutSessionBaseCurrencyUpdateMutation = {
@@ -7664,55 +9399,78 @@ export type CheckoutSessionUpdateMetadataMutation = {
     };
 };
 export type CheckoutSessionDetailsFragment = {
-    cartId: string | null;
+    id: string;
     clientSecret: string;
+    customerSessionClientSecret: string | null;
+    cartId: string | null;
     completedAt: string | null;
+    paymentProcessor: CheckoutPaymentProcessorType | null;
+    organizationId: string;
+    order: {
+        id: string;
+    } | null;
+    references: {
+        inclusivePriceConfigurationId: string | null;
+    } | null;
     customerProfile: {
+        name: string | null;
         email: string | null;
+        storeCreditBalance: number | null;
         locations: Array<{
+            name: string | null;
+            email: string | null;
+            phone: string | null;
             administrativeArea: string;
             countryCode: CountryCode;
-            email: string | null;
             line1: string;
             line2: string | null;
-            name: string | null;
-            phone: string | null;
             locality: string;
             postalCode: string;
         }> | null;
-        name: string | null;
-        storeCreditBalance: number | null;
     } | null;
-    customerSessionClientSecret: string | null;
-    id: string;
+    varianceTestResults: Array<{
+        selectedVariantKey: string;
+        testKey: string;
+    }> | null;
+    subtotals: {
+        items: number;
+        shipping: number;
+        duties: number;
+        adjustments: number;
+        taxes: number;
+        fees: number;
+        landedCostTotal: number;
+        presentmentCurrencyCode: CurrencyCode;
+        storeCredit: number;
+        total: number;
+        exchangeRate: {
+            id: string;
+            sourceCurrencyCode: CurrencyCode;
+            targetCurrencyCode: CurrencyCode;
+            rate: number;
+            type: ExchangeRateType;
+        };
+    };
     landedCost: {
-        amountSubtotals: {
-            discounts: number | null;
-            duties: number;
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            shipping: number;
-            taxes: number;
-        } | null;
-        appliedAdjustments: Array<{
-            adjustment: {
-                name: string | null;
-                source: AdjustmentSource | null;
-            } | null;
-            amount: number;
-            type: LandedCostAdjustmentType | null;
-            item: {
-                amount: number;
-            } | null;
-        }> | null;
+        id: string;
+        method: IncotermCode;
+        rootId: string;
+        landedCostGuaranteeCode: LandedCostGuaranteeCode;
         currencyCode: CurrencyCode;
+        remittance: Array<{
+            amount: number;
+            description: string;
+        }>;
         deMinimis: Array<{
             type: DeMinimisType;
             threshold: DeMinimisThreshold;
             method: IncotermCode;
             note: string;
             formula: string;
+        }>;
+        taxes: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
         }>;
         duties: Array<{
             amount: number;
@@ -7722,119 +9480,124 @@ export type CheckoutSessionDetailsFragment = {
             amount: number;
             currencyCode: CurrencyCode;
         }>;
-        landedCostGuaranteeCode: LandedCostGuaranteeCode;
-        id: string;
-        method: IncotermCode;
-        remittance: Array<{
+        appliedAdjustments: Array<{
             amount: number;
-            description: string;
-        }>;
-        rootId: string;
+            type: LandedCostAdjustmentType | null;
+            adjustment: {
+                source: AdjustmentSource | null;
+                name: string | null;
+            } | null;
+            item: {
+                amount: number;
+            } | null;
+        }> | null;
         shipmentRating: {
-            amount: number;
-            currencyCode: CurrencyCode;
-            displayName: string;
             id: string;
+            displayName: string;
+            currencyCode: CurrencyCode;
+            amount: number;
             shippingProfile: {
                 serviceLevel: {
+                    deliveryType: DeliveryType | null;
                     code: string;
                 };
                 transitTime: {
-                    guaranteedDelivery: string | null;
-                    max: number | null;
                     min: number | null;
+                    max: number | null;
+                    guaranteedDelivery: string | null;
                     type: TransitTypeCode | null;
                 } | null;
             } | null;
         };
-        taxes: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-        }>;
+        amountSubtotals: {
+            duties: number;
+            discounts: number | null;
+            fees: number;
+            taxes: number;
+            items: number;
+            shipping: number;
+            landedCostTotal: number;
+        } | null;
     } | null;
     metadata: Array<{
         key: string;
         value: string;
     } | null> | null;
-    organizationId: string;
-    references: {
-        inclusivePriceConfigurationId: string | null;
-    } | null;
-    subtotals: {
-        adjustments: number;
-        duties: number;
-        exchangeRate: {
-            id: string;
-            rate: number;
-            sourceCurrencyCode: CurrencyCode;
-            targetCurrencyCode: CurrencyCode;
-            type: ExchangeRateType;
-        };
-        fees: number;
-        items: number;
-        landedCostTotal: number;
-        presentmentCurrencyCode: CurrencyCode;
-        shipping: number;
-        storeCredit: number;
-        taxes: number;
-        total: number;
-    };
-    varianceTestResults: Array<{
-        selectedVariantKey: string;
-        testKey: string;
-    }> | null;
 };
 export type CheckoutSessionUpdateMutation = {
     checkoutSessionUpdate: {
-        cartId: string | null;
+        id: string;
         clientSecret: string;
+        customerSessionClientSecret: string | null;
+        cartId: string | null;
         completedAt: string | null;
+        paymentProcessor: CheckoutPaymentProcessorType | null;
+        organizationId: string;
+        order: {
+            id: string;
+        } | null;
+        references: {
+            inclusivePriceConfigurationId: string | null;
+        } | null;
         customerProfile: {
+            name: string | null;
             email: string | null;
+            storeCreditBalance: number | null;
             locations: Array<{
+                name: string | null;
+                email: string | null;
+                phone: string | null;
                 administrativeArea: string;
                 countryCode: CountryCode;
-                email: string | null;
                 line1: string;
                 line2: string | null;
-                name: string | null;
-                phone: string | null;
                 locality: string;
                 postalCode: string;
             }> | null;
-            name: string | null;
-            storeCreditBalance: number | null;
         } | null;
-        customerSessionClientSecret: string | null;
-        id: string;
+        varianceTestResults: Array<{
+            selectedVariantKey: string;
+            testKey: string;
+        }> | null;
+        subtotals: {
+            items: number;
+            shipping: number;
+            duties: number;
+            adjustments: number;
+            taxes: number;
+            fees: number;
+            landedCostTotal: number;
+            presentmentCurrencyCode: CurrencyCode;
+            storeCredit: number;
+            total: number;
+            exchangeRate: {
+                id: string;
+                sourceCurrencyCode: CurrencyCode;
+                targetCurrencyCode: CurrencyCode;
+                rate: number;
+                type: ExchangeRateType;
+            };
+        };
         landedCost: {
-            amountSubtotals: {
-                discounts: number | null;
-                duties: number;
-                fees: number;
-                items: number;
-                landedCostTotal: number;
-                shipping: number;
-                taxes: number;
-            } | null;
-            appliedAdjustments: Array<{
-                adjustment: {
-                    name: string | null;
-                    source: AdjustmentSource | null;
-                } | null;
-                amount: number;
-                type: LandedCostAdjustmentType | null;
-                item: {
-                    amount: number;
-                } | null;
-            }> | null;
+            id: string;
+            method: IncotermCode;
+            rootId: string;
+            landedCostGuaranteeCode: LandedCostGuaranteeCode;
             currencyCode: CurrencyCode;
+            remittance: Array<{
+                amount: number;
+                description: string;
+            }>;
             deMinimis: Array<{
                 type: DeMinimisType;
                 threshold: DeMinimisThreshold;
                 method: IncotermCode;
                 note: string;
                 formula: string;
+            }>;
+            taxes: Array<{
+                amount: number;
+                currencyCode: CurrencyCode;
             }>;
             duties: Array<{
                 amount: number;
@@ -7844,107 +9607,165 @@ export type CheckoutSessionUpdateMutation = {
                 amount: number;
                 currencyCode: CurrencyCode;
             }>;
-            landedCostGuaranteeCode: LandedCostGuaranteeCode;
-            id: string;
-            method: IncotermCode;
-            remittance: Array<{
+            appliedAdjustments: Array<{
                 amount: number;
-                description: string;
-            }>;
-            rootId: string;
+                type: LandedCostAdjustmentType | null;
+                adjustment: {
+                    source: AdjustmentSource | null;
+                    name: string | null;
+                } | null;
+                item: {
+                    amount: number;
+                } | null;
+            }> | null;
             shipmentRating: {
-                amount: number;
-                currencyCode: CurrencyCode;
-                displayName: string;
                 id: string;
+                displayName: string;
+                currencyCode: CurrencyCode;
+                amount: number;
                 shippingProfile: {
                     serviceLevel: {
+                        deliveryType: DeliveryType | null;
                         code: string;
                     };
                     transitTime: {
-                        guaranteedDelivery: string | null;
-                        max: number | null;
                         min: number | null;
+                        max: number | null;
+                        guaranteedDelivery: string | null;
                         type: TransitTypeCode | null;
                     } | null;
                 } | null;
             };
-            taxes: Array<{
-                amount: number;
-                currencyCode: CurrencyCode;
-            }>;
+            amountSubtotals: {
+                duties: number;
+                discounts: number | null;
+                fees: number;
+                taxes: number;
+                items: number;
+                shipping: number;
+                landedCostTotal: number;
+            } | null;
         } | null;
         metadata: Array<{
             key: string;
             value: string;
         } | null> | null;
-        organizationId: string;
-        references: {
-            inclusivePriceConfigurationId: string | null;
-        } | null;
-        subtotals: {
-            adjustments: number;
-            duties: number;
-            exchangeRate: {
-                id: string;
-                rate: number;
-                sourceCurrencyCode: CurrencyCode;
-                targetCurrencyCode: CurrencyCode;
-                type: ExchangeRateType;
-            };
-            fees: number;
-            items: number;
-            landedCostTotal: number;
-            presentmentCurrencyCode: CurrencyCode;
-            shipping: number;
-            storeCredit: number;
-            taxes: number;
-            total: number;
-        };
-        varianceTestResults: Array<{
-            selectedVariantKey: string;
-            testKey: string;
-        }> | null;
     };
 };
 export type ZonosSettingsQuery = {
+    helloSettings: {
+        desktopLocation: HelloDesktopLocation;
+        allowedDomains: Array<string>;
+        anchorElementSelector: string;
+        cartUrlPattern: string | null;
+        currencyBehavior: HelloCurrencyBehavior;
+        currencyElementSelector: string;
+        excludedUrlPatterns: Array<string>;
+        countryOverrideBehavior: HelloCountryOverrideBehavior;
+        widgetSize: number | null;
+        id: string;
+        createdAt: string;
+        createdBy: string;
+        mobileLocation: HelloMobileLocation;
+        mode: Mode;
+        organization: string;
+        updatedAt: string;
+        updatedBy: string;
+        homepageUrlPattern: string | null;
+        productDetailUrlPattern: string | null;
+        productListUrlPattern: string | null;
+        peekMessageDelay: number;
+        peekMessageBehavior: HelloPeekMessageBehavior;
+        restrictionBehavior: HelloRestrictionBehavior;
+        dutyTaxEstimationBehavior: HelloEstimateBehavior;
+        productAddToCartElementSelector: string | null;
+        productDescriptionElementSelector: string | null;
+        productPriceElementSelector: string | null;
+        productTitleElementSelector: string | null;
+        visibilityStatus: HelloVisibilityStatus;
+        desktopLocationOverride: {
+            anchor: HelloDesktopLocation;
+            horizontalOffset: number;
+            verticalOffset: number;
+        } | null;
+        countryDisplayRules: {
+            countrySelector: {
+                behavior: HelloCountryDisplayBehavior;
+                excludedCountries: Array<CountryCode>;
+                includedCountries: Array<CountryCode>;
+            };
+            widgetVisibility: {
+                behavior: HelloCountryDisplayBehavior;
+                excludedCountries: Array<CountryCode>;
+                includedCountries: Array<CountryCode>;
+            };
+        };
+        mobileLocationOverride: {
+            anchor: HelloDesktopLocation;
+            horizontalOffset: number;
+            verticalOffset: number;
+        } | null;
+    } | null;
     appearanceSettings: {
         colorPrimary: string;
         colorSecondary: string;
+        fontFamily: string;
+        logoUrl: string;
+        style: ElementsUiStyle;
+        supportedLocales: Array<string> | null;
+        theme: ElementsUiTheme;
+        zonosAttribution: ZonosAttribution | null;
         createdAt: string;
         createdBy: string;
-        fontFamily: string;
         id: string;
-        logoUrl: string;
         mode: Mode;
         organization: string;
-        style: ElementsUiStyle;
-        theme: ElementsUiTheme;
         updatedAt: string;
         updatedBy: string;
-        zonosAttribution: ZonosAttribution | null;
     } | null;
     checkoutSettings: {
+        disabledCountries: Array<CountryCode> | null;
         allowedCharacterSets: AllowedCharacterSets;
-        allowedSettlementCurrencies: AllowedSettlementCurrencies;
-        successRedirectUrl: string;
         captureDelay: number;
+        defaultCartExpiration: number;
         companyFieldsStatus: CheckoutCompanyFieldsStatus;
+        domesticElementSelector: string | null;
+        allowedSettlementCurrencies: AllowedSettlementCurrencies;
+        successBehavior: CheckoutSuccessBehavior;
+        customHTML: string;
+        mode: Mode;
+        successRedirectUrl: string;
+        placeOrderButtonSelector: string | null;
         createdAt: string;
         createdBy: string;
-        customHTML: string;
-        defaultCartExpiration: number;
-        disabledCountries: Array<CountryCode> | null;
-        externalPaymentMethods: Array<{
-            status: ExternalPaymentMethodStatus;
-            type: ExternalPaymentMethodType;
-        }> | null;
-        externalServiceTokens: Array<{
-            token: string;
-            type: ExternalServiceTokenType;
-        }>;
+        updatedAt: string;
+        updatedBy: string;
         id: string;
-        mode: Mode;
+        organization: string;
+        subscriptionStatus: CheckoutSubscriptionStatus;
+        visibilityStatus: CheckoutVisibilityStatus;
+        merchantPolicyLinks: {
+            termsAndConditions: {
+                link: string | null;
+            } | null;
+            privacyPolicy: {
+                link: string | null;
+            } | null;
+            refundPolicy: {
+                link: string | null;
+            } | null;
+            shippingPolicy: {
+                link: string | null;
+            } | null;
+            warrantyPolicy: {
+                link: string | null;
+            } | null;
+            euWithdrawalPolicy: {
+                maximumReturnShippingEstimate: number | null;
+                currencyCode: CurrencyCode;
+                status: NotificationActiveStatus | null;
+            } | null;
+        };
         orderNotifications: {
             abandonedCart: {
                 delay: number;
@@ -7963,16 +9784,18 @@ export type ZonosSettingsQuery = {
                 sendCopiesTo: Array<string>;
             };
         };
-        organization: string;
-        placeOrderButtonSelector: string | null;
-        subscriptionStatus: CheckoutSubscriptionStatus;
-        successBehavior: CheckoutSuccessBehavior;
+        externalPaymentMethods: Array<{
+            status: ExternalPaymentMethodStatus;
+            type: ExternalPaymentMethodType;
+        }> | null;
         analyticsProviders: Array<{
             status: AnalyticsProviderStatus;
             type: AnalyticsProviderType;
         }>;
-        updatedAt: string;
-        updatedBy: string;
+        externalServiceTokens: Array<{
+            token: string;
+            type: ExternalServiceTokenType;
+        }>;
         varianceTestRegistrations: Array<{
             testKey: string;
             varianceAllocation: Array<{
@@ -7980,55 +9803,12 @@ export type ZonosSettingsQuery = {
                 variantKey: string;
             }>;
         }> | null;
-        visibilityStatus: CheckoutVisibilityStatus;
-    } | null;
-    helloSettings: {
-        allowedDomains: Array<string>;
-        anchorElementSelector: string;
-        cartUrlPattern: string | null;
-        countryDisplayRules: {
-            countrySelector: {
-                behavior: HelloCountryDisplayBehavior;
-                excludedCountries: Array<CountryCode>;
-                includedCountries: Array<CountryCode>;
-            };
-            widgetVisibility: {
-                behavior: HelloCountryDisplayBehavior;
-                excludedCountries: Array<CountryCode>;
-                includedCountries: Array<CountryCode>;
+        plugins: {
+            bigcommerce: {
+                allowBypassQuery: boolean;
             };
         };
-        countryOverrideBehavior: HelloCountryOverrideBehavior;
-        createdAt: string;
-        createdBy: string;
-        currencyBehavior: HelloCurrencyBehavior;
-        currencyElementSelector: string;
-        desktopLocation: HelloDesktopLocation;
-        dutyTaxEstimationBehavior: HelloEstimateBehavior;
-        excludedUrlPatterns: Array<string>;
-        homepageUrlPattern: string | null;
-        id: string;
-        mobileLocation: HelloMobileLocation;
-        mode: Mode;
-        organization: string;
-        peekMessageBehavior: HelloPeekMessageBehavior;
-        peekMessageDelay: number;
-        productListUrlPattern: string | null;
-        productDetailUrlPattern: string | null;
-        updatedBy: string;
-        productDescriptionElementSelector: string | null;
-        productPriceElementSelector: string | null;
-        productTitleElementSelector: string | null;
-        restrictionBehavior: HelloRestrictionBehavior;
-        updatedAt: string;
-        productAddToCartElementSelector: string | null;
-        visibilityStatus: HelloVisibilityStatus;
-        widgetSize: number | null;
     } | null;
-    onlineStoreSettings: {
-        allowedDomains: Array<string>;
-        url: string;
-    };
     organization: {
         id: string;
         name: string;
@@ -8036,12 +9816,47 @@ export type ZonosSettingsQuery = {
             storeId: number | null;
         } | null;
     } | null;
+    onlineStoreSettings: {
+        allowedDomains: Array<string>;
+        url: string;
+    };
 };
 export type HelloSettingsQuery = {
     helloSettings: {
+        desktopLocation: HelloDesktopLocation;
         allowedDomains: Array<string>;
         anchorElementSelector: string;
         cartUrlPattern: string | null;
+        currencyBehavior: HelloCurrencyBehavior;
+        currencyElementSelector: string;
+        excludedUrlPatterns: Array<string>;
+        countryOverrideBehavior: HelloCountryOverrideBehavior;
+        widgetSize: number | null;
+        id: string;
+        createdAt: string;
+        createdBy: string;
+        mobileLocation: HelloMobileLocation;
+        mode: Mode;
+        organization: string;
+        updatedAt: string;
+        updatedBy: string;
+        homepageUrlPattern: string | null;
+        productDetailUrlPattern: string | null;
+        productListUrlPattern: string | null;
+        peekMessageDelay: number;
+        peekMessageBehavior: HelloPeekMessageBehavior;
+        restrictionBehavior: HelloRestrictionBehavior;
+        dutyTaxEstimationBehavior: HelloEstimateBehavior;
+        productAddToCartElementSelector: string | null;
+        productDescriptionElementSelector: string | null;
+        productPriceElementSelector: string | null;
+        productTitleElementSelector: string | null;
+        visibilityStatus: HelloVisibilityStatus;
+        desktopLocationOverride: {
+            anchor: HelloDesktopLocation;
+            horizontalOffset: number;
+            verticalOffset: number;
+        } | null;
         countryDisplayRules: {
             countrySelector: {
                 behavior: HelloCountryDisplayBehavior;
@@ -8054,59 +9869,57 @@ export type HelloSettingsQuery = {
                 includedCountries: Array<CountryCode>;
             };
         };
-        countryOverrideBehavior: HelloCountryOverrideBehavior;
-        createdAt: string;
-        createdBy: string;
-        currencyBehavior: HelloCurrencyBehavior;
-        currencyElementSelector: string;
-        desktopLocation: HelloDesktopLocation;
-        dutyTaxEstimationBehavior: HelloEstimateBehavior;
-        excludedUrlPatterns: Array<string>;
-        homepageUrlPattern: string | null;
-        id: string;
-        mobileLocation: HelloMobileLocation;
-        mode: Mode;
-        organization: string;
-        peekMessageBehavior: HelloPeekMessageBehavior;
-        peekMessageDelay: number;
-        productDetailUrlPattern: string | null;
-        productDescriptionElementSelector: string | null;
-        productAddToCartElementSelector: string | null;
-        productListUrlPattern: string | null;
-        productPriceElementSelector: string | null;
-        productTitleElementSelector: string | null;
-        restrictionBehavior: HelloRestrictionBehavior;
-        updatedAt: string;
-        updatedBy: string;
-        visibilityStatus: HelloVisibilityStatus;
-        widgetSize: number | null;
+        mobileLocationOverride: {
+            anchor: HelloDesktopLocation;
+            horizontalOffset: number;
+            verticalOffset: number;
+        } | null;
     } | null;
 };
 export type CheckoutSettingsQuery = {
     checkoutSettings: {
+        disabledCountries: Array<CountryCode> | null;
         allowedCharacterSets: AllowedCharacterSets;
-        allowedSettlementCurrencies: AllowedSettlementCurrencies;
-        analyticsProviders: Array<{
-            status: AnalyticsProviderStatus;
-            type: AnalyticsProviderType;
-        }>;
         captureDelay: number;
+        defaultCartExpiration: number;
         companyFieldsStatus: CheckoutCompanyFieldsStatus;
+        domesticElementSelector: string | null;
+        allowedSettlementCurrencies: AllowedSettlementCurrencies;
+        successBehavior: CheckoutSuccessBehavior;
+        customHTML: string;
+        mode: Mode;
+        successRedirectUrl: string;
+        placeOrderButtonSelector: string | null;
         createdAt: string;
         createdBy: string;
-        customHTML: string;
-        defaultCartExpiration: number;
-        disabledCountries: Array<CountryCode> | null;
-        externalPaymentMethods: Array<{
-            status: ExternalPaymentMethodStatus;
-            type: ExternalPaymentMethodType;
-        }> | null;
-        externalServiceTokens: Array<{
-            token: string;
-            type: ExternalServiceTokenType;
-        }>;
+        updatedAt: string;
+        updatedBy: string;
         id: string;
-        mode: Mode;
+        organization: string;
+        subscriptionStatus: CheckoutSubscriptionStatus;
+        visibilityStatus: CheckoutVisibilityStatus;
+        merchantPolicyLinks: {
+            termsAndConditions: {
+                link: string | null;
+            } | null;
+            privacyPolicy: {
+                link: string | null;
+            } | null;
+            refundPolicy: {
+                link: string | null;
+            } | null;
+            shippingPolicy: {
+                link: string | null;
+            } | null;
+            warrantyPolicy: {
+                link: string | null;
+            } | null;
+            euWithdrawalPolicy: {
+                maximumReturnShippingEstimate: number | null;
+                currencyCode: CurrencyCode;
+                status: NotificationActiveStatus | null;
+            } | null;
+        };
         orderNotifications: {
             abandonedCart: {
                 delay: number;
@@ -8125,13 +9938,18 @@ export type CheckoutSettingsQuery = {
                 sendCopiesTo: Array<string>;
             };
         };
-        organization: string;
-        placeOrderButtonSelector: string | null;
-        subscriptionStatus: CheckoutSubscriptionStatus;
-        successBehavior: CheckoutSuccessBehavior;
-        successRedirectUrl: string;
-        updatedAt: string;
-        updatedBy: string;
+        externalPaymentMethods: Array<{
+            status: ExternalPaymentMethodStatus;
+            type: ExternalPaymentMethodType;
+        }> | null;
+        analyticsProviders: Array<{
+            status: AnalyticsProviderStatus;
+            type: AnalyticsProviderType;
+        }>;
+        externalServiceTokens: Array<{
+            token: string;
+            type: ExternalServiceTokenType;
+        }>;
         varianceTestRegistrations: Array<{
             testKey: string;
             varianceAllocation: Array<{
@@ -8139,51 +9957,75 @@ export type CheckoutSettingsQuery = {
                 variantKey: string;
             }>;
         }> | null;
-        visibilityStatus: CheckoutVisibilityStatus;
+        plugins: {
+            bigcommerce: {
+                allowBypassQuery: boolean;
+            };
+        };
     } | null;
 };
 export type AppearanceSettingsQuery = {
     appearanceSettings: {
         colorPrimary: string;
         colorSecondary: string;
+        fontFamily: string;
+        logoUrl: string;
+        style: ElementsUiStyle;
+        supportedLocales: Array<string> | null;
+        theme: ElementsUiTheme;
+        zonosAttribution: ZonosAttribution | null;
         createdAt: string;
         createdBy: string;
-        fontFamily: string;
         id: string;
-        logoUrl: string;
         mode: Mode;
         organization: string;
-        style: ElementsUiStyle;
-        theme: ElementsUiTheme;
         updatedAt: string;
         updatedBy: string;
-        zonosAttribution: ZonosAttribution | null;
     } | null;
 };
 export type CheckoutSettingFragment = {
+    disabledCountries: Array<CountryCode> | null;
     allowedCharacterSets: AllowedCharacterSets;
-    allowedSettlementCurrencies: AllowedSettlementCurrencies;
-    analyticsProviders: Array<{
-        status: AnalyticsProviderStatus;
-        type: AnalyticsProviderType;
-    }>;
     captureDelay: number;
+    defaultCartExpiration: number;
     companyFieldsStatus: CheckoutCompanyFieldsStatus;
+    domesticElementSelector: string | null;
+    allowedSettlementCurrencies: AllowedSettlementCurrencies;
+    successBehavior: CheckoutSuccessBehavior;
+    customHTML: string;
+    mode: Mode;
+    successRedirectUrl: string;
+    placeOrderButtonSelector: string | null;
     createdAt: string;
     createdBy: string;
-    customHTML: string;
-    defaultCartExpiration: number;
-    disabledCountries: Array<CountryCode> | null;
-    externalPaymentMethods: Array<{
-        status: ExternalPaymentMethodStatus;
-        type: ExternalPaymentMethodType;
-    }> | null;
-    externalServiceTokens: Array<{
-        token: string;
-        type: ExternalServiceTokenType;
-    }>;
+    updatedAt: string;
+    updatedBy: string;
     id: string;
-    mode: Mode;
+    organization: string;
+    subscriptionStatus: CheckoutSubscriptionStatus;
+    visibilityStatus: CheckoutVisibilityStatus;
+    merchantPolicyLinks: {
+        termsAndConditions: {
+            link: string | null;
+        } | null;
+        privacyPolicy: {
+            link: string | null;
+        } | null;
+        refundPolicy: {
+            link: string | null;
+        } | null;
+        shippingPolicy: {
+            link: string | null;
+        } | null;
+        warrantyPolicy: {
+            link: string | null;
+        } | null;
+        euWithdrawalPolicy: {
+            maximumReturnShippingEstimate: number | null;
+            currencyCode: CurrencyCode;
+            status: NotificationActiveStatus | null;
+        } | null;
+    };
     orderNotifications: {
         abandonedCart: {
             delay: number;
@@ -8202,13 +10044,18 @@ export type CheckoutSettingFragment = {
             sendCopiesTo: Array<string>;
         };
     };
-    organization: string;
-    placeOrderButtonSelector: string | null;
-    subscriptionStatus: CheckoutSubscriptionStatus;
-    successBehavior: CheckoutSuccessBehavior;
-    successRedirectUrl: string;
-    updatedAt: string;
-    updatedBy: string;
+    externalPaymentMethods: Array<{
+        status: ExternalPaymentMethodStatus;
+        type: ExternalPaymentMethodType;
+    }> | null;
+    analyticsProviders: Array<{
+        status: AnalyticsProviderStatus;
+        type: AnalyticsProviderType;
+    }>;
+    externalServiceTokens: Array<{
+        token: string;
+        type: ExternalServiceTokenType;
+    }>;
     varianceTestRegistrations: Array<{
         testKey: string;
         varianceAllocation: Array<{
@@ -8216,12 +10063,47 @@ export type CheckoutSettingFragment = {
             variantKey: string;
         }>;
     }> | null;
-    visibilityStatus: CheckoutVisibilityStatus;
+    plugins: {
+        bigcommerce: {
+            allowBypassQuery: boolean;
+        };
+    };
 };
 export type HelloSettingFragment = {
+    desktopLocation: HelloDesktopLocation;
     allowedDomains: Array<string>;
     anchorElementSelector: string;
     cartUrlPattern: string | null;
+    currencyBehavior: HelloCurrencyBehavior;
+    currencyElementSelector: string;
+    excludedUrlPatterns: Array<string>;
+    countryOverrideBehavior: HelloCountryOverrideBehavior;
+    widgetSize: number | null;
+    id: string;
+    createdAt: string;
+    createdBy: string;
+    mobileLocation: HelloMobileLocation;
+    mode: Mode;
+    organization: string;
+    updatedAt: string;
+    updatedBy: string;
+    homepageUrlPattern: string | null;
+    productDetailUrlPattern: string | null;
+    productListUrlPattern: string | null;
+    peekMessageDelay: number;
+    peekMessageBehavior: HelloPeekMessageBehavior;
+    restrictionBehavior: HelloRestrictionBehavior;
+    dutyTaxEstimationBehavior: HelloEstimateBehavior;
+    productAddToCartElementSelector: string | null;
+    productDescriptionElementSelector: string | null;
+    productPriceElementSelector: string | null;
+    productTitleElementSelector: string | null;
+    visibilityStatus: HelloVisibilityStatus;
+    desktopLocationOverride: {
+        anchor: HelloDesktopLocation;
+        horizontalOffset: number;
+        verticalOffset: number;
+    } | null;
     countryDisplayRules: {
         countrySelector: {
             behavior: HelloCountryDisplayBehavior;
@@ -8234,48 +10116,28 @@ export type HelloSettingFragment = {
             includedCountries: Array<CountryCode>;
         };
     };
-    countryOverrideBehavior: HelloCountryOverrideBehavior;
-    createdAt: string;
-    createdBy: string;
-    currencyBehavior: HelloCurrencyBehavior;
-    currencyElementSelector: string;
-    desktopLocation: HelloDesktopLocation;
-    dutyTaxEstimationBehavior: HelloEstimateBehavior;
-    excludedUrlPatterns: Array<string>;
-    homepageUrlPattern: string | null;
-    id: string;
-    mobileLocation: HelloMobileLocation;
-    mode: Mode;
-    organization: string;
-    peekMessageBehavior: HelloPeekMessageBehavior;
-    peekMessageDelay: number;
-    productDetailUrlPattern: string | null;
-    productDescriptionElementSelector: string | null;
-    productAddToCartElementSelector: string | null;
-    productListUrlPattern: string | null;
-    productPriceElementSelector: string | null;
-    productTitleElementSelector: string | null;
-    restrictionBehavior: HelloRestrictionBehavior;
-    updatedAt: string;
-    updatedBy: string;
-    visibilityStatus: HelloVisibilityStatus;
-    widgetSize: number | null;
+    mobileLocationOverride: {
+        anchor: HelloDesktopLocation;
+        horizontalOffset: number;
+        verticalOffset: number;
+    } | null;
 };
 export type AppearanceSettingFragment = {
     colorPrimary: string;
     colorSecondary: string;
+    fontFamily: string;
+    logoUrl: string;
+    style: ElementsUiStyle;
+    supportedLocales: Array<string> | null;
+    theme: ElementsUiTheme;
+    zonosAttribution: ZonosAttribution | null;
     createdAt: string;
     createdBy: string;
-    fontFamily: string;
     id: string;
-    logoUrl: string;
     mode: Mode;
     organization: string;
-    style: ElementsUiStyle;
-    theme: ElementsUiTheme;
     updatedAt: string;
     updatedBy: string;
-    zonosAttribution: ZonosAttribution | null;
 };
 export type OnlineStoreSettingsQuery = {
     onlineStoreSettings: {
@@ -8286,21 +10148,22 @@ export type OnlineStoreSettingsQuery = {
 export type GetOrderQuery = {
     order: {
         accountOrderNumber: string | null;
+        createdAt: string;
+        updatedAt: string;
+        trackingNumbers: Array<string | null> | null;
+        currencyCode: CurrencyCode;
+        id: string;
+        mode: Mode;
+        status: OrderStatus;
         amountSubtotals: {
-            discounts: number | null;
             duties: number;
             fees: number;
             items: number;
-            shipping: number;
             taxes: number;
+            shipping: number;
             variance: number;
+            discounts: number | null;
         };
-        amountSubtotalsDetails: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-            targets: Array<AmountDetailTarget>;
-            type: AmountDetailSourceType | null;
-        }> | null;
         checkoutSession: {
             subtotals: {
                 exchangeRate: {
@@ -8310,28 +10173,32 @@ export type GetOrderQuery = {
                 };
             };
         } | null;
-        createdAt: string;
-        currencyCode: CurrencyCode;
-        id: string;
-        items: Array<{
+        amountSubtotalsDetails: Array<{
             amount: number;
-            attributes: Array<{
-                key: string | null;
-                value: string | null;
-            } | null> | null;
-            countryOfOrigin: CountryCode | null;
+            currencyCode: CurrencyCode;
+            type: AmountDetailSourceType | null;
+            targets: Array<AmountDetailTarget>;
+        }> | null;
+        items: Array<{
             createdAt: string;
+            amount: number;
+            itemType: ItemType | null;
+            parentProductId: string | null;
             description: string | null;
             hsCode: string | null;
-            itemType: ItemType | null;
-            metadata: Array<{
-                key: string | null;
-                value: string | null;
-            } | null> | null;
+            countryOfOrigin: CountryCode | null;
             name: string | null;
             productId: string;
             quantity: number;
             sku: string | null;
+            attributes: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+            metadata: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
         }> | null;
         landedCosts: Array<{
             amountSubtotals: {
@@ -8342,16 +10209,6 @@ export type GetOrderQuery = {
                 shipping: number;
                 taxes: number;
             } | null;
-            appliedAdjustments: Array<{
-                adjustment: {
-                    name: string | null;
-                } | null;
-                amount: number;
-                item: {
-                    amount: number;
-                    name: string | null;
-                } | null;
-            }> | null;
             duties: Array<{
                 exchangeRate: {
                     rate: number;
@@ -8360,25 +10217,42 @@ export type GetOrderQuery = {
                 } | null;
             }>;
             shipmentRating: {
+                id: string;
                 amount: number;
+                currencyCode: CurrencyCode;
+                displayName: string;
                 serviceLevelCode: string;
                 details: Array<{
                     amount: number;
                     carrierCode: string;
                     type: ShipmentAmountType;
                 }> | null;
-                displayName: string;
-                id: string;
-                currencyCode: CurrencyCode;
             };
+            appliedAdjustments: Array<{
+                amount: number;
+                adjustment: {
+                    name: string | null;
+                } | null;
+                item: {
+                    name: string | null;
+                    amount: number;
+                } | null;
+            }> | null;
         }> | null;
         metadata: Array<{
             key: string;
             value: string;
         } | null> | null;
-        mode: Mode;
         parties: Array<{
             id: string;
+            type: PartyType | null;
+            person: {
+                companyName: string | null;
+                firstName: string | null;
+                lastName: string | null;
+                email: string | null;
+                phone: string | null;
+            } | null;
             location: {
                 administrativeArea: string | null;
                 administrativeAreaCode: string | null;
@@ -8391,18 +10265,6 @@ export type GetOrderQuery = {
                 longitude: number | null;
                 postalCode: string | null;
             } | null;
-            person: {
-                companyName: string | null;
-                email: string | null;
-                firstName: string | null;
-                lastName: string | null;
-                phone: string | null;
-            } | null;
-            type: PartyType | null;
-        }> | null;
-        references: Array<{
-            key: string | null;
-            value: string | null;
         }> | null;
         root: {
             exchangeRates: Array<{
@@ -8412,9 +10274,10 @@ export type GetOrderQuery = {
                 type: ExchangeRateType;
             }>;
         } | null;
-        status: OrderStatus;
-        trackingNumbers: Array<string | null> | null;
-        updatedAt: string;
+        references: Array<{
+            key: string | null;
+            value: string | null;
+        }> | null;
     } | null;
 };
 export type OrderUpdateAccountOrderNumberMutation = {
@@ -8440,15 +10303,42 @@ export type GetOrdersQuery = {
         };
     } | null;
 };
+export type GetChannelConnectionsQuery = {
+    channelConnections: {
+        edges: Array<{
+            node: {
+                id: string;
+                externalAccountId: string;
+                status: ChannelConnectionStatus;
+            };
+        }>;
+    };
+};
+export type ChannelConnectionCreateMutation = {
+    channelConnectionCreate: {
+        id: string;
+        status: ChannelConnectionStatus;
+    };
+};
+export type ChannelConnectionUpdateMutation = {
+    channelConnectionUpdate: {
+        id: string;
+        status: ChannelConnectionStatus;
+    };
+};
+export type ChannelConnectionDeleteMutation = {
+    channelConnectionDelete: Result;
+};
 export type GetWebhooksQuery = {
     webhooks: {
         edges: Array<{
             node: {
                 id: string;
-                query: string;
-                status: WebhookStatus;
-                type: WebhookType;
                 url: string;
+                query: string;
+                type: WebhookType;
+                status: WebhookStatus;
+                secret: string;
             } | null;
         }>;
     };
@@ -8456,16 +10346,16 @@ export type GetWebhooksQuery = {
 export type CreateWebhookMutation = {
     webhookCreate: {
         id: string;
-        organizationId: string;
         type: WebhookType;
+        organizationId: string;
         url: string;
     } | null;
 };
 export type UpdateWebhookMutation = {
     webhookUpdate: {
         id: string;
-        organizationId: string;
         type: WebhookType;
+        organizationId: string;
         url: string;
     } | null;
 };
@@ -8493,46 +10383,9 @@ export type RemoveTrackingNumberMutation = {
 };
 export type CartQuery = {
     cart: {
-        adjustments: Array<{
-            amount: number;
-            currencyCode: CurrencyCode;
-            description: string | null;
-            productId: string | null;
-            sku: string | null;
-            type: CartAdjustmentType;
-        }>;
-        createdAt: string;
         id: string;
-        items: Array<{
-            amount: number;
-            attributes: Array<{
-                key: string | null;
-                value: string | null;
-            } | null> | null;
-            countryOfOrigin: CountryCode | null;
-            currencyCode: CurrencyCode;
-            description: string | null;
-            id: string;
-            imageUrl: string | null;
-            itemType: ItemType | null;
-            measurements: Array<{
-                type: ItemMeasurementType;
-                unitOfMeasure: ItemUnitOfMeasure;
-                value: number;
-            } | null> | null;
-            metadata: Array<{
-                key: string | null;
-                value: string | null;
-            } | null> | null;
-            name: string | null;
-            productId: string;
-            quantity: number;
-            sku: string | null;
-        }>;
-        metadata: Array<{
-            key: string;
-            value: string;
-        }>;
+        createdAt: string;
+        type: CartType | null;
         organization: {
             id: string;
             references: {
@@ -8543,7 +10396,44 @@ export type CartQuery = {
             checkoutSessionId: string | null;
             landedCostId: string | null;
         } | null;
-        type: CartType | null;
+        adjustments: Array<{
+            amount: number;
+            currencyCode: CurrencyCode;
+            description: string | null;
+            productId: string | null;
+            sku: string | null;
+            type: CartAdjustmentType;
+        }>;
+        items: Array<{
+            id: string;
+            amount: number;
+            name: string | null;
+            description: string | null;
+            countryOfOrigin: CountryCode | null;
+            currencyCode: CurrencyCode;
+            itemType: ItemType | null;
+            imageUrl: string | null;
+            quantity: number;
+            sku: string | null;
+            productId: string;
+            measurements: Array<{
+                type: ItemMeasurementType;
+                unitOfMeasure: ItemUnitOfMeasure;
+                value: number;
+            } | null> | null;
+            attributes: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+            metadata: Array<{
+                key: string | null;
+                value: string | null;
+            } | null> | null;
+        }>;
+        metadata: Array<{
+            key: string;
+            value: string;
+        }>;
     } | null;
 };
 export type GetCartOrganizationInfoQuery = {
@@ -8556,211 +10446,229 @@ export type GetCartOrganizationInfoQuery = {
         } | null;
     } | null;
 };
-export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
+export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: {
+    [x: string]: never;
+}) => Promise<T>;
 export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionWrapper): {
     activeDiscounts(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<ActiveDiscountsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ActiveDiscountsQuery>;
     addTrackingNumber(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<AddTrackingNumberMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<AddTrackingNumberMutation>;
     appearanceSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<AppearanceSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<AppearanceSettingsQuery>;
     bulkClassify(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<BulkClassifyMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<BulkClassifyMutation>;
     calculateLandedCost(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CalculateLandedCostMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CalculateLandedCostMutation>;
     cart(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CartQuery>;
     cartById(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartByIdQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CartByIdQuery>;
     cartCalculateLandedCost(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartCalculateLandedCostMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CartCalculateLandedCostMutation>;
     cartCheckoutWorkflow(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartCheckoutWorkflowQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CartCheckoutWorkflowQuery>;
     cartCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CartCreateMutation>;
     cartUpdate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CartUpdateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CartUpdateMutation>;
+    channelConnectionCreate(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ChannelConnectionCreateMutation>;
+    channelConnectionDelete(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ChannelConnectionDeleteMutation>;
+    channelConnectionUpdate(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ChannelConnectionUpdateMutation>;
     checkItemRestrictions(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckItemRestrictionsMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckItemRestrictionsMutation>;
     checkoutCustomerProfileAuthenticate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutCustomerProfileAuthenticateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutCustomerProfileAuthenticateMutation>;
     checkoutSessionBaseCurrencyUpdate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionBaseCurrencyUpdateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionBaseCurrencyUpdateMutation>;
     checkoutSessionCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionCreateMutation>;
     checkoutSessionOrderCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionOrderCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionOrderCreateMutation>;
     checkoutSessionPaymentIntentCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionPaymentIntentCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionPaymentIntentCreateMutation>;
     checkoutSessionStoreCreditOrderCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionStoreCreditOrderCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionStoreCreditOrderCreateMutation>;
     checkoutSessionUpdate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionUpdateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionUpdateMutation>;
     checkoutSessionUpdateAttributes(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionUpdateAttributesMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionUpdateAttributesMutation>;
     checkoutSessionUpdateMetadata(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSessionUpdateMetadataMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSessionUpdateMetadataMutation>;
     checkoutSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CheckoutSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CheckoutSettingsQuery>;
     createCollectQuote(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateCollectQuoteMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateCollectQuoteMutation>;
     createWebhook(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateWebhookMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateWebhookMutation>;
     currencyConversionCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CurrencyConversionCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CurrencyConversionCreateMutation>;
     deleteWebhook(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteWebhookMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<DeleteWebhookMutation>;
     exchangeRateCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<ExchangeRateCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ExchangeRateCreateMutation>;
     fulfillmentCenter(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<FulfillmentCenterQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<FulfillmentCenterQuery>;
+    getAirwallexPaymentIntent(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetAirwallexPaymentIntentQuery>;
     getCartForCollectReceipt(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCartForCollectReceiptQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCartForCollectReceiptQuery>;
     getCartInfo(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCartInfoQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCartInfoQuery>;
     getCartOrganizationInfo(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCartOrganizationInfoQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCartOrganizationInfoQuery>;
+    getChannelConnections(variables?: {
+        [x: string]: never;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetChannelConnectionsQuery>;
     getCheckoutPlaceOrderButtonSelector(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCheckoutPlaceOrderButtonSelectorQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCheckoutPlaceOrderButtonSelectorQuery>;
     getCheckoutSession(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCheckoutSessionQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCheckoutSessionQuery>;
     getCheckoutSessionAttributes(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCheckoutSessionAttributesQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCheckoutSessionAttributesQuery>;
     getCheckoutSessionReferences(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCheckoutSessionReferencesQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCheckoutSessionReferencesQuery>;
     getCollectCheckoutSession(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetCollectCheckoutSessionQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetCollectCheckoutSessionQuery>;
     getOrder(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetOrderQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetOrderQuery>;
     getOrders(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetOrdersQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetOrdersQuery>;
     getPartyInfoByLandedCostId(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetPartyInfoByLandedCostIdQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetPartyInfoByLandedCostIdQuery>;
     getReceiptCheckoutSession(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetReceiptCheckoutSessionQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetReceiptCheckoutSessionQuery>;
     getReceiptOrder(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetReceiptOrderQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetReceiptOrderQuery>;
     getTaxIdByCountry(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetTaxIdByCountryQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetTaxIdByCountryQuery>;
     getWebhooks(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetWebhooksQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetWebhooksQuery>;
     helloSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<HelloSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<HelloSettingsQuery>;
     inclusivePriceConfigurationId(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InclusivePriceConfigurationIdQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InclusivePriceConfigurationIdQuery>;
     inclusivePriceConfigurations(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InclusivePriceConfigurationsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InclusivePriceConfigurationsQuery>;
     inclusivePriceConfigurationsSync(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InclusivePriceConfigurationsSyncMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InclusivePriceConfigurationsSyncMutation>;
     landedCostSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<LandedCostSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<LandedCostSettingsQuery>;
     onlineStoreSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<OnlineStoreSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<OnlineStoreSettingsQuery>;
     orderUpdateAccountOrderNumber(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<OrderUpdateAccountOrderNumberMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<OrderUpdateAccountOrderNumberMutation>;
     organization(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<OrganizationQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<OrganizationQuery>;
     organizationByStoreId(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<OrganizationByStoreIdQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<OrganizationByStoreIdQuery>;
     organizations(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<OrganizationsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<OrganizationsQuery>;
     partyCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<PartyCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<PartyCreateMutation>;
     partyInfo(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<PartyInfoQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<PartyInfoQuery>;
     paypalOrder(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<PaypalOrderQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<PaypalOrderQuery>;
     paypalOrderCapture(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<PaypalOrderCaptureMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<PaypalOrderCaptureMutation>;
     paypalOrderCreate(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<PaypalOrderCreateMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<PaypalOrderCreateMutation>;
     removeTrackingNumber(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<RemoveTrackingNumberMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<RemoveTrackingNumberMutation>;
     renewCartExpirationToken(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<RenewCartExpirationTokenMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<RenewCartExpirationTokenMutation>;
     selectCheckoutVarianceTest(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<SelectCheckoutVarianceTestMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<SelectCheckoutVarianceTestMutation>;
     shippingZones(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<ShippingZonesQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ShippingZonesQuery>;
     storeCreditAddCredit(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreCreditAddCreditMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<StoreCreditAddCreditMutation>;
     storeCreditApplyToCheckoutSession(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreCreditApplyToCheckoutSessionMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<StoreCreditApplyToCheckoutSessionMutation>;
     storeCreditRemoveCredit(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreCreditRemoveCreditMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<StoreCreditRemoveCreditMutation>;
     storeCreditsByCustomer(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreCreditsByCustomerQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<StoreCreditsByCustomerQuery>;
     updateWebhook(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateWebhookMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<UpdateWebhookMutation>;
     zonosSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<ZonosSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<ZonosSettingsQuery>;
 };
 export type Sdk = ReturnType<typeof getSdk>;
+export {};

@@ -3,8 +3,9 @@ import type { containsNonLatinChars } from "../../utils/containsNonLatinChars";
 import type { CreatePartyRequest } from "../../../types/index";
 import type { CheckoutSessionCreateRequest, CheckoutSessionUpdateRequest } from "../../../types/checkout/api/CheckoutSession";
 import type { CustomAddressErrors } from "../../../types/checkout/form/CustomAddressErrors";
+import type { CheckoutTaxIdTypeValue } from "../../../types/checkout/TaxId";
 import type { TranslatedAddressObject } from "../../../types/checkout/TranslatedText";
-import type { CheckoutSessionDetailsFragment, CheckoutSessionUpdateMutation, CurrencyCode, ElementsUiStyle, ElementsUiTheme } from "../../../types/generated/graphql.internal.types";
+import { type CheckoutSessionDetailsFragment, type CheckoutSessionUpdateMutation, type CurrencyCode, type ElementsUiStyle, type ElementsUiTheme } from "../../../types/generated/graphql.internal.types";
 export type StripeStoreContactOption = {
     address: {
         city: string;
@@ -117,6 +118,14 @@ type StripeStore = {
      */
     taxId: string;
     /**
+     * Document kind selected for countries that collect more than one tax id type.
+     */
+    taxIdType: CheckoutTaxIdTypeValue | '';
+    /**
+     * Tax id type used when async address update
+     */
+    taxIdTypeUsedWhenAsyncAddressUpdate: CheckoutTaxIdTypeValue | '';
+    /**
      * Tax id used when async address update
      */
     taxIdUsedWhenAsyncAddressUpdate: string;
@@ -137,6 +146,9 @@ export type DomesticShippingSession = {
     postalCode: string;
     state: string;
 };
+declare const DOMESTIC_SESSION_REDIRECT_MARKER = "zonos--bc-domestic-session-redirected";
+declare const stripeStoreHasDomesticSessionRedirectMarker: () => boolean;
+declare const stripeStoreMarkDomesticSessionRedirected: () => void;
 declare const stripeStoreCleanupDomesticShippingSession: () => void;
 declare const stripeStoreSaveDomesticShippingSession: (props: DomesticShippingSession) => void;
 declare const stripeStoreGetDomesticShippingSession: () => DomesticShippingSession | null;
@@ -152,6 +164,10 @@ declare const stripeStoreBuildAddressForPartyCreate: ({ address, firstName, last
 declare const stripeStoreAsyncAddressUpdate: () => Promise<{
     partiesCreated: boolean;
 }>;
+export declare const getCountryField: (country: string) => {
+    stateRequired: boolean;
+    zipRequired: boolean;
+} | null;
 declare const stripeCalculateLandedCost: () => Promise<void>;
 declare const stripeStorePrefetchLandedCost: (params?: {
     /**
@@ -228,6 +244,19 @@ declare const stripeStoreUpdateCheckoutSession: ({ adjustmentsAmount, cartId, cu
     json: CheckoutSessionUpdateMutation | null;
 }>;
 /**
+ * Pushes the buyer's policy consent into the checkout session's metadata via the
+ * dedicated metadata-only mutation. Called from the payment continue handler so
+ * consent is persisted to the session before Stripe's confirmPayment fires.
+ *
+ * Uses `checkoutSessionUpdateMetadata` — not the full `checkoutSessionUpdate` —
+ * because this fires at the end of the payment phase, when we don't want to
+ * touch landed-cost / cart / party state. No-op when no policies are configured,
+ * when consent hasn't been accepted, or when there is no active session ID.
+ */
+export declare const stripeStoreRecordPolicyConsent: () => Promise<{
+    errors: string[];
+}>;
+/**
  * This function translates an address to Latin characters using the Zonos API.
  * It first builds the request body for the API call. If there's no request body, it resets the translated address in the store and returns.
  * If the address is not outdated, it returns without making the API call.
@@ -242,4 +271,4 @@ declare const stripeStoreTranslateAddressToLatin: ({ addressInvalidCharactersLis
     addressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
     billingAddressInvalidCharactersList: ReturnType<typeof containsNonLatinChars> | null;
 }) => Promise<void>;
-export { initStripeElements, stripeCalculateLandedCost, stripeStore, stripeStoreApplyPromoCode, stripeStoreAsyncAddressUpdate, stripeStoreBuildAddressForPartyCreate, stripeStoreCleanupDomesticShippingSession, stripeStoreConfirmPayment, stripeStoreGetDomesticShippingSession, stripeStoreGetPaymentIntent, stripeStoreHandleInventoryCheck, stripeStoreHandleInventoryRefund, stripeStoreInitCheckoutSession, stripeStoreMessageBasedOnStatus, stripeStoreOnChange, stripeStorePrefetchLandedCost, stripeStoreRemovePromoCode, stripeStoreReset, stripeStoreResetPromoCode, stripeStoreRetrievePayment, stripeStoreSaveDomesticShippingSession, stripeStoreTranslateAddressToLatin, stripeStoreUpdateCheckoutSession, stripeStoreUpdateCheckoutSessionBaseCurrency, };
+export { DOMESTIC_SESSION_REDIRECT_MARKER, initStripeElements, stripeCalculateLandedCost, stripeStore, stripeStoreApplyPromoCode, stripeStoreAsyncAddressUpdate, stripeStoreBuildAddressForPartyCreate, stripeStoreCleanupDomesticShippingSession, stripeStoreConfirmPayment, stripeStoreGetDomesticShippingSession, stripeStoreGetPaymentIntent, stripeStoreHandleInventoryCheck, stripeStoreHandleInventoryRefund, stripeStoreHasDomesticSessionRedirectMarker, stripeStoreInitCheckoutSession, stripeStoreMarkDomesticSessionRedirected, stripeStoreMessageBasedOnStatus, stripeStoreOnChange, stripeStorePrefetchLandedCost, stripeStoreRemovePromoCode, stripeStoreReset, stripeStoreResetPromoCode, stripeStoreRetrievePayment, stripeStoreSaveDomesticShippingSession, stripeStoreTranslateAddressToLatin, stripeStoreUpdateCheckoutSession, stripeStoreUpdateCheckoutSessionBaseCurrency, };

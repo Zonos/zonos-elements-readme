@@ -1,6 +1,6 @@
 /* eslint-disable no-relative-import-paths/no-relative-import-paths */
-/// <reference types="google.maps" />
 import type { StripeConstructor, StripeElements } from '@stripe/stripe-js';
+import type {} from 'google.maps';
 
 /** Need to use relative path so that this declaration file can be correctly bundled */
 import type { CustomEventMap } from '../components/utils/createCustomEvent';

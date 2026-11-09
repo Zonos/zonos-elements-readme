@@ -9,6 +9,13 @@ export type ExchangeRateForUse = {
     targetFormat: TargetFormat;
 };
 type LocalizationStore = {
+    /**
+     * All countries from countries.json, regardless of whether they are in the
+     * merchant's shipping zone. Used for address fields that are not restricted
+     * to shippable countries, e.g. the billing address country. `null` until
+     * localization has initialized or when the countries request failed.
+     */
+    allCountries: ICountryJson | null;
     countryLandedCost: CountryLandedCost | null;
     customMessages: ILocaleMessageForUse[];
     exchangeRate: ExchangeRateForUse | null;
@@ -37,10 +44,11 @@ type ILocaleMessageForUse = {
 };
 declare const localizationDispose: () => void, localizationStoreOnChange: import("@stencil/store/dist/types").OnChangeHandler<LocalizationStore>, localizationStore: LocalizationStore;
 export declare const getFallbackDefaultCountryCode: (allowedCountries: CountryCode[]) => CountryCode;
-declare const localizationStoreUpdateSelectedCountryCode: ({ isInitializing, newSelectedCountryCode, }: {
+declare const localizationStoreUpdateSelectedCountryCode: ({ isInitializing, newSelectedCountryCode, persistOverride, }: {
     isInitializing?: boolean;
     newSelectedCountryCode: CountryCode | null;
+    persistOverride?: boolean;
 }) => void;
-declare const localizationStoreUpdateSelectedLocale: (newSelectedLocale: Locale_ElementsSupportedLocationCode_Enum) => void;
+declare const localizationStoreUpdateSelectedLocale: (requestedLocale: Locale_ElementsSupportedLocationCode_Enum) => void;
 declare const initLocalizationStore: () => Promise<void>;
 export { initLocalizationStore, localizationDispose, localizationStore, localizationStoreOnChange, localizationStoreUpdateSelectedCountryCode, localizationStoreUpdateSelectedLocale, };

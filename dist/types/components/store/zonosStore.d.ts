@@ -20,6 +20,13 @@ export type AppearanceConfig = {
     fontSizeXS?: number;
     logoUrl: string;
     style: ElementsUiStyle;
+    /**
+     * Locales the merchant offers in the language selector, as lowercase codes.
+     * `null` offers every locale Elements supports. Plain `string[]`, matching the
+     * `[String!]` the settings graph sends — a merchant's saved list is data, not a
+     * compile-time constant, so `getSupportedLanguages` drops codes it can't render.
+     */
+    supportedLocales: string[] | null;
     theme: ElementsUiTheme;
     zonosAttribution: ZonosAttribution | null;
 };
@@ -86,4 +93,5 @@ declare const zonosStoreInitSetting: ({ overrideSettings, zonosSettings, }: {
     zonosSettings: ZonosSettings | null;
 }) => void;
 declare const zonosStoreFontFamily: () => string;
-export { getZonosStoreTheme, zonosStore, zonosStoreDispose, zonosStoreFontFamily, zonosStoreInitSetting, zonosStoreOnChange, };
+declare const getShouldRequirePeruTaxId: () => boolean;
+export { getShouldRequirePeruTaxId, getZonosStoreTheme, zonosStore, zonosStoreDispose, zonosStoreFontFamily, zonosStoreInitSetting, zonosStoreOnChange, };

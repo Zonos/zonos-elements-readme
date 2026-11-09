@@ -86,10 +86,19 @@ export declare const stringsJapanese: {
     'CPF/CNPJ number': {
         value: string;
     };
+    CURP: {
+        value: string;
+    };
     Cancel: {
         value: string;
     };
     'Card number copied to clipboard': {
+        value: string;
+    };
+    'Carn\u00E9 de extranjer\u00EDa': {
+        value: string;
+    };
+    'Carn\u00E9 de extranjer\u00EDa must be 9 digits.': {
         value: string;
     };
     'Cart subtotal': {
@@ -117,6 +126,9 @@ export declare const stringsJapanese: {
         value: string;
     };
     'Company name (optional)': {
+        value: string;
+    };
+    'Complete your shipping address': {
         value: string;
     };
     Confirm: {
@@ -159,6 +171,12 @@ export declare const stringsJapanese: {
         value: string;
     };
     'Customs fees total': {
+        value: string;
+    };
+    DNI: {
+        value: string;
+    };
+    'DNI must be 8 digits.': {
         value: string;
     };
     Delivery: {
@@ -224,6 +242,9 @@ export declare const stringsJapanese: {
     'Duties will apply to all orders.': {
         value: string;
     };
+    'Duties will be charged upon delivery.': {
+        value: string;
+    };
     'Duties, taxes, and fees': {
         value: string;
     };
@@ -281,6 +302,18 @@ export declare const stringsJapanese: {
     'Hide non-prepaid options': {
         value: string;
     };
+    "I agree to [merchantName]'s [policies]": {
+        value: string;
+    };
+    'I agree to the [policies]': {
+        value: string;
+    };
+    'If you later choose to exercise your right to withdrawal, you will be responsible for any associated return shipping costs, up to a maximum [amount].': {
+        value: string;
+    };
+    'If you later choose to exercise your right to withdrawal, you will be responsible for any associated return shipping costs.': {
+        value: string;
+    };
     "If you select FedEx Ground as your shipping option, you'll need to complete a General Agency Agreement (GAA) after placing your order. This form allows FedEx to clear your package through Canadian customs on your behalf. FedEx will contact you directly\u2014usually by email or phone\u2014with instructions on how to complete the GAA. To avoid delays or the return of your package, please respond promptly to their request.": {
         value: string;
     };
@@ -293,7 +326,10 @@ export declare const stringsJapanese: {
     'Invalid CUIT/CUIL format. Must contain 11 digits, with or without dashes (XX-XXXXXXXX-X).': {
         value: string;
     };
-    'Invalid RFC format. Must be 12\u201313 uppercase letters and numbers only.': {
+    'Invalid CURP format. Must be 18 uppercase letters and numbers.': {
+        value: string;
+    };
+    'Invalid RFC format. Must be 12\u201313 uppercase letters and numbers.': {
         value: string;
     };
     'Invalid promo code': {
@@ -404,6 +440,9 @@ export declare const stringsJapanese: {
     'Pay [organizationName]': {
         value: string;
     };
+    'Pay [organizationName] duties, taxes and fees for your shipment': {
+        value: string;
+    };
     'Pay in USD (United States Dollar)?': {
         value: string;
     };
@@ -494,7 +533,19 @@ export declare const stringsJapanese: {
     Quantity: {
         value: string;
     };
-    'RFC number': {
+    RFC: {
+        value: string;
+    };
+    'RFC or CURP number': {
+        value: string;
+    };
+    RUC: {
+        value: string;
+    };
+    'RUC must be 11 digits.': {
+        value: string;
+    };
+    'Refund policy': {
         value: string;
     };
     Region: {
@@ -515,6 +566,9 @@ export declare const stringsJapanese: {
     'Return to merchant site': {
         value: string;
     };
+    'Save and continue': {
+        value: string;
+    };
     'Search countries': {
         value: string;
     };
@@ -533,10 +587,16 @@ export declare const stringsJapanese: {
     'Select a language': {
         value: string;
     };
+    'Selected address': {
+        value: string;
+    };
     'Session does not have valid landed cost. Please contact [organizationName] for assistance.': {
         value: string;
     };
     'Session timed out': {
+        value: string;
+    };
+    'Shipment details': {
         value: string;
     };
     Shipping: {
@@ -549,6 +609,9 @@ export declare const stringsJapanese: {
         value: string;
     };
     'Shipping method': {
+        value: string;
+    };
+    'Shipping policy': {
         value: string;
     };
     'Shopping cart expired': {
@@ -623,6 +686,12 @@ export declare const stringsJapanese: {
     'Tax id is required': {
         value: string;
     };
+    'Tax id type': {
+        value: string;
+    };
+    'Tax id type is required': {
+        value: string;
+    };
     Taxes: {
         value: string;
     };
@@ -636,6 +705,9 @@ export declare const stringsJapanese: {
         value: string;
     };
     'Taxes, duties, and fees included': {
+        value: string;
+    };
+    'Terms and conditions': {
         value: string;
     };
     'Test cards': {
@@ -666,6 +738,9 @@ export declare const stringsJapanese: {
         value: string;
     };
     "There's been an error updating your checkout session. Please reload and try again or contact support if the error persists": {
+        value: string;
+    };
+    'This saved address is missing information required to ship internationally. Please add the details below.': {
         value: string;
     };
     'To ensure delivery all address details must be in Latin characters.': {
@@ -725,6 +800,9 @@ export declare const stringsJapanese: {
     Village: {
         value: string;
     };
+    'Warranty policy': {
+        value: string;
+    };
     "We couldn't complete your payment. Please verify the payment details and try again.": {
         value: string;
     };
@@ -755,6 +833,9 @@ export declare const stringsJapanese: {
     'You may incur additional fees from the shipping carrier by not prepaying.': {
         value: string;
     };
+    'You must accept the policies to place this order': {
+        value: string;
+    };
     "You will be redirected back to the merchant's site in a few seconds.": {
         value: string;
     };
@@ -782,7 +863,7 @@ export declare const stringsJapanese: {
     'Your payment went through successfully! Thank you for shopping with us! We hope you had an enjoyable experience and your support means the world to us.': {
         value: string;
     };
-    'Your saved default address ships internationally. Would you like to continue to international checkout, or stay here and select a domestic address?': {
+    'Your selected address ships internationally. Would you like to continue to international checkout, or stay here and select a domestic address?': {
         value: string;
     };
     'Your selected payment method requires additional verification. Please follow the instructions provided by your payment provider to complete the transaction.': {

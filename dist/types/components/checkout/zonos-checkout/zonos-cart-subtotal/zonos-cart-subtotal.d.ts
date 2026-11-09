@@ -20,5 +20,13 @@ export declare class ZonosCartSubtotal {
     private renderMessageLine;
     private renderCustomMessage;
     private getCartSubtotalSubtitle;
+    /**
+     * EU 3-EUR cutover (05CHECK-893): for EU remittance quotes that we keep as DAP
+     * (see [[isEuDapRemittance]]), taxes and fees are included in the checkout
+     * total while duties are paid upon delivery. Returns the foreign (presentment)
+     * estimates needed for the dedicated message, or `null` when the selected
+     * quote isn't this case.
+     */
+    private getEuDapDetails;
     render(): any;
 }
