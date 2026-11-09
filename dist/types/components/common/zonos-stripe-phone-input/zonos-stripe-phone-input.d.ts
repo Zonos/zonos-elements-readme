@@ -68,6 +68,7 @@ export declare class ZonosStripePhoneInput {
         valid: boolean;
         wrongFormat: boolean;
     }>;
+    onCountryCodeChange(): void;
     onCountryOptionsChange(): void;
     onSelectedCountryChange(): void;
     onPhoneNumberChange(): void;

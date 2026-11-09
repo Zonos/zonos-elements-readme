@@ -144,6 +144,20 @@ export declare class ZonosCheckout {
      * Check if stripe payment intent is succeeded or in a good state to move forward
      */
     private checkStripePaymentIntentStatus;
+    /**
+     * Recover an order-modification payment-only session that was already
+     * completed (or already paid but not yet completed) by the time this cart
+     * link is opened/reopened — e.g. the shopper paid, closed the tab before
+     * the async order-creation webhook finished, then reopened the same
+     * payment link. Without this, re-rendering the payment form would let them
+     * attempt to pay again against an already-resolved session. Mirrors
+     * zonos-collect's recoverCompletedCollectSession for its own no-shipping
+     * flow, minus the Airwallex branch (this checkout only supports Stripe).
+     *
+     * @returns `true` when it routed to the finish step, `false` when the
+     * caller should proceed with a normal init.
+     */
+    private recoverCompletedOrderModificationSession;
     private buildCartAndInit;
     private reloadCheckoutSession;
     private handleOrderDuplication;

@@ -1,17 +1,24 @@
+export type ICloudflareDeployTarget = 'pages' | 'worker';
 /**
- * This is to generate cloudflare url based on the environment. This won't
- * - Get the cloudflare alias to build if the environment is Preview
- * - Get the cloudflare production url (not preview alias) if it's production
- * @note
- * This is mainly used for get correct Cloudflare API to be used in scripts
- * @note
- * "url" is the API url in Cloudflare
- * @returns
- * - `https://<branch_name>.<project_name>.pages.dev` if is Preview
- * - `https://route.elements.zonos.com` if is Production
+ * Pages when Cloudflare Pages sets `CF_PAGES=1`.
+ * Otherwise a Cloudflare build is the worker. Every other build stays on the Pages preview path.
+ * `USE_OPENNEXT` is not an input.
  */
-export declare const formattedCloudflareApiUrl: ({ branchName, inCI: _inCI, inGithubAction, inVercel: _inVercel, isVercelPreview: _isVercelPreview, url, }: {
+export declare const resolveCloudflareDeployTarget: ({ buildEnv, cfPages, }: {
+    buildEnv: string | undefined;
+    cfPages: string | undefined;
+}) => ICloudflareDeployTarget;
+/**
+ * Cloudflare API address inlined into the storefront script.
+ * @returns
+ * - `https://<label>.robert-152.workers.dev` for a non-production Worker preview
+ * - `https://zonos-elements-serverless-test.robert-152.workers.dev` for the test Worker production host
+ * - `https://<branch_name>.<project_name>.pages.dev` for a non-production Pages preview
+ * - the configured host for production, local, and GitHub Actions
+ */
+export declare const formattedCloudflareApiUrl: ({ branchName, cloudflareTarget, inCI: _inCI, inGithubAction, inVercel: _inVercel, isVercelPreview: _isVercelPreview, url, }: {
     branchName?: string;
+    cloudflareTarget: ICloudflareDeployTarget;
     inCI: boolean;
     inGithubAction: boolean;
     inVercel: boolean;

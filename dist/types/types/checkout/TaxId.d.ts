@@ -104,7 +104,7 @@ export declare const shipToTaxIdLabels: {
         readonly placeholder: "DE123456789";
     };
     readonly MX: {
-        readonly friendlyName: "RFC number";
+        readonly friendlyName: "RFC or CURP number";
         readonly placeholder: "XAXX010101000";
     };
     readonly NL: {
@@ -140,3 +140,48 @@ export declare const shipToTaxIdLabels: {
         readonly placeholder: "DE123456789";
     };
 };
+export declare const isCountryRequireTaxId: (countryCode: string) => countryCode is CountryRequireTaxId;
+export type TaxIdErrorField = 'type' | 'value';
+export declare const taxIdTypeOptions: {
+    readonly MX: readonly [{
+        readonly label: "RFC";
+        readonly placeholder: "XAXX010101000";
+        readonly value: "RFC";
+    }, {
+        readonly label: "CURP";
+        readonly placeholder: "AAAA800101HDFRRR09";
+        readonly value: "CURP";
+    }];
+    readonly PE: readonly [{
+        readonly label: "DNI";
+        readonly placeholder: "12345678";
+        readonly value: "DNI";
+    }, {
+        readonly label: "RUC";
+        readonly placeholder: "20123456789";
+        readonly value: "RUC";
+    }, {
+        readonly label: "Carné de extranjería";
+        readonly placeholder: "001234567";
+        readonly value: "CE";
+    }];
+};
+export type TaxIdTypeOption = (typeof taxIdTypeOptions.MX)[number] | (typeof taxIdTypeOptions.PE)[number];
+export type MexicoTaxIdType = (typeof taxIdTypeOptions.MX)[number]['value'];
+export type PeruTaxIdType = (typeof taxIdTypeOptions.PE)[number]['value'];
+declare const checkoutTaxIdTypeValueList: readonly ["CE", "CURP", "DNI", "RFC", "RUC"];
+type AssertEveryCheckoutTaxIdType<T extends readonly TaxIdTypeOption['value'][]> = Exclude<TaxIdTypeOption['value'], T[number]> extends never ? T : never;
+/** Every document kind checkout can send. Older clients omit the field. */
+export declare const checkoutTaxIdTypeValues: AssertEveryCheckoutTaxIdType<typeof checkoutTaxIdTypeValueList>;
+export type CheckoutTaxIdTypeValue = (typeof checkoutTaxIdTypeValues)[number];
+export declare const peruTaxIdDigitLength: {
+    readonly CE: 9;
+    readonly DNI: 8;
+    readonly RUC: 11;
+};
+export declare const peruTaxIdFormatError: {
+    readonly CE: "Carné de extranjería must be 9 digits.";
+    readonly DNI: "DNI must be 8 digits.";
+    readonly RUC: "RUC must be 11 digits.";
+};
+export {};

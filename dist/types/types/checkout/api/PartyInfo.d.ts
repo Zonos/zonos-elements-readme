@@ -1,4 +1,10 @@
 export type GetShippingInfoByLandedCostIdResponse = {
+    /**
+     * Optional Collect logo URL from the landed cost metadata (`collectLogoUrl`).
+     * Overrides the default appearance logo when set. The company name comes from
+     * the origin party.
+     */
+    collectLogoUrl: string | null;
     landedCostShortId: string | null;
     origin: {
         companyName: string | null;

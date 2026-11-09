@@ -1,49 +1,39 @@
-import type { GraphQLClient } from 'graphql-request';
-import type { GraphQLClientRequestHeaders } from 'graphql-request/build/cjs/types';
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends {
-    [key: string]: unknown;
-}> = {
-    [K in keyof T]: T[K];
-};
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-    [SubKey in K]?: Maybe<T[SubKey]>;
-};
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-    [SubKey in K]: Maybe<T[SubKey]>;
-};
-export type MakeEmpty<T extends {
-    [key: string]: unknown;
-}, K extends keyof T> = {
-    [_ in K]?: never;
-};
+/** Internal type. DO NOT USE DIRECTLY. */
+/** Internal type. DO NOT USE DIRECTLY. */
 export type Incremental<T> = T | {
     [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never;
 };
+import type { GraphQLClient, RequestOptions } from 'graphql-request';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+type GraphQLClientRequestHeaders = RequestOptions['requestHeaders'];
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-    Boolean: {
-        input: boolean;
-        output: boolean;
-    };
-    Float: {
-        input: number;
-        output: number;
-    };
     ID: {
         input: string;
         output: string;
-    };
-    Int: {
-        input: number;
-        output: number;
     };
     String: {
         input: string;
         output: string;
     };
+    Boolean: {
+        input: boolean;
+        output: boolean;
+    };
+    Int: {
+        input: number;
+        output: number;
+    };
+    Float: {
+        input: number;
+        output: number;
+    };
     bigint: {
+        input: number;
+        output: number;
+    };
+    float8: {
         input: number;
         output: number;
     };
@@ -84,6 +74,7 @@ export declare const errorProjectNameEnum: {
 export declare const featureAspectKeyEnum: {
     readonly AdminRulesWrite: "admin_rules_write";
     readonly AirwallexBeta: "airwallex_beta";
+    readonly ChannelIntegrations: "channel_integrations";
     readonly Checkout_2_0: "checkout_2_0";
     readonly ClassifyBulk: "classify_bulk";
     readonly ClassifyBulkExportViewConfidenceScore: "classify_bulk_export_view_confidence_score";
@@ -107,6 +98,8 @@ export declare const featureAspectKeyEnum: {
     readonly NewPayoutReport: "new_payout_report";
     readonly NewRefundsUx: "new_refunds_ux";
     readonly OnboardingBeta: "onboarding_beta";
+    readonly OrderModifications: "order_modifications";
+    readonly OrderReturns: "order_returns";
     readonly PageAuditor: "page_auditor";
     readonly PromptExplorer: "prompt_explorer";
     readonly RulesUiCreate: "rules_ui_create";
@@ -119,6 +112,7 @@ export declare const featureAudienceNameEnum: {
     readonly AccountsReceivable: "accounts_receivable";
     readonly AdminRulesEditor: "admin_rules_editor";
     readonly AirwallexBetaMerchant: "airwallex_beta_merchant";
+    readonly ChannelIntegrationsMerchant: "channel_integrations_merchant";
     readonly CheckoutSales: "checkout_sales";
     readonly ClassifyBulkMerchant: "classify_bulk_merchant";
     readonly ClassifyBulkMerchantExportConfidenceScore: "classify_bulk_merchant_export_confidence_score";
@@ -141,6 +135,8 @@ export declare const featureAudienceNameEnum: {
     readonly NewRefundsUxMerchant: "new_refunds_ux_merchant";
     readonly Onboarding: "onboarding";
     readonly OnboardingBetaMerchant: "onboarding_beta_merchant";
+    readonly OrderModificationsMerchant: "order_modifications_merchant";
+    readonly OrderReturnsMerchant: "order_returns_merchant";
     readonly PrincipalEngineer: "principal_engineer";
     readonly ProServeHead: "pro_serve_head";
     readonly ProductManager: "product_manager";
@@ -554,24 +550,10 @@ export type Prompt_BulkJobStatus_Enum = (typeof promptBulkJobStatusEnum)[keyof t
 export type AnalyticConversionEventQuery = {
     cartCreate: {
         aggregate: {
+            count: number;
             avg: {
                 checkoutStepSeconds: number | null;
             } | null;
-            count: number;
-            max: {
-                checkoutStepSeconds: number | null;
-            } | null;
-            min: {
-                checkoutStepSeconds: number | null;
-            } | null;
-        } | null;
-    };
-    customerInfoCompleted: {
-        aggregate: {
-            avg: {
-                checkoutStepSeconds: number | null;
-            } | null;
-            count: number;
             max: {
                 checkoutStepSeconds: number | null;
             } | null;
@@ -582,10 +564,10 @@ export type AnalyticConversionEventQuery = {
     };
     customerInfoFilled: {
         aggregate: {
+            count: number;
             avg: {
                 checkoutStepSeconds: number | null;
             } | null;
-            count: number;
             max: {
                 checkoutStepSeconds: number | null;
             } | null;
@@ -594,40 +576,12 @@ export type AnalyticConversionEventQuery = {
             } | null;
         } | null;
     };
-    orderCompleted: {
+    customerInfoCompleted: {
         aggregate: {
+            count: number;
             avg: {
                 checkoutStepSeconds: number | null;
             } | null;
-            count: number;
-            max: {
-                checkoutStepSeconds: number | null;
-            } | null;
-            min: {
-                checkoutStepSeconds: number | null;
-            } | null;
-        } | null;
-    };
-    paymentInfoCompleted: {
-        aggregate: {
-            avg: {
-                checkoutStepSeconds: number | null;
-            } | null;
-            count: number;
-            max: {
-                checkoutStepSeconds: number | null;
-            } | null;
-            min: {
-                checkoutStepSeconds: number | null;
-            } | null;
-        } | null;
-    };
-    paymentInfoFilled: {
-        aggregate: {
-            avg: {
-                checkoutStepSeconds: number | null;
-            } | null;
-            count: number;
             max: {
                 checkoutStepSeconds: number | null;
             } | null;
@@ -638,10 +592,10 @@ export type AnalyticConversionEventQuery = {
     };
     quoteReceived: {
         aggregate: {
+            count: number;
             avg: {
                 checkoutStepSeconds: number | null;
             } | null;
-            count: number;
             max: {
                 checkoutStepSeconds: number | null;
             } | null;
@@ -652,10 +606,52 @@ export type AnalyticConversionEventQuery = {
     };
     shippingInfoCompleted: {
         aggregate: {
+            count: number;
             avg: {
                 checkoutStepSeconds: number | null;
             } | null;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    paymentInfoFilled: {
+        aggregate: {
             count: number;
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    paymentInfoCompleted: {
+        aggregate: {
+            count: number;
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            max: {
+                checkoutStepSeconds: number | null;
+            } | null;
+            min: {
+                checkoutStepSeconds: number | null;
+            } | null;
+        } | null;
+    };
+    orderCompleted: {
+        aggregate: {
+            count: number;
+            avg: {
+                checkoutStepSeconds: number | null;
+            } | null;
             max: {
                 checkoutStepSeconds: number | null;
             } | null;
@@ -667,10 +663,10 @@ export type AnalyticConversionEventQuery = {
 };
 export type ConversionEventFragmentFragment = {
     aggregate: {
+        count: number;
         avg: {
             checkoutStepSeconds: number | null;
         } | null;
-        count: number;
         max: {
             checkoutStepSeconds: number | null;
         } | null;
@@ -687,11 +683,11 @@ export type MetricAllApiPathsQuery = {
 export type MetricApiPathSpeedQuery = {
     usage_scriptLoadEvent_aggregate: {
         aggregate: {
+            count: number;
             avg: {
                 loadTimeClientMiddleware: number | null;
                 loadTimeInternal: number | null;
             } | null;
-            count: number;
             max: {
                 createdAt: string | null;
                 loadTimeClientMiddleware: number | null;
@@ -711,49 +707,49 @@ export type FailToGetQuoteErrorsQuery = {
             count: number;
         } | null;
         nodes: Array<{
-            cartId: Record<string, unknown> | Record<string, unknown>[] | null;
             createdAt: string;
-            domain: Record<string, unknown> | Record<string, unknown>[] | null;
+            href: string | null;
             endpoint: string;
             errors: Record<string, unknown> | Record<string, unknown>[];
-            href: string | null;
             id: number;
             metadata: Record<string, unknown> | Record<string, unknown>[] | null;
-            requestLocation: Record<string, unknown> | Record<string, unknown>[] | null;
             requestPayload: Record<string, unknown> | Record<string, unknown>[];
             responseBody: Record<string, unknown> | Record<string, unknown>[] | null;
-            shipToAddress: Record<string, unknown> | Record<string, unknown>[] | null;
             status: number;
+            domain: Record<string, unknown> | Record<string, unknown>[] | null;
+            shipToAddress: Record<string, unknown> | Record<string, unknown>[] | null;
+            cartId: Record<string, unknown> | Record<string, unknown>[] | null;
+            requestLocation: Record<string, unknown> | Record<string, unknown>[] | null;
         }>;
     };
 };
 export type LocaleCountryMessagesQuery = {
     locale_countryCodesPage: Array<{
-        countryCodes: Array<string> | null;
+        countryCodes: Array<string>;
+        pageName: Locale_PageName_Enum;
+        id: number;
         countryCodesPageMessageLinks: Array<{
             id: number;
             message: {
-                id: number;
-                localeFrom: string;
-                localeTo: string;
                 textFrom: string;
                 textTo: string;
+                localeFrom: string;
+                localeTo: string;
+                id: number;
             };
         }>;
-        id: number;
-        pageName: Locale_PageName_Enum;
     }>;
 };
 export type GetConversionEventBySessionIdAndOrgIdQuery = {
     usage_conversionEvent: Array<{
-        countryCode: string | null;
-        createdAt: string;
-        eventName: string;
         id: number;
+        countryCode: string | null;
+        eventName: string;
         metadata: Record<string, unknown> | Record<string, unknown>[] | null;
         organizationId: string;
         sessionId: string | null;
         stepSeconds: number | null;
+        createdAt: string;
     }>;
 };
 export type InsertConversionEventMutation = {
@@ -772,8 +768,8 @@ export type CreateBulkLoadEventMutation = {
 export type CreateErrorEventMutation = {
     insert_error_event: {
         returning: Array<{
-            errors: Record<string, unknown> | Record<string, unknown>[];
             id: number;
+            errors: Record<string, unknown> | Record<string, unknown>[];
             status: number;
         }>;
     } | null;
@@ -797,13 +793,13 @@ export type CreateBulkScriptLoadEventMutation = {
 export type GetAudienceByAspectKeyQuery = {
     feature_audienceAspectLink: Array<{
         audience: {
+            name: Feature_AudienceName_Enum;
             entityLinks: Array<{
                 entity: {
                     email: string | null;
                     storeId: number | null;
                 };
             }>;
-            name: Feature_AudienceName_Enum;
         };
     }>;
 };
@@ -814,8 +810,8 @@ export type AllSettingsQuery = {
         id: number;
         storeHash: string;
         zonosCredentialToken: string | null;
-        zonosIsNewVersion: boolean;
         zonosStoreId: number | null;
+        zonosIsNewVersion: boolean;
     }>;
 };
 export type CleanupTestErrorsMutation = {
@@ -847,20 +843,12 @@ export type DeleteOrderImportLockMutation = {
         }>;
     } | null;
 };
-export type InsertReserveOrderMutation = {
-    insert_bigcommerce_reserveOrder: {
-        returning: Array<{
-            cartId: string;
-            id: number;
-        }>;
-    } | null;
-};
 export type GetReserveOrderQuery = {
     bigcommerce_reserveOrder: Array<{
-        cartId: string;
         id: number;
         orderId: string | null;
         storeHash: string;
+        cartId: string;
     }>;
 };
 export type DeleteReserveOrdersMutation = {
@@ -877,14 +865,6 @@ export type DeleteAllStoreReserveOrdersMutation = {
         }>;
     } | null;
 };
-export type UpdateReserveOrderMutation = {
-    update_bigcommerce_reserveOrder_by_pk: {
-        cartId: string;
-        id: number;
-        orderId: string | null;
-        storeHash: string;
-    } | null;
-};
 export type InsertReserveOrderEventMutation = {
     insert_bigcommerce_reserveOrderEvent_one: {
         id: number;
@@ -893,37 +873,37 @@ export type InsertReserveOrderEventMutation = {
 export type GetBigCommerceSettingsQuery = {
     bigcommerce_settings: Array<{
         authToken: string;
-        createCustomerEnabled: boolean;
+        zonosCredentialToken: string | null;
         dimensionUnits: string;
         domain: string;
         id: number;
-        inventoryCheckEnabled: boolean;
-        reserveOrderEnabled: boolean;
         storeHash: string;
-        testModeEnabled: boolean;
-        user: string;
         weightUnits: string;
-        zonosCredentialToken: string | null;
-        zonosIsNewVersion: boolean;
+        createCustomerEnabled: boolean;
+        inventoryCheckEnabled: boolean;
+        testModeEnabled: boolean;
+        reserveOrderEnabled: boolean;
         zonosStoreId: number | null;
+        user: string;
+        zonosIsNewVersion: boolean;
     }>;
 };
 export type UpsertBigCommerceSettingsMutation = {
     insert_bigcommerce_settings_one: {
         authToken: string;
-        createCustomerEnabled: boolean;
-        createdAt: string;
+        zonosCredentialToken: string | null;
         dimensionUnits: string;
         domain: string;
         id: number;
-        reserveOrderEnabled: boolean;
         storeHash: string;
-        updatedAt: string;
-        user: string;
         weightUnits: string;
-        zonosCredentialToken: string | null;
-        zonosIsNewVersion: boolean;
+        createCustomerEnabled: boolean;
+        reserveOrderEnabled: boolean;
         zonosStoreId: number | null;
+        user: string;
+        zonosIsNewVersion: boolean;
+        createdAt: string;
+        updatedAt: string;
     } | null;
 };
 export type DeleteBigCommerceSettingsMutation = {
@@ -934,11 +914,11 @@ export type DeleteBigCommerceSettingsMutation = {
 export type GetSettingsReserveOrdersQuery = {
     bigcommerce_settings: Array<{
         authToken: string;
+        storeHash: string;
         reserveOrders: Array<{
             cartId: string;
             orderId: string | null;
         }>;
-        storeHash: string;
     }>;
 };
 export type InsertBigCommerceSettingsEventMutation = {
@@ -948,9 +928,9 @@ export type InsertBigCommerceSettingsEventMutation = {
 };
 export type StoreVersionSettingQuery = {
     ux_zonosElementsSetting: Array<{
-        currentVersion: string;
-        previousVersion: string | null;
         storeId: number | null;
+        previousVersion: string | null;
+        currentVersion: string;
         token: string | null;
     }>;
 };
@@ -969,100 +949,97 @@ export type CleanupTestZonosElementSettingMutation = {
         affected_rows: number;
     } | null;
 };
-export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string) => Promise<T>;
+export type SdkFunctionWrapper = <T>(action: (requestHeaders?: Record<string, string>) => Promise<T>, operationName: string, operationType?: string, variables?: {
+    [x: string]: never;
+}) => Promise<T>;
 export declare function getSdk(client: GraphQLClient, withWrapper?: SdkFunctionWrapper): {
     allSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<AllSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<AllSettingsQuery>;
     analyticConversionEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<AnalyticConversionEventQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<AnalyticConversionEventQuery>;
     cleanupTestErrors(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CleanupTestErrorsMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CleanupTestErrorsMutation>;
     cleanupTestZonosElementSetting(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CleanupTestZonosElementSettingMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CleanupTestZonosElementSettingMutation>;
     createBulkLoadEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateBulkLoadEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateBulkLoadEventMutation>;
     createBulkScriptLoadEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateBulkScriptLoadEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateBulkScriptLoadEventMutation>;
     createErrorEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateErrorEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateErrorEventMutation>;
     createScriptLoadEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateScriptLoadEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateScriptLoadEventMutation>;
     createStoreVersionSetting(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<CreateStoreVersionSettingMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<CreateStoreVersionSettingMutation>;
     deleteAllStoreReserveOrders(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteAllStoreReserveOrdersMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<DeleteAllStoreReserveOrdersMutation>;
     deleteBigCommerceSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteBigCommerceSettingsMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<DeleteBigCommerceSettingsMutation>;
     deleteOrderImportLock(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteOrderImportLockMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<DeleteOrderImportLockMutation>;
     deleteReserveOrders(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<DeleteReserveOrdersMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<DeleteReserveOrdersMutation>;
     failToGetQuoteErrors(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<FailToGetQuoteErrorsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<FailToGetQuoteErrorsQuery>;
     getAudienceByAspectKey(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetAudienceByAspectKeyQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetAudienceByAspectKeyQuery>;
     getBigCommerceSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetBigCommerceSettingsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetBigCommerceSettingsQuery>;
     getConversionEventBySessionIdAndOrgId(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetConversionEventBySessionIdAndOrgIdQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetConversionEventBySessionIdAndOrgIdQuery>;
     getReserveOrder(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetReserveOrderQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetReserveOrderQuery>;
     getSettingsReserveOrders(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<GetSettingsReserveOrdersQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<GetSettingsReserveOrdersQuery>;
     hasPreviousErrors(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<HasPreviousErrorsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<HasPreviousErrorsQuery>;
     insertBigCommerceSettingsEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InsertBigCommerceSettingsEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InsertBigCommerceSettingsEventMutation>;
     insertConversionEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InsertConversionEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InsertConversionEventMutation>;
     insertOrderImportLock(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InsertOrderImportLockMutation>;
-    insertReserveOrder(variables?: {
-        [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InsertReserveOrderMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InsertOrderImportLockMutation>;
     insertReserveOrderEvent(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<InsertReserveOrderEventMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<InsertReserveOrderEventMutation>;
     localeCountryMessages(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<LocaleCountryMessagesQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<LocaleCountryMessagesQuery>;
     metricAllApiPaths(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<MetricAllApiPathsQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<MetricAllApiPathsQuery>;
     metricApiPathSpeed(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<MetricApiPathSpeedQuery>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<MetricApiPathSpeedQuery>;
     storeVersionSetting(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<StoreVersionSettingQuery>;
-    updateReserveOrder(variables?: {
-        [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpdateReserveOrderMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<StoreVersionSettingQuery>;
     upsertBigCommerceSettings(variables?: {
         [x: string]: never;
-    }, requestHeaders?: GraphQLClientRequestHeaders): Promise<UpsertBigCommerceSettingsMutation>;
+    }, requestHeaders?: GraphQLClientRequestHeaders, signal?: RequestInit["signal"]): Promise<UpsertBigCommerceSettingsMutation>;
 };
 export type Sdk = ReturnType<typeof getSdk>;
+export {};

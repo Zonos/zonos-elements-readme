@@ -15,6 +15,7 @@ export * from './checkout/api/StoreDiscountEnabled';
 export * from './checkout/api/ValidateAddress';
 export * from './checkout/api/VarianceTest';
 export * from './checkout/CheckoutConfig';
+export * from './checkout/itemCustomization';
 export * from './checkout/ShortAddressCode';
 export * from './checkout/TaxId';
 export * from './ConversionEvent';

@@ -1,6 +1,5 @@
 import type { EventEmitter } from '../../../stencil-public-runtime';
 import type { ContactOption, Stripe, StripeAddressElementChangeEvent } from '@stripe/stripe-js';
-import type { ICountryJson } from "../../../components";
 import type { CheckoutAddressService } from "../../utils/iframe/CheckoutAddressService";
 import type { CustomAddressErrors } from "../../../types/checkout/form/CustomAddressErrors";
 import type { CountryFields } from "../../../types/CountryFields";
@@ -19,6 +18,10 @@ export declare class ZonosAddress {
      * Default address for stripe
      */
     defaultAddress: ContactOption[];
+    /**
+     * Which tax id control the error belongs on. Empty when there is no error.
+     */
+    taxIdErrorField: 'type' | 'value' | '';
     /**
      * Error message for tax id input
      */
@@ -71,17 +74,6 @@ export declare class ZonosAddress {
      * Whether to start google place suggestions
      */
     startGooglePlaceSuggestions: boolean;
-    /**
-     * List of countries to show in the address element
-     */
-    shipToCountries: {
-        label: string;
-        value: string;
-    }[] | null;
-    /**
-     * Shipping zones from localization
-     */
-    shippingZones: ICountryJson | null;
     city: string;
     country: string;
     firstName: string;
@@ -129,6 +121,15 @@ export declare class ZonosAddress {
      * Unsubscribe function for address selected listener
      */
     private onAddressSelectedUnsubscribe?;
+    /**
+     * Memoized country options, keyed on the store references they derive from.
+     * `render()` runs on every keystroke, and rebuilding the list each time would
+     * re-sort ~244 countries and hand `zonos-stripe-select` a new array identity,
+     * re-rendering it needlessly. `@stencil/store` replaces these references
+     * wholesale rather than mutating them, so reference equality is a safe key.
+     */
+    private countryOptionsCache;
+    private getCountryOptions;
     private getStripeAddressInstance;
     private updateAddressEventData;
     isAddressFilledChanged(): void;
@@ -136,7 +137,6 @@ export declare class ZonosAddress {
     private getIsComplete;
     private throttledGetAddressSuggestions;
     private setCustomAddressFormToStripeAddressEventData;
-    private isInTaxIdCountry;
     /**
      * Render tax id input based on ship to country code
      */
@@ -160,7 +160,6 @@ export declare class ZonosAddress {
     private initAddressSuggestions;
     countryChanged(countryCode: string): void;
     shouldEnabledCustomAddressChanged(): void;
-    shippingZonesChanged(): void;
     private renderCustomAddressForm;
     private onStoreCheckoutSessionIdChanged;
     disconnectedCallback(): void;

@@ -15,6 +15,15 @@ export type GenericZonosSettings = {
      */
     bigcommerceDomesticCheckoutCountrySelector?: string;
     /**
+     * CSS selector for BigCommerce's native currency selector element.
+     * @description When Hello is actively converting prices (user is in a
+     * shipping zone and BC's native currency matches the store's source
+     * currency), matching element(s) are hidden so shoppers don't toggle
+     * BC's selector and conflict with Hello's conversion. Selectors vary
+     * by theme, so this is configured per merchant.
+     */
+    bigcommerceNativeCurrencySelector?: string;
+    /**
      * Whether to blur the currency while initializing Zonos to avoid price flickering.
      */
     blurCurrencyOnInit?: boolean;
@@ -43,9 +52,20 @@ export type GenericZonosSettings = {
      */
     shouldEnabledCustomAddress?: boolean;
     /**
+     * For Collect: when the carrier does not provide a logo via the landed cost
+     * metadata (`collectLogoUrl`), fall back to the organization's appearance logo.
+     * When disabled (default), no logo is shown unless the carrier provides one.
+     */
+    shouldFallbackToOrganizationLogoForCollect?: boolean;
+    /**
      * Whether or not Canadian shopper has to consent that they are aware of some procedures must happen after checking out otherwise the order will be returned
      */
     shouldFedExShippingConsentForCanadianShopper?: boolean;
+    /**
+     * When true, checkout requires a Peru tax id and lets the shopper pick the document type.
+     * The API sets this from an organization list so stores can be added without a client release.
+     */
+    shouldRequirePeruTaxId?: boolean;
     /**
      * Signed token for Google Places API iframe access.
      */
@@ -60,6 +80,15 @@ export type GenericZonosSettings = {
      * List of countries that are allowed to use USD denominated cards for settlement.
      */
     usdSettlementCountryEnabled?: CountryCode[];
+    /**
+     * Ship-to countries affected by the EU right-of-withdrawal regulation. When the
+     * buyer's destination is in this list (and the merchant has opted into the EU
+     * withdrawal policy), the withdrawal notice is shown above the Pay button.
+     * Sourced from the API so the affected-country list is controlled centrally
+     * rather than hardcoded in the storefront; an absent/empty list shows it for no
+     * country.
+     */
+    withdrawalCountryEnabled?: CountryCode[];
 };
 export type ZonosSettingsBase = AppearanceSettingsQuery & CheckoutSettingsQuery & HelloSettingsQuery & OnlineStoreSettingsQuery & OrganizationQuery & ShippingZonesQuery & {
     inclusivePriceConfigurations: InclusivePriceConfigurationResponse;

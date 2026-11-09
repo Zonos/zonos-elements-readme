@@ -1,5 +1,5 @@
 import { stripeStoreUpdateCheckoutSession } from "./stripe";
-import type { CalculateLandedCostMutation, CartQuery, CheckoutPresentmentFragment, CheckoutSessionDetailsFragment, CountryCode, CurrencyCode, IncotermCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.internal.types";
+import type { CalculateLandedCostMutation, CartQuery, CheckoutPresentmentFragment, CheckoutSessionDetailsFragment, CountryCode, CurrencyCode, DeliveryType, IncotermCode, ItemMeasurementType, ItemType, ItemUnitOfMeasure, LandedCostFragment, ShipmentRatingFragment } from "../../../types/generated/graphql.internal.types";
 type Step = 'customer-info' | 'shipping' | 'payment' | 'finish' | 'error';
 export type TabItem = {
     index: number;
@@ -45,6 +45,8 @@ export type CartItem = {
     productId?: string;
     quantity: number;
     sku?: string;
+    gtin?: string;
+    manufacturerProductId?: string;
 };
 export type CartAdjustment = NonNullable<CartQuery['cart']>['adjustments'][number];
 type CartItemToUse = CartItem & {
@@ -157,24 +159,24 @@ declare const cartStoreCheckItemRestrictions: (itemsWorkflow: ItemWorkflowInfo[]
     cartItems: CartItemToUse[];
     restrictedItems: {
         restriction: {
-            action: import("src/types/generated/graphql.internal.types").RestrictedItemAction;
             reason: string;
+            action: import("src/types/generated/graphql.internal.types").RestrictedItemAction;
         };
+        id: string;
         amount: number;
+        name: string | null;
+        description: string | null;
+        imageUrl: string | null;
+        quantity: number;
+        sku: string | null;
+        productId: string;
+        reverseAmountDetail: Array<{
+            inclusivePriceConfigurationId: string | null;
+        }> | null;
         attributes: Array<{
             key: string | null;
             value: string | null;
         } | null> | null;
-        description: string | null;
-        id: string;
-        imageUrl: string | null;
-        name: string | null;
-        productId: string;
-        quantity: number;
-        reverseAmountDetail: Array<{
-            inclusivePriceConfigurationId: string | null;
-        }> | null;
-        sku: string | null;
         matchedItem: CartItemToUse | undefined;
     }[];
 };
@@ -212,12 +214,21 @@ type CartStoreRecalculateTotalParams = Omit<Parameters<typeof stripeStoreUpdateC
  * Detect if there are any items in cart that are not restricted and have positive amount, exclude negative amount items
  */
 declare const cartStoreHasOneEligibleItem: () => boolean;
+/**
+ * An order-modification payment-only session (skip-to-payment, no shipping
+ * step): a session tied to an order that hasn't completed yet, meaning the
+ * shopper is only paying a delta against an already-approved landed cost.
+ * Single source of truth for this detection — previously duplicated inline
+ * at each call site, which let one of them (the forceDialogOpen/preview init
+ * path) miss it entirely.
+ */
+declare const cartStoreIsOrderModificationPaymentOnlySession: () => boolean;
 declare const cartStoreSetCheckoutSession: (checkoutSession: CheckoutSessionDetailsFragment) => void;
 declare const cartStoreReCalculateTotal: ({ adjustmentsAmount, cartId, currency, dutiesTaxesFeesEstimate, itemsAmount, landedCostId, shouldInitSessionOnFailure, }: CartStoreRecalculateTotalParams) => Promise<boolean>;
 /**
  * For some service levels, the landed cost that's DAP and we do remittance on behalf of the merchant, these landed cost should be treated as DDP
  */
-declare const cartStoreGetMethod: (landedCost: LandedCostFragment) => IncotermCode;
+declare const cartStoreGetMethod: (landedCost: LandedCostFragment, deliveryType?: DeliveryType | null) => IncotermCode;
 declare const cartStoreUpdateSelectedShippingOption: ({ applySubtotalsOnly, landedCostId, selectedShippingOption, }: {
     /**
      * Whether or not to only apply subtotals to cartStore and not update checkout session with the selected landed cost
@@ -254,4 +265,4 @@ declare const cartStoreResetTabItems: () => void;
  * Debounced to prevent multiple rapid requests when store changes cascade.
  */
 declare const cartStoreUpdateStoreCredit: () => void;
-export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreClearCheckoutInterval, cartStoreGetMethod, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreNextStep, cartStoreOnChange, cartStorePreviousStep, cartStoreReCalculateTotal, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreSetCheckoutSession, cartStoreStartCheckoutInterval, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateStoreCredit, cartStoreUpdateToErrorState, };
+export { cartStore, cartStoreApplySubtotals, cartStoreCheckItemRestrictions, cartStoreClearCheckoutInterval, cartStoreGetMethod, cartStoreGetShippingTransitInfo, cartStoreHasOneEligibleItem, cartStoreIsOrderModificationPaymentOnlySession, cartStoreNextStep, cartStoreOnChange, cartStorePreviousStep, cartStoreReCalculateTotal, cartStoreReset, cartStoreResetCartItems, cartStoreResetTabItems, cartStoreSetCheckoutSession, cartStoreStartCheckoutInterval, cartStoreUpdateItems, cartStoreUpdateSelectedShippingOption, cartStoreUpdateStoreCredit, cartStoreUpdateToErrorState, };

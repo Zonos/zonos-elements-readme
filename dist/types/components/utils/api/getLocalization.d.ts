@@ -4,4 +4,6 @@ export type Localization = {
     country: CountryCode | null;
     locale: Locale_ElementsSupportedLocationCode_Enum | null;
 };
-export declare const getLocalization: () => Promise<Localization>;
+export declare const getLocalization: ({ ignoreCountryOverride, }?: {
+    ignoreCountryOverride?: boolean;
+}) => Promise<Localization>;

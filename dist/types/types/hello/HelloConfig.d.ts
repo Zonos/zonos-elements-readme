@@ -30,9 +30,21 @@ export type HelloConfig = {
     currencyBehavior: HelloCurrencyBehavior;
     currencyElementSelector: string;
     desktopLocation?: HelloDesktopLocation | null;
+    /**
+     * Fine-grained float placement (corner anchor + pixel offsets) from settings.
+     * Distinct from the component `@Prop` of the same name, which remains an enum.
+     * @default null
+     */
+    desktopLocationOverride?: HelloSettingFragment['desktopLocationOverride'];
     excludedUrlPatterns: Array<string>;
     homepageUrlPattern: string | null;
     mobileLocation: HelloMobileLocation | null;
+    /**
+     * Fine-grained float placement for mobile viewports from settings.
+     * Distinct from the component `@Prop` of the same name, which remains an enum.
+     * @default null
+     */
+    mobileLocationOverride?: HelloSettingFragment['mobileLocationOverride'];
     mode: Mode;
     /**
      * Position of floating hello if `anchorElementSelector` is not found after 3 seconds

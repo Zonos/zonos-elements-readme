@@ -19,6 +19,10 @@ export declare class ZonosAddress {
      */
     defaultAddress: ContactOption[];
     /**
+     * Which tax id control the error belongs on. Empty when there is no error.
+     */
+    taxIdErrorField: 'type' | 'value' | '';
+    /**
      * Error message for tax id input
      */
     taxIdErrorMessage: string;
@@ -64,7 +68,6 @@ export declare class ZonosAddress {
     private updateAddressElement;
     watchInitStripe(): Promise<void>;
     defaultAddressChanged(newAddress: ContactOption[], oldAddress: ContactOption[]): void;
-    private isInTaxIdCountry;
     /**
      * Render tax id input based on ship to country code
      */

@@ -1,4 +1,5 @@
 import type { CartItem } from "../../../components/store/checkout/cart";
+import type { CheckoutTaxIdTypeValue } from "../TaxId";
 import type { CalculateLandedCostMutation, CartCalculateLandedCostMutation, CountryCode, CurrencyCode, LandedCostAdjustmentType } from "../../generated/graphql.internal.types";
 export type CalculateLandedCostAdjustmentInput = {
     amount: number;
@@ -17,6 +18,8 @@ export type Extensions = {
         name: string;
     };
     ruleMessageType?: 'CUSTOM' | 'DEFAULT';
+    /** Set on shipment-rating errors emitted by a country constraint that blocked a service level. */
+    source?: string;
 };
 export type ApiError = {
     extensions?: Extensions | null;
@@ -65,6 +68,11 @@ export type CalculateLandedCostRequest = {
      * TaxId that the some destination countries require for the shipment.
      */
     shipToTaxId?: string;
+    /**
+     * Document kind selected in checkout. Mexico uses RFC or CURP.
+     * Peru uses DNI, RUC, or CE.
+     */
+    shipToTaxIdType?: CheckoutTaxIdTypeValue;
     shippingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;
@@ -122,6 +130,11 @@ export type CartCalculateLandedCostRequest = {
      * TaxId that the some destination countries require for the shipment.
      */
     shipToTaxId?: string;
+    /**
+     * Document kind selected in checkout. Mexico uses RFC or CURP.
+     * Peru uses DNI, RUC, or CE.
+     */
+    shipToTaxIdType?: CheckoutTaxIdTypeValue;
     shippingAddress: {
         addressLine1: string;
         addressLine2?: string | undefined;

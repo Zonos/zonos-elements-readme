@@ -31,6 +31,10 @@ export declare class ZonosCollectPayment {
      */
     paypalSessionDone: EventEmitter<string>;
     /**
+     * Event to emit when the Airwallex payment is completed successfully
+     */
+    airwallexPaymentDone: EventEmitter<void>;
+    /**
      * Show error banner when the form is not complete, and user clicks on `Submit` button
      * @default false
      */

@@ -6,7 +6,9 @@
  */
 import { HTMLStencilElement, JSXBase } from "./stencil-public-runtime";
 import { ContactOption, PaymentIntent, Stripe, StripeAddressElementChangeEvent } from "@stripe/stripe-js";
+import { MissingShippingField } from "./components/utils/checkout/getMissingRequiredShippingFields";
 import { EnteredInfo, TranslatedAddressObject } from "./types/checkout/TranslatedText";
+import { AddressCompletionSubmit } from "./components/utils/checkout/applyAddressCompletion";
 import { EventPayloadMap, IframeSuggestionsResponsePayload } from "./components/utils/iframe/IframeHelpers";
 import { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-address-update-dialog/zonos-address-update-dialog";
 import { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
@@ -32,7 +34,9 @@ import { SelectOption } from "./components/common/zonos-stripe-select/zonos-stri
 import { ToggleItem } from "./types/common-ui/Toggle";
 import { VirtualScrollRenderItem } from "./types/common-ui/VirtualScroll";
 export { ContactOption, PaymentIntent, Stripe, StripeAddressElementChangeEvent } from "@stripe/stripe-js";
+export { MissingShippingField } from "./components/utils/checkout/getMissingRequiredShippingFields";
 export { EnteredInfo, TranslatedAddressObject } from "./types/checkout/TranslatedText";
+export { AddressCompletionSubmit } from "./components/utils/checkout/applyAddressCompletion";
 export { EventPayloadMap, IframeSuggestionsResponsePayload } from "./components/utils/iframe/IframeHelpers";
 export { SubmitEventData } from "./components/checkout/zonos-checkout/zonos-address-update-dialog/zonos-address-update-dialog";
 export { CheckboxColorPrefix, Color, ColorPrefix } from "./types/styles/Color";
@@ -61,14 +65,22 @@ export namespace Components {
     interface ZonosAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress": ContactOption[];
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage": string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField": 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage": string;
         /**
@@ -79,6 +91,40 @@ export namespace Components {
           * The type of address element to render
          */
         "type": 'billing' | 'shipping';
+    }
+    interface ZonosAddressCompletionDialog {
+        /**
+          * Whether or not the continue button is loading
+          * @default false
+         */
+        "continueLoading": boolean;
+        /**
+          * Whether or not the dialog is open
+          * @default false
+         */
+        "dialogOpen": boolean;
+        /**
+          * Whether or not the dialog is rendered in mobile mode
+          * @default false
+         */
+        "isMobile": boolean;
+        /**
+          * The Zonos-required fields still missing from the selected address
+          * @default []
+         */
+        "missingFields": MissingShippingField[];
+        /**
+          * The shipping address selected from Stripe, shown read-only for context
+         */
+        "shippingAddress": EnteredInfo;
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosAddressDisplay {
         /**
@@ -107,6 +153,7 @@ export namespace Components {
     interface ZonosAddressSuggestions {
         /**
           * Suggestions to display
+          * @default []
          */
         "suggestions": IframeSuggestionsResponsePayload['suggestions'];
         /**
@@ -121,6 +168,7 @@ export namespace Components {
         "billingAddress": EnteredInfo | null;
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -129,10 +177,12 @@ export namespace Components {
         "dialogLoading": boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "dialogOpen": boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile": boolean;
         /**
@@ -155,6 +205,8 @@ export namespace Components {
           * Translated address fields that GPT has translated
          */
         "translatedShippingAddress": TranslatedAddressObject;
+    }
+    interface ZonosAirwallexPayment {
     }
     interface ZonosBadge {
         /**
@@ -214,6 +266,7 @@ export namespace Components {
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
           * Whether or not the button text color is bold
+          * @default false
          */
         "bold": boolean;
         /**
@@ -241,6 +294,7 @@ export namespace Components {
           * @prop ().
           * @prop decorator is to watch the update of the attribute of the component in the dom. And `disabled` prop is not an only factor to determine the component is disabled. isLoading
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
+          * @default false
          */
         "isDisabled": boolean;
         /**
@@ -250,6 +304,7 @@ export namespace Components {
         "justifyContent": 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
+          * @default false
          */
         "loading": boolean;
         /**
@@ -259,10 +314,12 @@ export namespace Components {
         "noBackground": boolean;
         /**
           * Whether or not the button has a left padding
+          * @default false
          */
         "noPaddingLeft": boolean;
         /**
           * Whether or not the button has a right padding
+          * @default false
          */
         "noPaddingRight": boolean;
         /**
@@ -288,6 +345,7 @@ export namespace Components {
     | 'warning';
         /**
           * Whether or not the button has a box shadow
+          * @default false
          */
         "withBoxShadow": boolean;
     }
@@ -323,6 +381,7 @@ export namespace Components {
         "label"?: HTMLElement;
         /**
           * The spacing to apply between elements in the card
+          * @default '24px'
          */
         "spacing"?: string;
     }
@@ -331,6 +390,7 @@ export namespace Components {
     interface ZonosCartRestrictedItems {
         /**
           * This is to hide the section when the parent collapse on mobile
+          * @default false
          */
         "hide": boolean;
     }
@@ -347,6 +407,7 @@ export namespace Components {
     interface ZonosCheckbox {
         /**
           * background color of the checkbox
+          * @default 'blue'
          */
         "backgroundColor": | CheckboxColorPrefix
     | (string & { _placeholder?: never });
@@ -357,14 +418,17 @@ export namespace Components {
         "borderStyle"?: ElementsUiStyle;
         /**
           * Font size of the checkbox text
+          * @default 'base'
          */
         "fontSize": Size;
         /**
           * Whether or not the checkbox is checked
+          * @default false
          */
         "isChecked": boolean;
         /**
           * Whether or not the checkbox is disabled
+          * @default false
          */
         "isDisabled": boolean;
         /**
@@ -373,6 +437,7 @@ export namespace Components {
         "label"?: string;
         /**
           * Size of the checkbox
+          * @default 12
          */
         "size": 12 | 16 | 24;
     }
@@ -387,15 +452,18 @@ export namespace Components {
         "closeDialogHandler": (props?: { confirmed: boolean; }) => Promise<void>;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress": | StripeStoreContactOption[]
     | StripeStoreContactOption;
         /**
           * Force dialog to be open
+          * @default false
          */
         "forceDialogOpen": boolean;
         /**
           * Hidden mode to hide the checkout modal in preview mode
+          * @default false
          */
         "hiddenMode": boolean;
         /**
@@ -404,6 +472,7 @@ export namespace Components {
         "init": () => Promise<void>;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
@@ -416,6 +485,7 @@ export namespace Components {
         "overrideStagingMode"?: boolean;
         /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
+          * @default false
          */
         "preview": boolean;
         /**
@@ -430,6 +500,7 @@ export namespace Components {
     interface ZonosCheckoutFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius": ElementsUiStyle;
         /**
@@ -452,16 +523,19 @@ export namespace Components {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile": boolean;
     }
     interface ZonosCheckoutPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
           * Whether or not the checkout is in mobile mode
+          * @default false
          */
         "isMobile": boolean;
         /**
@@ -480,6 +554,7 @@ export namespace Components {
     interface ZonosCheckoutProgressTabs {
         /**
           * Background color of the parent that's wrapped around the tab progress bar
+          * @default null
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never }) | null;
         /**
@@ -492,26 +567,31 @@ export namespace Components {
         "setTabSelected": (tabValue: TabItem["value"]) => Promise<void>;
         /**
           * Color of the tab progress bar and label, override the secondary color of the appearance settings
+          * @default null
          */
         "tabColor"?: string | null;
     }
     interface ZonosCollapse {
         /**
           * Collapsed size when collapsed
+          * @default 0
          */
         "collapseSize": number;
         /**
           * Collapsed state of the element
+          * @default false
          */
         "collapsed": boolean;
     }
     interface ZonosCollect {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
@@ -520,10 +600,12 @@ export namespace Components {
     interface ZonosCollectFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius": ElementsUiStyle;
         /**
           * The confirmation id for the collect order
+          * @default null
          */
         "confirmationId": string | null;
         /**
@@ -546,10 +628,12 @@ export namespace Components {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile": boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet": boolean;
     }
@@ -560,16 +644,19 @@ export namespace Components {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId": string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile": boolean;
     }
     interface ZonosCollectPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -588,14 +675,17 @@ export namespace Components {
     interface ZonosCollectReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed": boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
@@ -604,14 +694,17 @@ export namespace Components {
     interface ZonosComponent {
         /**
           * The first name
+          * @default ''
          */
         "first": string;
         /**
           * The last name
+          * @default ''
          */
         "last": string;
         /**
           * The middle name
+          * @default ''
          */
         "middle": string;
     }
@@ -655,6 +748,7 @@ export namespace Components {
         "dialogWidth": number;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile": boolean;
         /**
@@ -742,14 +836,22 @@ export namespace Components {
     interface ZonosCustomAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress": ContactOption[];
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage": string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField": 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage": string;
         /**
@@ -764,28 +866,34 @@ export namespace Components {
     interface ZonosCustomMessage {
         /**
           * The custom message icon
+          * @default ''
          */
         "icon": string;
         /**
           * The custom message text
+          * @default ''
          */
         "message": string;
     }
     interface ZonosCustomerInfo {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress": StripeStoreContactOption[];
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile": boolean;
         /**
           * Whether to override custom address form to be always visible
+          * @default false
          */
         "shouldUseCustomAddressFormOverride": boolean;
         /**
@@ -805,6 +913,7 @@ export namespace Components {
         "borderStyle"?: ElementsUiStyle;
         /**
           * The header text for the dialog
+          * @default ''
          */
         "headerText": string;
         /**
@@ -813,6 +922,7 @@ export namespace Components {
         "height"?: string;
         /**
           * Load loading spinner for the dialog or not
+          * @default true
          */
         "isLoading": boolean;
         /**
@@ -829,6 +939,7 @@ export namespace Components {
         "minHeight"?: string;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
@@ -874,6 +985,7 @@ export namespace Components {
         "emptyStateText": string;
         /**
           * Theme color of the icon
+          * @default 'LIGHT'
          */
         "theme": ElementsUiTheme;
     }
@@ -905,7 +1017,7 @@ export namespace Components {
          */
         "convertAndFormat": (value: number) => Promise<string>;
         /**
-          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocation` and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
+          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocationOverride` (HelloPlacement) and `helloSettings.desktopLocation`, and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
          */
         "desktopLocationOverride"?: HelloDesktopLocation;
         /**
@@ -923,8 +1035,7 @@ export namespace Components {
          */
         "getCountryList": () => Promise<ICountryJson | null>;
         /**
-          * Force mobile styling instead of media query and use the passed location value
-          * @default false
+          * Override the configured mobile floating location (enum). Takes precedence over `helloSettings.mobileLocationOverride` (HelloPlacement) and `helloSettings.mobileLocation`.
          */
         "mobileLocationOverride"?: HelloMobileLocation;
         /**
@@ -945,6 +1056,7 @@ export namespace Components {
         "appearanceSettings"?: Partial<AppearanceConfig>;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isOpen": boolean;
         /**
@@ -1008,48 +1120,58 @@ export namespace Components {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder": string;
         /**
           * Input size
+          * @default 'md'
          */
         "inputSize": 'sm' | 'md' | 'lg' | 'xl';
         /**
           * Value of the input
+          * @default ''
          */
         "inputValue": string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled": boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError": boolean;
     }
     interface ZonosInvoice {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
     interface ZonosInvoiceCartItems {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile": boolean;
     }
     interface ZonosInvoiceFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius": ElementsUiStyle;
         /**
           * The confirmation id for the invoice order
+          * @default null
          */
         "confirmationId": string | null;
         /**
@@ -1072,10 +1194,12 @@ export namespace Components {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile": boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet": boolean;
     }
@@ -1086,16 +1210,19 @@ export namespace Components {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId": string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile": boolean;
     }
     interface ZonosInvoicePayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -1114,20 +1241,24 @@ export namespace Components {
     interface ZonosInvoiceReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed": boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile": boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet": boolean;
     }
     interface ZonosInvoiceSubtotal {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile": boolean;
     }
@@ -1141,6 +1272,7 @@ export namespace Components {
     interface ZonosLink {
         /**
           * The href for the link
+          * @default ''
          */
         "href": string;
         /**
@@ -1159,10 +1291,12 @@ export namespace Components {
     interface ZonosLinkAuthentication {
         /**
           * Default email for stripe
+          * @default null
          */
         "defaultEmail": string | null;
         /**
           * Email error text to dispaly
+          * @default false
          */
         "isEmailError": boolean;
         /**
@@ -1178,6 +1312,7 @@ export namespace Components {
         "open": boolean;
         /**
           * Spinner size (optional, default 40)
+          * @default 40
          */
         "size": number;
         /**
@@ -1194,10 +1329,12 @@ export namespace Components {
     interface ZonosLogo {
         /**
           * Theme to change the color of the logo
+          * @default 'LIGHT'
          */
         "theme": ElementsUiTheme;
         /**
           * The width of the logo
+          * @default 'auto'
          */
         "width": string;
     }
@@ -1214,6 +1351,8 @@ export namespace Components {
         "titleText"?: string;
     }
     interface ZonosPaypalPayment {
+    }
+    interface ZonosPolicyConsent {
     }
     interface ZonosRestState {
         /**
@@ -1232,10 +1371,12 @@ export namespace Components {
     interface ZonosReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed": boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile": boolean;
     }
@@ -1247,12 +1388,14 @@ export namespace Components {
         "handleOnClose": () => void;
         /**
           * The label for the select dialog
+          * @default ''
          */
         "label": string;
     }
     interface ZonosShipping {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading": boolean;
         /**
@@ -1325,6 +1468,7 @@ export namespace Components {
     interface ZonosStoreCredit {
         /**
           * Whether the component is enabled
+          * @default true
          */
         "enabled": boolean;
     }
@@ -1338,6 +1482,7 @@ export namespace Components {
         "autoComplete"?: string;
         /**
           * Error message of the input
+          * @default ''
          */
         "error"?: string;
         /**
@@ -1346,18 +1491,22 @@ export namespace Components {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder": string;
         /**
           * Value of the stripeInput
+          * @default ''
          */
         "inputValue": string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled": boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError": boolean;
         /**
@@ -1374,28 +1523,34 @@ export namespace Components {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the input is required
+          * @default false
          */
         "required"?: boolean;
         /**
           * The value of the input.
+          * @default ''
          */
         "value": string;
     }
     interface ZonosStripePhoneInput {
         /**
           * The autoComplete attribute for the phone input
+          * @default ''
          */
         "autoComplete": string;
         /**
           * The country code of the phone input
+          * @default null
          */
         "countryCode": CountryCode | null;
         /**
           * Available country options for the select dropdown
+          * @default null
          */
         "countryOptions": GenericZonosSettings['countryFields'] | null;
         /**
           * Whether the input is disabled
+          * @default false
          */
         "disabled": boolean;
         /**
@@ -1426,22 +1581,27 @@ export namespace Components {
     interface ZonosStripeSelect {
         /**
           * The autoComplete attribute for the select.
+          * @default ''
          */
         "autoComplete": string;
         /**
           * Error message of the select
+          * @default ''
          */
         "error": string;
         /**
           * Whether the select can be cleared
+          * @default false
          */
         "isClearable": boolean;
         /**
           * Disables the select
+          * @default false
          */
         "isDisabled": boolean;
         /**
           * Error state of the select
+          * @default false
          */
         "isError": boolean;
         /**
@@ -1454,6 +1614,7 @@ export namespace Components {
         "name"?: string;
         /**
           * Options for the select. Must be set using a query selector.
+          * @default []
          */
         "options": SelectOption[];
         /**
@@ -1466,6 +1627,7 @@ export namespace Components {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the select is required
+          * @default false
          */
         "required"?: boolean;
         /**
@@ -1474,14 +1636,17 @@ export namespace Components {
         "selectLabel": string;
         /**
           * Placeholder for the select
+          * @default ''
          */
         "selectPlaceholder": string;
         /**
           * Selected value of the select
+          * @default ''
          */
         "selectedValue": string;
         /**
           * The value of the select.
+          * @default ''
          */
         "value": string;
     }
@@ -1492,10 +1657,12 @@ export namespace Components {
         "size"?: Size;
         /**
           * The icon element to display
+          * @default 'gray-1000'
          */
         "textColor": Color | (string & { _placeholder?: never });
         /**
           * Type of the text to display
+          * @default 'body'
          */
         "type": Type;
         /**
@@ -1506,6 +1673,7 @@ export namespace Components {
     interface ZonosToggle {
         /**
           * Options for the toggle
+          * @default []
          */
         "options": ToggleItem<string>[];
         /**
@@ -1516,10 +1684,12 @@ export namespace Components {
     interface ZonosTooltip {
         /**
           * The title of the tooltip
+          * @default ''
          */
         "label": string;
         /**
           * The subtitle of the tooltip
+          * @default ''
          */
         "subtitle": string;
     }
@@ -1564,6 +1734,10 @@ export interface ZonosAddressCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressElement;
 }
+export interface ZonosAddressCompletionDialogCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosAddressCompletionDialogElement;
+}
 export interface ZonosAddressFormCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressFormElement;
@@ -1575,6 +1749,10 @@ export interface ZonosAddressSuggestionsCustomEvent<T> extends CustomEvent<T> {
 export interface ZonosAddressUpdateDialogCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLZonosAddressUpdateDialogElement;
+}
+export interface ZonosAirwallexPaymentCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLZonosAirwallexPaymentElement;
 }
 export interface ZonosCheckboxCustomEvent<T> extends CustomEvent<T> {
     detail: T;
@@ -1691,6 +1869,24 @@ declare global {
         prototype: HTMLZonosAddressElement;
         new (): HTMLZonosAddressElement;
     };
+    interface HTMLZonosAddressCompletionDialogElementEventMap {
+        "closeCompletionDialog": void;
+        "completionSubmit": AddressCompletionSubmit;
+    }
+    interface HTMLZonosAddressCompletionDialogElement extends Components.ZonosAddressCompletionDialog, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosAddressCompletionDialogElementEventMap>(type: K, listener: (this: HTMLZonosAddressCompletionDialogElement, ev: ZonosAddressCompletionDialogCustomEvent<HTMLZonosAddressCompletionDialogElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosAddressCompletionDialogElementEventMap>(type: K, listener: (this: HTMLZonosAddressCompletionDialogElement, ev: ZonosAddressCompletionDialogCustomEvent<HTMLZonosAddressCompletionDialogElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosAddressCompletionDialogElement: {
+        prototype: HTMLZonosAddressCompletionDialogElement;
+        new (): HTMLZonosAddressCompletionDialogElement;
+    };
     interface HTMLZonosAddressDisplayElement extends Components.ZonosAddressDisplay, HTMLStencilElement {
     }
     var HTMLZonosAddressDisplayElement: {
@@ -1748,6 +1944,24 @@ declare global {
     var HTMLZonosAddressUpdateDialogElement: {
         prototype: HTMLZonosAddressUpdateDialogElement;
         new (): HTMLZonosAddressUpdateDialogElement;
+    };
+    interface HTMLZonosAirwallexPaymentElementEventMap {
+        "airwallexPaymentSuccess": void;
+        "airwallexPaymentError": void;
+    }
+    interface HTMLZonosAirwallexPaymentElement extends Components.ZonosAirwallexPayment, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLZonosAirwallexPaymentElementEventMap>(type: K, listener: (this: HTMLZonosAirwallexPaymentElement, ev: ZonosAirwallexPaymentCustomEvent<HTMLZonosAirwallexPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLZonosAirwallexPaymentElementEventMap>(type: K, listener: (this: HTMLZonosAirwallexPaymentElement, ev: ZonosAirwallexPaymentCustomEvent<HTMLZonosAirwallexPaymentElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLZonosAirwallexPaymentElement: {
+        prototype: HTMLZonosAirwallexPaymentElement;
+        new (): HTMLZonosAirwallexPaymentElement;
     };
     interface HTMLZonosBadgeElement extends Components.ZonosBadge, HTMLStencilElement {
     }
@@ -1924,6 +2138,7 @@ declare global {
         "continueClicked": void;
         "paypalSessionFailed": void;
         "paypalSessionDone": string;
+        "airwallexPaymentDone": void;
     }
     interface HTMLZonosCollectPaymentElement extends Components.ZonosCollectPayment, HTMLStencilElement {
         addEventListener<K extends keyof HTMLZonosCollectPaymentElementEventMap>(type: K, listener: (this: HTMLZonosCollectPaymentElement, ev: ZonosCollectPaymentCustomEvent<HTMLZonosCollectPaymentElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
@@ -2300,6 +2515,12 @@ declare global {
         prototype: HTMLZonosPaypalPaymentElement;
         new (): HTMLZonosPaypalPaymentElement;
     };
+    interface HTMLZonosPolicyConsentElement extends Components.ZonosPolicyConsent, HTMLStencilElement {
+    }
+    var HTMLZonosPolicyConsentElement: {
+        prototype: HTMLZonosPolicyConsentElement;
+        new (): HTMLZonosPolicyConsentElement;
+    };
     interface HTMLZonosRestStateElement extends Components.ZonosRestState, HTMLStencilElement {
     }
     var HTMLZonosRestStateElement: {
@@ -2479,10 +2700,12 @@ declare global {
     };
     interface HTMLElementTagNameMap {
         "zonos-address": HTMLZonosAddressElement;
+        "zonos-address-completion-dialog": HTMLZonosAddressCompletionDialogElement;
         "zonos-address-display": HTMLZonosAddressDisplayElement;
         "zonos-address-form": HTMLZonosAddressFormElement;
         "zonos-address-suggestions": HTMLZonosAddressSuggestionsElement;
         "zonos-address-update-dialog": HTMLZonosAddressUpdateDialogElement;
+        "zonos-airwallex-payment": HTMLZonosAirwallexPaymentElement;
         "zonos-badge": HTMLZonosBadgeElement;
         "zonos-banner": HTMLZonosBannerElement;
         "zonos-button": HTMLZonosButtonElement;
@@ -2538,6 +2761,7 @@ declare global {
         "zonos-notification": HTMLZonosNotificationElement;
         "zonos-payment": HTMLZonosPaymentElement;
         "zonos-paypal-payment": HTMLZonosPaypalPaymentElement;
+        "zonos-policy-consent": HTMLZonosPolicyConsentElement;
         "zonos-rest-state": HTMLZonosRestStateElement;
         "zonos-review": HTMLZonosReviewElement;
         "zonos-select-dialog-header": HTMLZonosSelectDialogHeaderElement;
@@ -2557,9 +2781,12 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    type OneOf<K extends string, PropT, AttrT = PropT> = { [P in K]: PropT } & { [P in `attr:${K}`]?: never } | { [P in `attr:${K}`]: AttrT } & { [P in K]?: never };
+
     interface ZonosAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress"?: ContactOption[];
         /**
@@ -2572,10 +2799,17 @@ declare namespace LocalJSX {
         "onTaxIdChanged"?: (event: ZonosAddressCustomEvent<string>) => void;
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage"?: string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField"?: 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage"?: string;
         /**
@@ -2586,6 +2820,48 @@ declare namespace LocalJSX {
           * The type of address element to render
          */
         "type": 'billing' | 'shipping';
+    }
+    interface ZonosAddressCompletionDialog {
+        /**
+          * Whether or not the continue button is loading
+          * @default false
+         */
+        "continueLoading"?: boolean;
+        /**
+          * Whether or not the dialog is open
+          * @default false
+         */
+        "dialogOpen"?: boolean;
+        /**
+          * Whether or not the dialog is rendered in mobile mode
+          * @default false
+         */
+        "isMobile"?: boolean;
+        /**
+          * The Zonos-required fields still missing from the selected address
+          * @default []
+         */
+        "missingFields"?: MissingShippingField[];
+        /**
+          * Close dialog button click
+         */
+        "onCloseCompletionDialog"?: (event: ZonosAddressCompletionDialogCustomEvent<void>) => void;
+        /**
+          * Emitted with the captured values when the customer completes the missing fields
+         */
+        "onCompletionSubmit"?: (event: ZonosAddressCompletionDialogCustomEvent<AddressCompletionSubmit>) => void;
+        /**
+          * The shipping address selected from Stripe, shown read-only for context
+         */
+        "shippingAddress": EnteredInfo;
+        /**
+          * Button color of the submit button
+         */
+        "submitBtnColor"?: string;
+        /**
+          * Button type of the submit button
+         */
+        "submitBtnType"?: HTMLZonosButtonElement['variant'];
     }
     interface ZonosAddressDisplay {
         /**
@@ -2622,6 +2898,7 @@ declare namespace LocalJSX {
         "onSuggestionSelected"?: (event: ZonosAddressSuggestionsCustomEvent<EventPayloadMap['placeSelected']>) => void;
         /**
           * Suggestions to display
+          * @default []
          */
         "suggestions"?: IframeSuggestionsResponsePayload['suggestions'];
         /**
@@ -2636,6 +2913,7 @@ declare namespace LocalJSX {
         "billingAddress": EnteredInfo | null;
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
@@ -2644,10 +2922,12 @@ declare namespace LocalJSX {
         "dialogLoading": boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "dialogOpen"?: boolean;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -2678,6 +2958,16 @@ declare namespace LocalJSX {
           * Translated address fields that GPT has translated
          */
         "translatedShippingAddress": TranslatedAddressObject;
+    }
+    interface ZonosAirwallexPayment {
+        /**
+          * Emitted when the Airwallex payment fails.
+         */
+        "onAirwallexPaymentError"?: (event: ZonosAirwallexPaymentCustomEvent<void>) => void;
+        /**
+          * Emitted when the Airwallex payment intent is confirmed successfully.
+         */
+        "onAirwallexPaymentSuccess"?: (event: ZonosAirwallexPaymentCustomEvent<void>) => void;
     }
     interface ZonosBadge {
         /**
@@ -2737,6 +3027,7 @@ declare namespace LocalJSX {
         "backgroundColor"?: Color | (string & { _placeholder?: never });
         /**
           * Whether or not the button text color is bold
+          * @default false
          */
         "bold"?: boolean;
         /**
@@ -2764,6 +3055,7 @@ declare namespace LocalJSX {
           * @prop ().
           * @prop decorator is to watch the update of the attribute of the component in the dom. And `disabled` prop is not an only factor to determine the component is disabled. isLoading
           * @prop () also affect that. <Host> is also referred to a component itself, if disabled prop is true, the `zonos-button` will have disabled attribute. So let's say when the loading state is true, and the component consume the zonos-button doesn't pass the disabled prop down. It accidentally turns the disabled prop on even thought the disabled state is not changed from the outside.
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
@@ -2773,6 +3065,7 @@ declare namespace LocalJSX {
         "justifyContent"?: 'center' | 'flex-end' | 'flex-start';
         /**
           * Whether or not the button is loading
+          * @default false
          */
         "loading"?: boolean;
         /**
@@ -2782,10 +3075,12 @@ declare namespace LocalJSX {
         "noBackground"?: boolean;
         /**
           * Whether or not the button has a left padding
+          * @default false
          */
         "noPaddingLeft"?: boolean;
         /**
           * Whether or not the button has a right padding
+          * @default false
          */
         "noPaddingRight"?: boolean;
         /**
@@ -2811,6 +3106,7 @@ declare namespace LocalJSX {
     | 'warning';
         /**
           * Whether or not the button has a box shadow
+          * @default false
          */
         "withBoxShadow"?: boolean;
     }
@@ -2846,6 +3142,7 @@ declare namespace LocalJSX {
         "label"?: HTMLElement;
         /**
           * The spacing to apply between elements in the card
+          * @default '24px'
          */
         "spacing"?: string;
     }
@@ -2854,6 +3151,7 @@ declare namespace LocalJSX {
     interface ZonosCartRestrictedItems {
         /**
           * This is to hide the section when the parent collapse on mobile
+          * @default false
          */
         "hide"?: boolean;
     }
@@ -2870,6 +3168,7 @@ declare namespace LocalJSX {
     interface ZonosCheckbox {
         /**
           * background color of the checkbox
+          * @default 'blue'
          */
         "backgroundColor"?: | CheckboxColorPrefix
     | (string & { _placeholder?: never });
@@ -2880,14 +3179,17 @@ declare namespace LocalJSX {
         "borderStyle"?: ElementsUiStyle;
         /**
           * Font size of the checkbox text
+          * @default 'base'
          */
         "fontSize"?: Size;
         /**
           * Whether or not the checkbox is checked
+          * @default false
          */
         "isChecked"?: boolean;
         /**
           * Whether or not the checkbox is disabled
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
@@ -2900,6 +3202,7 @@ declare namespace LocalJSX {
         "onCheckboxSelected"?: (event: ZonosCheckboxCustomEvent<boolean>) => void;
         /**
           * Size of the checkbox
+          * @default 12
          */
         "size"?: 12 | 16 | 24;
     }
@@ -2910,19 +3213,23 @@ declare namespace LocalJSX {
         "appearanceSettingsOverride"?: Partial<AppearanceConfig>;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress"?: | StripeStoreContactOption[]
     | StripeStoreContactOption;
         /**
           * Force dialog to be open
+          * @default false
          */
         "forceDialogOpen"?: boolean;
         /**
           * Hidden mode to hide the checkout modal in preview mode
+          * @default false
          */
         "hiddenMode"?: boolean;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
@@ -2931,12 +3238,14 @@ declare namespace LocalJSX {
         "overrideStagingMode"?: boolean;
         /**
           * Preview checkout without needing to click on the button. This would be useful for demo purpose
+          * @default false
          */
         "preview"?: boolean;
     }
     interface ZonosCheckoutFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius"?: ElementsUiStyle;
         /**
@@ -2963,16 +3272,19 @@ declare namespace LocalJSX {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile"?: boolean;
     }
     interface ZonosCheckoutPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
           * Whether or not the checkout is in mobile mode
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -3003,30 +3315,36 @@ declare namespace LocalJSX {
     interface ZonosCheckoutProgressTabs {
         /**
           * Background color of the parent that's wrapped around the tab progress bar
+          * @default null
          */
         "backgroundColor"?: Color | (string & { _placeholder?: never }) | null;
         /**
           * Color of the tab progress bar and label, override the secondary color of the appearance settings
+          * @default null
          */
         "tabColor"?: string | null;
     }
     interface ZonosCollapse {
         /**
           * Collapsed size when collapsed
+          * @default 0
          */
         "collapseSize"?: number;
         /**
           * Collapsed state of the element
+          * @default false
          */
         "collapsed"?: boolean;
     }
     interface ZonosCollect {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -3035,10 +3353,12 @@ declare namespace LocalJSX {
     interface ZonosCollectFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius"?: ElementsUiStyle;
         /**
           * The confirmation id for the collect order
+          * @default null
          */
         "confirmationId"?: string | null;
         /**
@@ -3065,10 +3385,12 @@ declare namespace LocalJSX {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -3079,10 +3401,12 @@ declare namespace LocalJSX {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId"?: string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile"?: boolean;
         /**
@@ -3093,8 +3417,13 @@ declare namespace LocalJSX {
     interface ZonosCollectPayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
+        /**
+          * Event to emit when the Airwallex payment is completed successfully
+         */
+        "onAirwallexPaymentDone"?: (event: ZonosCollectPaymentCustomEvent<void>) => void;
         /**
           * Event to emit when the continue button is clicked
          */
@@ -3123,14 +3452,17 @@ declare namespace LocalJSX {
     interface ZonosCollectReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed"?: boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -3139,14 +3471,17 @@ declare namespace LocalJSX {
     interface ZonosComponent {
         /**
           * The first name
+          * @default ''
          */
         "first"?: string;
         /**
           * The last name
+          * @default ''
          */
         "last"?: string;
         /**
           * The middle name
+          * @default ''
          */
         "middle"?: string;
     }
@@ -3190,6 +3525,7 @@ declare namespace LocalJSX {
         "dialogWidth"?: number;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -3252,6 +3588,7 @@ declare namespace LocalJSX {
     interface ZonosCustomAddress {
         /**
           * Default address for stripe
+          * @default []
          */
         "defaultAddress"?: ContactOption[];
         /**
@@ -3268,10 +3605,17 @@ declare namespace LocalJSX {
         "onInvalidCharacters"?: (event: ZonosCustomAddressCustomEvent<boolean>) => void;
         /**
           * Error message for short address code input
+          * @default ''
          */
         "shortAddressCodeErrorMessage"?: string;
         /**
+          * Which tax id control the error belongs on. Empty when there is no error.
+          * @default ''
+         */
+        "taxIdErrorField"?: 'type' | 'value' | '';
+        /**
           * Error message for tax id input
+          * @default ''
          */
         "taxIdErrorMessage"?: string;
         /**
@@ -3286,24 +3630,29 @@ declare namespace LocalJSX {
     interface ZonosCustomMessage {
         /**
           * The custom message icon
+          * @default ''
          */
         "icon"?: string;
         /**
           * The custom message text
+          * @default ''
          */
         "message"?: string;
     }
     interface ZonosCustomerInfo {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
           * Default address to use for the checkout (preview mode)
+          * @default []
          */
         "defaultAddress"?: StripeStoreContactOption[];
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isMobile"?: boolean;
         /**
@@ -3324,6 +3673,7 @@ declare namespace LocalJSX {
   }>) => void;
         /**
           * Whether to override custom address form to be always visible
+          * @default false
          */
         "shouldUseCustomAddressFormOverride"?: boolean;
         /**
@@ -3343,6 +3693,7 @@ declare namespace LocalJSX {
         "borderStyle"?: ElementsUiStyle;
         /**
           * The header text for the dialog
+          * @default ''
          */
         "headerText"?: string;
         /**
@@ -3351,6 +3702,7 @@ declare namespace LocalJSX {
         "height"?: string;
         /**
           * Load loading spinner for the dialog or not
+          * @default true
          */
         "isLoading"?: boolean;
         /**
@@ -3367,6 +3719,7 @@ declare namespace LocalJSX {
         "minHeight"?: string;
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
@@ -3416,6 +3769,7 @@ declare namespace LocalJSX {
         "emptyStateText": string;
         /**
           * Theme color of the icon
+          * @default 'LIGHT'
          */
         "theme"?: ElementsUiTheme;
     }
@@ -3437,12 +3791,11 @@ declare namespace LocalJSX {
          */
         "appearanceSettingsOverride"?: Partial<AppearanceConfig>;
         /**
-          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocation` and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
+          * Override the configured desktop floating location. Takes precedence over `helloSettings.desktopLocationOverride` (HelloPlacement) and `helloSettings.desktopLocation`, and also drives the peek-message animation direction, so consumers no longer need `animateFromLeftOverride` for desktop positioning.
          */
         "desktopLocationOverride"?: HelloDesktopLocation;
         /**
-          * Force mobile styling instead of media query and use the passed location value
-          * @default false
+          * Override the configured mobile floating location (enum). Takes precedence over `helloSettings.mobileLocationOverride` (HelloPlacement) and `helloSettings.mobileLocation`.
          */
         "mobileLocationOverride"?: HelloMobileLocation;
     }
@@ -3458,6 +3811,7 @@ declare namespace LocalJSX {
         "appearanceSettings"?: Partial<AppearanceConfig>;
         /**
           * Whether or not the dialog is open
+          * @default false
          */
         "isOpen"?: boolean;
         /**
@@ -3525,22 +3879,27 @@ declare namespace LocalJSX {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder"?: string;
         /**
           * Input size
+          * @default 'md'
          */
         "inputSize"?: 'sm' | 'md' | 'lg' | 'xl';
         /**
           * Value of the input
+          * @default ''
          */
         "inputValue"?: string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError"?: boolean;
         /**
@@ -3551,26 +3910,31 @@ declare namespace LocalJSX {
     interface ZonosInvoice {
         /**
           * Flag to determine if the checkout is on mobile
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
     interface ZonosInvoiceCartItems {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile"?: boolean;
     }
     interface ZonosInvoiceFinish {
         /**
           * The border radius style of the dialog
+          * @default 'ROUNDED'
          */
         "borderRadius"?: ElementsUiStyle;
         /**
           * The confirmation id for the invoice order
+          * @default null
          */
         "confirmationId"?: string | null;
         /**
@@ -3597,10 +3961,12 @@ declare namespace LocalJSX {
         "dataTheme"?: ElementsUiTheme;
         /**
           * Override mobile mode
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Override tablet mode
+          * @default false
          */
         "tablet"?: boolean;
     }
@@ -3611,10 +3977,12 @@ declare namespace LocalJSX {
         "collapsed": boolean;
         /**
           * The landed cost id that is used to fetch the shipping address
+          * @default ''
          */
         "landedCostId"?: string;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default true
          */
         "mobile"?: boolean;
         /**
@@ -3625,6 +3993,7 @@ declare namespace LocalJSX {
     interface ZonosInvoicePayment {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
@@ -3655,20 +4024,24 @@ declare namespace LocalJSX {
     interface ZonosInvoiceReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed"?: boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile"?: boolean;
         /**
           * Whether or not the component is being rendered with tablet styles
+          * @default false
          */
         "tablet"?: boolean;
     }
     interface ZonosInvoiceSubtotal {
         /**
           * Whether the component is mobile
+          * @default false
          */
         "isMobile"?: boolean;
     }
@@ -3682,6 +4055,7 @@ declare namespace LocalJSX {
     interface ZonosLink {
         /**
           * The href for the link
+          * @default ''
          */
         "href"?: string;
         /**
@@ -3700,10 +4074,12 @@ declare namespace LocalJSX {
     interface ZonosLinkAuthentication {
         /**
           * Default email for stripe
+          * @default null
          */
         "defaultEmail"?: string | null;
         /**
           * Email error text to dispaly
+          * @default false
          */
         "isEmailError"?: boolean;
         /**
@@ -3723,6 +4099,7 @@ declare namespace LocalJSX {
         "open"?: boolean;
         /**
           * Spinner size (optional, default 40)
+          * @default 40
          */
         "size"?: number;
         /**
@@ -3739,10 +4116,12 @@ declare namespace LocalJSX {
     interface ZonosLogo {
         /**
           * Theme to change the color of the logo
+          * @default 'LIGHT'
          */
         "theme"?: ElementsUiTheme;
         /**
           * The width of the logo
+          * @default 'auto'
          */
         "width"?: string;
     }
@@ -3764,6 +4143,8 @@ declare namespace LocalJSX {
          */
         "onPaypalSessionFail"?: (event: ZonosPaypalPaymentCustomEvent<void>) => void;
     }
+    interface ZonosPolicyConsent {
+    }
     interface ZonosRestState {
         /**
           * The subtitle of the rest state
@@ -3781,10 +4162,12 @@ declare namespace LocalJSX {
     interface ZonosReview {
         /**
           * Whether or not to show the collapse icon This is controled from the collapsed state of the zonos-collapse component to show the collapse icon
+          * @default false
          */
         "collapsed"?: boolean;
         /**
           * Whether or not the component is being rendered with mobile styles
+          * @default false
          */
         "mobile"?: boolean;
     }
@@ -3796,12 +4179,14 @@ declare namespace LocalJSX {
         "handleOnClose"?: () => void;
         /**
           * The label for the select dialog
+          * @default ''
          */
         "label"?: string;
     }
     interface ZonosShipping {
         /**
           * Whether or not the continue button is loading
+          * @default false
          */
         "continueLoading"?: boolean;
         /**
@@ -3882,6 +4267,7 @@ declare namespace LocalJSX {
     interface ZonosStoreCredit {
         /**
           * Whether the component is enabled
+          * @default true
          */
         "enabled"?: boolean;
     }
@@ -3895,6 +4281,7 @@ declare namespace LocalJSX {
         "autoComplete"?: string;
         /**
           * Error message of the input
+          * @default ''
          */
         "error"?: string;
         /**
@@ -3903,18 +4290,22 @@ declare namespace LocalJSX {
         "inputLabel": string;
         /**
           * Placeholder for the input
+          * @default ''
          */
         "inputPlaceholder"?: string;
         /**
           * Value of the stripeInput
+          * @default ''
          */
         "inputValue"?: string;
         /**
           * Disables the input
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
           * Error state of the input
+          * @default false
          */
         "isError"?: boolean;
         /**
@@ -3935,28 +4326,34 @@ declare namespace LocalJSX {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the input is required
+          * @default false
          */
         "required"?: boolean;
         /**
           * The value of the input.
+          * @default ''
          */
         "value"?: string;
     }
     interface ZonosStripePhoneInput {
         /**
           * The autoComplete attribute for the phone input
+          * @default ''
          */
         "autoComplete"?: string;
         /**
           * The country code of the phone input
+          * @default null
          */
         "countryCode"?: CountryCode | null;
         /**
           * Available country options for the select dropdown
+          * @default null
          */
         "countryOptions"?: GenericZonosSettings['countryFields'] | null;
         /**
           * Whether the input is disabled
+          * @default false
          */
         "disabled"?: boolean;
         /**
@@ -3997,22 +4394,27 @@ declare namespace LocalJSX {
     interface ZonosStripeSelect {
         /**
           * The autoComplete attribute for the select.
+          * @default ''
          */
         "autoComplete"?: string;
         /**
           * Error message of the select
+          * @default ''
          */
         "error"?: string;
         /**
           * Whether the select can be cleared
+          * @default false
          */
         "isClearable"?: boolean;
         /**
           * Disables the select
+          * @default false
          */
         "isDisabled"?: boolean;
         /**
           * Error state of the select
+          * @default false
          */
         "isError"?: boolean;
         /**
@@ -4029,6 +4431,7 @@ declare namespace LocalJSX {
         "onSelectChange"?: (event: ZonosStripeSelectCustomEvent<string>) => void;
         /**
           * Options for the select. Must be set using a query selector.
+          * @default []
          */
         "options"?: SelectOption[];
         /**
@@ -4041,6 +4444,7 @@ declare namespace LocalJSX {
         "overrideSecondaryColor"?: string;
         /**
           * Whether the select is required
+          * @default false
          */
         "required"?: boolean;
         /**
@@ -4049,14 +4453,17 @@ declare namespace LocalJSX {
         "selectLabel": string;
         /**
           * Placeholder for the select
+          * @default ''
          */
         "selectPlaceholder"?: string;
         /**
           * Selected value of the select
+          * @default ''
          */
         "selectedValue"?: string;
         /**
           * The value of the select.
+          * @default ''
          */
         "value"?: string;
     }
@@ -4067,10 +4474,12 @@ declare namespace LocalJSX {
         "size"?: Size;
         /**
           * The icon element to display
+          * @default 'gray-1000'
          */
         "textColor"?: Color | (string & { _placeholder?: never });
         /**
           * Type of the text to display
+          * @default 'body'
          */
         "type"?: Type;
         /**
@@ -4085,6 +4494,7 @@ declare namespace LocalJSX {
         "onToggleChanged"?: (event: ZonosToggleCustomEvent<string>) => void;
         /**
           * Options for the toggle
+          * @default []
          */
         "options"?: ToggleItem<string>[];
         /**
@@ -4095,10 +4505,12 @@ declare namespace LocalJSX {
     interface ZonosTooltip {
         /**
           * The title of the tooltip
+          * @default ''
          */
         "label"?: string;
         /**
           * The subtitle of the tooltip
+          * @default ''
          */
         "subtitle"?: string;
     }
@@ -4138,174 +4550,584 @@ declare namespace LocalJSX {
          */
         "renderItem": VirtualScrollRenderItem;
     }
+
+    interface ZonosAddressAttributes {
+        "type": 'billing' | 'shipping';
+        "titleText": string;
+        "taxIdErrorField": 'type' | 'value' | '';
+        "taxIdErrorMessage": string;
+        "shortAddressCodeErrorMessage": string;
+    }
+    interface ZonosAddressCompletionDialogAttributes {
+        "continueLoading": boolean;
+        "dialogOpen": boolean;
+        "isMobile": boolean;
+        "submitBtnColor": string;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+    }
+    interface ZonosAddressDisplayAttributes {
+        "addressType": 'shipping' | 'billing';
+    }
+    interface ZonosAddressFormAttributes {
+        "addressType": 'shipping' | 'billing';
+    }
+    interface ZonosAddressSuggestionsAttributes {
+        "type": 'billing' | 'shipping';
+    }
+    interface ZonosAddressUpdateDialogAttributes {
+        "continueLoading": boolean;
+        "dialogLoading": boolean;
+        "dialogOpen": boolean;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "submitBtnColor": string;
+        "isMobile": boolean;
+    }
+    interface ZonosBadgeAttributes {
+        "bold": boolean;
+        "badgeColor": ColorPrefix | 'transparent';
+        "iconRight": boolean;
+        "size": 'small' | 'default';
+        "rounded": boolean;
+        "loading": boolean;
+    }
+    interface ZonosBannerAttributes {
+        "bannerTitle": string;
+        "intent": BannerIntent;
+    }
+    interface ZonosButtonAttributes {
+        "buttonColor": Color | (string & { _placeholder?: never });
+        "backgroundColor": Color | (string & { _placeholder?: never });
+        "borderStyle": ElementsUiStyle;
+        "isDisabled": boolean;
+        "iconRight": boolean;
+        "size": 'sm' | 'md' | 'lg';
+        "variant": | 'primary'
+    | 'success'
+    | 'subtle'
+    | 'outline'
+    | 'standard'
+    | 'danger'
+    | 'warning';
+        "noBackground": boolean;
+        "withBoxShadow": boolean;
+        "noPaddingLeft": boolean;
+        "noPaddingRight": boolean;
+        "loading": boolean;
+        "justifyContent": 'center' | 'flex-end' | 'flex-start';
+        "bold": boolean;
+        "theme": ElementsUiTheme;
+    }
+    interface ZonosCardAttributes {
+        "backgroundColor": Color;
+        "borderRadius": number;
+        "footerHeight": number;
+        "spacing": string;
+    }
+    interface ZonosCartRestrictedItemsAttributes {
+        "hide": boolean;
+    }
+    interface ZonosCartSubtotalAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "submitBtnColor": string;
+    }
+    interface ZonosCheckboxAttributes {
+        "backgroundColor": | CheckboxColorPrefix
+    | (string & { _placeholder?: never });
+        "label": string;
+        "isChecked": boolean;
+        "isDisabled": boolean;
+        "size": 12 | 16 | 24;
+        "fontSize": Size;
+        "borderStyle": ElementsUiStyle;
+    }
+    interface ZonosCheckoutAttributes {
+        "preview": boolean;
+        "hiddenMode": boolean;
+        "mobile": boolean;
+        "overrideStagingMode": boolean;
+        "forceDialogOpen": boolean;
+    }
+    interface ZonosCheckoutFinishAttributes {
+        "borderRadius": ElementsUiStyle;
+        "storybookForceStatus": PaymentIntent['status'];
+    }
+    interface ZonosCheckoutFooterAttributes {
+        "mobile": boolean;
+        "dataTheme": ElementsUiTheme;
+    }
+    interface ZonosCheckoutPaymentAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "isMobile": boolean;
+        "overridePrimaryColor": string;
+    }
+    interface ZonosCheckoutProgressTabsAttributes {
+        "tabColor": string | null;
+        "backgroundColor": Color | (string & { _placeholder?: never }) | null;
+    }
+    interface ZonosCollapseAttributes {
+        "collapsed": boolean;
+        "collapseSize": number;
+    }
+    interface ZonosCollectAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+    }
+    interface ZonosCollectFinishAttributes {
+        "borderRadius": ElementsUiStyle;
+        "storybookForceStatus": PaymentIntent['status'];
+        "confirmationId": string | null;
+    }
+    interface ZonosCollectFooterAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "dataTheme": ElementsUiTheme;
+    }
+    interface ZonosCollectOrderDetailsAttributes {
+        "mobile": boolean;
+        "collapsed": boolean;
+        "landedCostId": string;
+    }
+    interface ZonosCollectPaymentAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "overridePrimaryColor": string;
+    }
+    interface ZonosCollectReviewAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "collapsed": boolean;
+    }
+    interface ZonosComponentAttributes {
+        "first": string;
+        "middle": string;
+        "last": string;
+    }
+    interface ZonosConfirmDialogAttributes {
+        "dialogTitle": string;
+        "dialogIntent": 'info' | 'danger' | 'warn';
+        "dialogSubtitle": string | null;
+        "submitBtnColor": string;
+        "dialogConfirmBtnText": string;
+        "dialogWidth": number;
+        "dialogCancelBtnText": string;
+        "dialogType": 'alert' | 'confirm';
+        "isMobile": boolean;
+        "dialogOpen": boolean;
+        "noClickOutside": boolean;
+    }
+    interface ZonosControllerAttributes {
+        "zonosApiKey": string;
+    }
+    interface ZonosCountryFlagAttributes {
+        "countryCode": CountryCode | null;
+        "size": number;
+    }
+    interface ZonosCustomAddressAttributes {
+        "type": 'billing' | 'shipping';
+        "titleText": string;
+        "taxIdErrorField": 'type' | 'value' | '';
+        "taxIdErrorMessage": string;
+        "shortAddressCodeErrorMessage": string;
+    }
+    interface ZonosCustomMessageAttributes {
+        "icon": string;
+        "message": string;
+    }
+    interface ZonosCustomerInfoAttributes {
+        "continueLoading": boolean;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "submitBtnColor": string;
+        "isMobile": boolean;
+        "shouldUseCustomAddressFormOverride": boolean;
+    }
+    interface ZonosDialogAttributes {
+        "open": boolean;
+        "headerText": string;
+        "width": string;
+        "height": string;
+        "minHeight": string;
+        "noHeader": boolean;
+        "loadingTitle": string;
+        "loadingText": string;
+        "noBodyPadding": boolean;
+        "noBorder": boolean;
+        "borderStyle": ElementsUiStyle;
+        "noCloseButton": boolean;
+        "noClickOutside": boolean;
+        "mobile": boolean;
+        "isLoading": boolean;
+    }
+    interface ZonosEmptyStatePaymentAttributes {
+        "emptyStateText": string;
+        "theme": ElementsUiTheme;
+    }
+    interface ZonosHStackAttributes {
+        "spacing": GridSpacing;
+    }
+    interface ZonosHelloAttributes {
+        "mobileLocationOverride": HelloMobileLocation;
+        "desktopLocationOverride": HelloDesktopLocation;
+        "animateFromLeftOverride": boolean;
+    }
+    interface ZonosHelloDialogAttributes {
+        "isOpen": boolean;
+        "mobileLocationOverride": HelloMobileLocation;
+        "animateFromLeftOverride": boolean;
+    }
+    interface ZonosIconAttributes {
+        "autoHeight": boolean;
+        "iconColor": Color | (string & { _placeholder?: never });
+        "content": string;
+        "size": number;
+    }
+    interface ZonosInputAttributes {
+        "inputValue": string;
+        "inputLabel": string;
+        "inputSize": 'sm' | 'md' | 'lg' | 'xl';
+        "isDisabled": boolean;
+        "isError": boolean;
+        "inputPlaceholder": string;
+    }
+    interface ZonosInvoiceAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+    }
+    interface ZonosInvoiceCartItemsAttributes {
+        "isMobile": boolean;
+    }
+    interface ZonosInvoiceFinishAttributes {
+        "borderRadius": ElementsUiStyle;
+        "storybookForceStatus": PaymentIntent['status'];
+        "confirmationId": string | null;
+    }
+    interface ZonosInvoiceFooterAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "dataTheme": ElementsUiTheme;
+    }
+    interface ZonosInvoiceOrderDetailsAttributes {
+        "mobile": boolean;
+        "collapsed": boolean;
+        "landedCostId": string;
+    }
+    interface ZonosInvoicePaymentAttributes {
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "overridePrimaryColor": string;
+    }
+    interface ZonosInvoiceReviewAttributes {
+        "mobile": boolean;
+        "tablet": boolean;
+        "collapsed": boolean;
+    }
+    interface ZonosInvoiceSubtotalAttributes {
+        "isMobile": boolean;
+    }
+    interface ZonosLinkAttributes {
+        "href": string;
+        "rel": string;
+        "target": string;
+        "linkTitle": string;
+    }
+    interface ZonosLinkAuthenticationAttributes {
+        "titleText": string;
+        "defaultEmail": string | null;
+        "isEmailError": boolean;
+    }
+    interface ZonosLoadingOverlayAttributes {
+        "open": boolean;
+        "spinnerColor": | 'primary'
+    | 'info'
+    | 'success'
+    | 'danger'
+    | 'warning'
+    | 'black'
+    | 'white';
+        "size": number;
+    }
+    interface ZonosLogoAttributes {
+        "theme": ElementsUiTheme;
+        "width": string;
+    }
+    interface ZonosPaymentAttributes {
+        "titleText": string;
+    }
+    interface ZonosRestStateAttributes {
+        "restStateSubtitle": string;
+        "restStateTitle": string;
+        "restStateType": RestStateType;
+    }
+    interface ZonosReviewAttributes {
+        "mobile": boolean;
+        "collapsed": boolean;
+    }
+    interface ZonosSelectDialogHeaderAttributes {
+        "label": string;
+    }
+    interface ZonosShippingAttributes {
+        "continueLoading": boolean;
+        "submitBtnColor": string;
+        "submitBtnType": HTMLZonosButtonElement['variant'];
+        "isMobile": boolean;
+    }
+    interface ZonosShippingRichRadioAttributes {
+        "borderColor": Color | (string & { _placeholder?: never });
+        "borderStyle": ElementsUiStyle;
+        "theme": ElementsUiTheme;
+        "isMobile": boolean;
+    }
+    interface ZonosSkeletonAttributes {
+        "skeletonWidth": string;
+        "skeletonHeight": string;
+    }
+    interface ZonosSpinnerAttributes {
+        "size": number;
+        "spinnerColor": SpinnerColor;
+    }
+    interface ZonosStoreCreditAttributes {
+        "enabled": boolean;
+    }
+    interface ZonosStripeInputAttributes {
+        "name": string;
+        "autoComplete": string;
+        "inputValue": string;
+        "inputLabel": string;
+        "overridePrimaryColor": string;
+        "overrideSecondaryColor": string;
+        "isDisabled": boolean;
+        "isError": boolean;
+        "error": string;
+        "inputPlaceholder": string;
+        "value": string;
+        "required": boolean;
+    }
+    interface ZonosStripePhoneInputAttributes {
+        "autoComplete": string;
+        "disabled": boolean;
+        "error": string;
+        "inputLabel": string;
+        "overridePrimaryColor": string;
+        "overrideSecondaryColor": string;
+        "inputValue": string;
+        "countryCode": CountryCode | null;
+        "minWidth": string;
+    }
+    interface ZonosStripeSelectAttributes {
+        "name": string;
+        "selectedValue": string;
+        "selectLabel": string;
+        "overridePrimaryColor": string;
+        "overrideSecondaryColor": string;
+        "isDisabled": boolean;
+        "isError": boolean;
+        "error": string;
+        "selectPlaceholder": string;
+        "autoComplete": string;
+        "value": string;
+        "required": boolean;
+        "isClearable": boolean;
+        "minWidth": string;
+    }
+    interface ZonosTextAttributes {
+        "textColor": Color | (string & { _placeholder?: never });
+        "size": Size;
+        "type": Type;
+        "weight": FontWeight;
+    }
+    interface ZonosToggleAttributes {
+        "value": string;
+    }
+    interface ZonosTooltipAttributes {
+        "label": string;
+        "subtitle": string;
+    }
+    interface ZonosVStackAttributes {
+        "spacing": GridSpacing;
+    }
+    interface ZonosVirtualScrollAttributes {
+        "itemWidth": number;
+        "fallbackItemHeight": number;
+        "buffer": number;
+    }
+
     interface IntrinsicElements {
-        "zonos-address": ZonosAddress;
-        "zonos-address-display": ZonosAddressDisplay;
-        "zonos-address-form": ZonosAddressForm;
-        "zonos-address-suggestions": ZonosAddressSuggestions;
-        "zonos-address-update-dialog": ZonosAddressUpdateDialog;
-        "zonos-badge": ZonosBadge;
-        "zonos-banner": ZonosBanner;
-        "zonos-button": ZonosButton;
-        "zonos-card": ZonosCard;
+        "zonos-address": Omit<ZonosAddress, keyof ZonosAddressAttributes> & { [K in keyof ZonosAddress & keyof ZonosAddressAttributes]?: ZonosAddress[K] } & { [K in keyof ZonosAddress & keyof ZonosAddressAttributes as `attr:${K}`]?: ZonosAddressAttributes[K] } & { [K in keyof ZonosAddress & keyof ZonosAddressAttributes as `prop:${K}`]?: ZonosAddress[K] } & OneOf<"type", ZonosAddress["type"], ZonosAddressAttributes["type"]> & OneOf<"titleText", ZonosAddress["titleText"], ZonosAddressAttributes["titleText"]>;
+        "zonos-address-completion-dialog": Omit<ZonosAddressCompletionDialog, keyof ZonosAddressCompletionDialogAttributes> & { [K in keyof ZonosAddressCompletionDialog & keyof ZonosAddressCompletionDialogAttributes]?: ZonosAddressCompletionDialog[K] } & { [K in keyof ZonosAddressCompletionDialog & keyof ZonosAddressCompletionDialogAttributes as `attr:${K}`]?: ZonosAddressCompletionDialogAttributes[K] } & { [K in keyof ZonosAddressCompletionDialog & keyof ZonosAddressCompletionDialogAttributes as `prop:${K}`]?: ZonosAddressCompletionDialog[K] };
+        "zonos-address-display": Omit<ZonosAddressDisplay, keyof ZonosAddressDisplayAttributes> & { [K in keyof ZonosAddressDisplay & keyof ZonosAddressDisplayAttributes]?: ZonosAddressDisplay[K] } & { [K in keyof ZonosAddressDisplay & keyof ZonosAddressDisplayAttributes as `attr:${K}`]?: ZonosAddressDisplayAttributes[K] } & { [K in keyof ZonosAddressDisplay & keyof ZonosAddressDisplayAttributes as `prop:${K}`]?: ZonosAddressDisplay[K] } & OneOf<"addressType", ZonosAddressDisplay["addressType"], ZonosAddressDisplayAttributes["addressType"]>;
+        "zonos-address-form": Omit<ZonosAddressForm, keyof ZonosAddressFormAttributes> & { [K in keyof ZonosAddressForm & keyof ZonosAddressFormAttributes]?: ZonosAddressForm[K] } & { [K in keyof ZonosAddressForm & keyof ZonosAddressFormAttributes as `attr:${K}`]?: ZonosAddressFormAttributes[K] } & { [K in keyof ZonosAddressForm & keyof ZonosAddressFormAttributes as `prop:${K}`]?: ZonosAddressForm[K] } & OneOf<"addressType", ZonosAddressForm["addressType"], ZonosAddressFormAttributes["addressType"]>;
+        "zonos-address-suggestions": Omit<ZonosAddressSuggestions, keyof ZonosAddressSuggestionsAttributes> & { [K in keyof ZonosAddressSuggestions & keyof ZonosAddressSuggestionsAttributes]?: ZonosAddressSuggestions[K] } & { [K in keyof ZonosAddressSuggestions & keyof ZonosAddressSuggestionsAttributes as `attr:${K}`]?: ZonosAddressSuggestionsAttributes[K] } & { [K in keyof ZonosAddressSuggestions & keyof ZonosAddressSuggestionsAttributes as `prop:${K}`]?: ZonosAddressSuggestions[K] } & OneOf<"type", ZonosAddressSuggestions["type"], ZonosAddressSuggestionsAttributes["type"]>;
+        "zonos-address-update-dialog": Omit<ZonosAddressUpdateDialog, keyof ZonosAddressUpdateDialogAttributes> & { [K in keyof ZonosAddressUpdateDialog & keyof ZonosAddressUpdateDialogAttributes]?: ZonosAddressUpdateDialog[K] } & { [K in keyof ZonosAddressUpdateDialog & keyof ZonosAddressUpdateDialogAttributes as `attr:${K}`]?: ZonosAddressUpdateDialogAttributes[K] } & { [K in keyof ZonosAddressUpdateDialog & keyof ZonosAddressUpdateDialogAttributes as `prop:${K}`]?: ZonosAddressUpdateDialog[K] } & OneOf<"dialogLoading", ZonosAddressUpdateDialog["dialogLoading"], ZonosAddressUpdateDialogAttributes["dialogLoading"]>;
+        "zonos-airwallex-payment": ZonosAirwallexPayment;
+        "zonos-badge": Omit<ZonosBadge, keyof ZonosBadgeAttributes> & { [K in keyof ZonosBadge & keyof ZonosBadgeAttributes]?: ZonosBadge[K] } & { [K in keyof ZonosBadge & keyof ZonosBadgeAttributes as `attr:${K}`]?: ZonosBadgeAttributes[K] } & { [K in keyof ZonosBadge & keyof ZonosBadgeAttributes as `prop:${K}`]?: ZonosBadge[K] };
+        "zonos-banner": Omit<ZonosBanner, keyof ZonosBannerAttributes> & { [K in keyof ZonosBanner & keyof ZonosBannerAttributes]?: ZonosBanner[K] } & { [K in keyof ZonosBanner & keyof ZonosBannerAttributes as `attr:${K}`]?: ZonosBannerAttributes[K] } & { [K in keyof ZonosBanner & keyof ZonosBannerAttributes as `prop:${K}`]?: ZonosBanner[K] };
+        "zonos-button": Omit<ZonosButton, keyof ZonosButtonAttributes> & { [K in keyof ZonosButton & keyof ZonosButtonAttributes]?: ZonosButton[K] } & { [K in keyof ZonosButton & keyof ZonosButtonAttributes as `attr:${K}`]?: ZonosButtonAttributes[K] } & { [K in keyof ZonosButton & keyof ZonosButtonAttributes as `prop:${K}`]?: ZonosButton[K] };
+        "zonos-card": Omit<ZonosCard, keyof ZonosCardAttributes> & { [K in keyof ZonosCard & keyof ZonosCardAttributes]?: ZonosCard[K] } & { [K in keyof ZonosCard & keyof ZonosCardAttributes as `attr:${K}`]?: ZonosCardAttributes[K] } & { [K in keyof ZonosCard & keyof ZonosCardAttributes as `prop:${K}`]?: ZonosCard[K] };
         "zonos-cart-items": ZonosCartItems;
-        "zonos-cart-restricted-items": ZonosCartRestrictedItems;
-        "zonos-cart-subtotal": ZonosCartSubtotal;
-        "zonos-checkbox": ZonosCheckbox;
-        "zonos-checkout": ZonosCheckout;
-        "zonos-checkout-finish": ZonosCheckoutFinish;
-        "zonos-checkout-footer": ZonosCheckoutFooter;
-        "zonos-checkout-payment": ZonosCheckoutPayment;
-        "zonos-checkout-progress-tabs": ZonosCheckoutProgressTabs;
-        "zonos-collapse": ZonosCollapse;
-        "zonos-collect": ZonosCollect;
+        "zonos-cart-restricted-items": Omit<ZonosCartRestrictedItems, keyof ZonosCartRestrictedItemsAttributes> & { [K in keyof ZonosCartRestrictedItems & keyof ZonosCartRestrictedItemsAttributes]?: ZonosCartRestrictedItems[K] } & { [K in keyof ZonosCartRestrictedItems & keyof ZonosCartRestrictedItemsAttributes as `attr:${K}`]?: ZonosCartRestrictedItemsAttributes[K] } & { [K in keyof ZonosCartRestrictedItems & keyof ZonosCartRestrictedItemsAttributes as `prop:${K}`]?: ZonosCartRestrictedItems[K] };
+        "zonos-cart-subtotal": Omit<ZonosCartSubtotal, keyof ZonosCartSubtotalAttributes> & { [K in keyof ZonosCartSubtotal & keyof ZonosCartSubtotalAttributes]?: ZonosCartSubtotal[K] } & { [K in keyof ZonosCartSubtotal & keyof ZonosCartSubtotalAttributes as `attr:${K}`]?: ZonosCartSubtotalAttributes[K] } & { [K in keyof ZonosCartSubtotal & keyof ZonosCartSubtotalAttributes as `prop:${K}`]?: ZonosCartSubtotal[K] };
+        "zonos-checkbox": Omit<ZonosCheckbox, keyof ZonosCheckboxAttributes> & { [K in keyof ZonosCheckbox & keyof ZonosCheckboxAttributes]?: ZonosCheckbox[K] } & { [K in keyof ZonosCheckbox & keyof ZonosCheckboxAttributes as `attr:${K}`]?: ZonosCheckboxAttributes[K] } & { [K in keyof ZonosCheckbox & keyof ZonosCheckboxAttributes as `prop:${K}`]?: ZonosCheckbox[K] };
+        "zonos-checkout": Omit<ZonosCheckout, keyof ZonosCheckoutAttributes> & { [K in keyof ZonosCheckout & keyof ZonosCheckoutAttributes]?: ZonosCheckout[K] } & { [K in keyof ZonosCheckout & keyof ZonosCheckoutAttributes as `attr:${K}`]?: ZonosCheckoutAttributes[K] } & { [K in keyof ZonosCheckout & keyof ZonosCheckoutAttributes as `prop:${K}`]?: ZonosCheckout[K] };
+        "zonos-checkout-finish": Omit<ZonosCheckoutFinish, keyof ZonosCheckoutFinishAttributes> & { [K in keyof ZonosCheckoutFinish & keyof ZonosCheckoutFinishAttributes]?: ZonosCheckoutFinish[K] } & { [K in keyof ZonosCheckoutFinish & keyof ZonosCheckoutFinishAttributes as `attr:${K}`]?: ZonosCheckoutFinishAttributes[K] } & { [K in keyof ZonosCheckoutFinish & keyof ZonosCheckoutFinishAttributes as `prop:${K}`]?: ZonosCheckoutFinish[K] };
+        "zonos-checkout-footer": Omit<ZonosCheckoutFooter, keyof ZonosCheckoutFooterAttributes> & { [K in keyof ZonosCheckoutFooter & keyof ZonosCheckoutFooterAttributes]?: ZonosCheckoutFooter[K] } & { [K in keyof ZonosCheckoutFooter & keyof ZonosCheckoutFooterAttributes as `attr:${K}`]?: ZonosCheckoutFooterAttributes[K] } & { [K in keyof ZonosCheckoutFooter & keyof ZonosCheckoutFooterAttributes as `prop:${K}`]?: ZonosCheckoutFooter[K] };
+        "zonos-checkout-payment": Omit<ZonosCheckoutPayment, keyof ZonosCheckoutPaymentAttributes> & { [K in keyof ZonosCheckoutPayment & keyof ZonosCheckoutPaymentAttributes]?: ZonosCheckoutPayment[K] } & { [K in keyof ZonosCheckoutPayment & keyof ZonosCheckoutPaymentAttributes as `attr:${K}`]?: ZonosCheckoutPaymentAttributes[K] } & { [K in keyof ZonosCheckoutPayment & keyof ZonosCheckoutPaymentAttributes as `prop:${K}`]?: ZonosCheckoutPayment[K] };
+        "zonos-checkout-progress-tabs": Omit<ZonosCheckoutProgressTabs, keyof ZonosCheckoutProgressTabsAttributes> & { [K in keyof ZonosCheckoutProgressTabs & keyof ZonosCheckoutProgressTabsAttributes]?: ZonosCheckoutProgressTabs[K] } & { [K in keyof ZonosCheckoutProgressTabs & keyof ZonosCheckoutProgressTabsAttributes as `attr:${K}`]?: ZonosCheckoutProgressTabsAttributes[K] } & { [K in keyof ZonosCheckoutProgressTabs & keyof ZonosCheckoutProgressTabsAttributes as `prop:${K}`]?: ZonosCheckoutProgressTabs[K] };
+        "zonos-collapse": Omit<ZonosCollapse, keyof ZonosCollapseAttributes> & { [K in keyof ZonosCollapse & keyof ZonosCollapseAttributes]?: ZonosCollapse[K] } & { [K in keyof ZonosCollapse & keyof ZonosCollapseAttributes as `attr:${K}`]?: ZonosCollapseAttributes[K] } & { [K in keyof ZonosCollapse & keyof ZonosCollapseAttributes as `prop:${K}`]?: ZonosCollapse[K] };
+        "zonos-collect": Omit<ZonosCollect, keyof ZonosCollectAttributes> & { [K in keyof ZonosCollect & keyof ZonosCollectAttributes]?: ZonosCollect[K] } & { [K in keyof ZonosCollect & keyof ZonosCollectAttributes as `attr:${K}`]?: ZonosCollectAttributes[K] } & { [K in keyof ZonosCollect & keyof ZonosCollectAttributes as `prop:${K}`]?: ZonosCollect[K] };
         "zonos-collect-cart-items": ZonosCollectCartItems;
-        "zonos-collect-finish": ZonosCollectFinish;
-        "zonos-collect-footer": ZonosCollectFooter;
-        "zonos-collect-order-details": ZonosCollectOrderDetails;
-        "zonos-collect-payment": ZonosCollectPayment;
-        "zonos-collect-review": ZonosCollectReview;
+        "zonos-collect-finish": Omit<ZonosCollectFinish, keyof ZonosCollectFinishAttributes> & { [K in keyof ZonosCollectFinish & keyof ZonosCollectFinishAttributes]?: ZonosCollectFinish[K] } & { [K in keyof ZonosCollectFinish & keyof ZonosCollectFinishAttributes as `attr:${K}`]?: ZonosCollectFinishAttributes[K] } & { [K in keyof ZonosCollectFinish & keyof ZonosCollectFinishAttributes as `prop:${K}`]?: ZonosCollectFinish[K] };
+        "zonos-collect-footer": Omit<ZonosCollectFooter, keyof ZonosCollectFooterAttributes> & { [K in keyof ZonosCollectFooter & keyof ZonosCollectFooterAttributes]?: ZonosCollectFooter[K] } & { [K in keyof ZonosCollectFooter & keyof ZonosCollectFooterAttributes as `attr:${K}`]?: ZonosCollectFooterAttributes[K] } & { [K in keyof ZonosCollectFooter & keyof ZonosCollectFooterAttributes as `prop:${K}`]?: ZonosCollectFooter[K] };
+        "zonos-collect-order-details": Omit<ZonosCollectOrderDetails, keyof ZonosCollectOrderDetailsAttributes> & { [K in keyof ZonosCollectOrderDetails & keyof ZonosCollectOrderDetailsAttributes]?: ZonosCollectOrderDetails[K] } & { [K in keyof ZonosCollectOrderDetails & keyof ZonosCollectOrderDetailsAttributes as `attr:${K}`]?: ZonosCollectOrderDetailsAttributes[K] } & { [K in keyof ZonosCollectOrderDetails & keyof ZonosCollectOrderDetailsAttributes as `prop:${K}`]?: ZonosCollectOrderDetails[K] } & OneOf<"collapsed", ZonosCollectOrderDetails["collapsed"], ZonosCollectOrderDetailsAttributes["collapsed"]>;
+        "zonos-collect-payment": Omit<ZonosCollectPayment, keyof ZonosCollectPaymentAttributes> & { [K in keyof ZonosCollectPayment & keyof ZonosCollectPaymentAttributes]?: ZonosCollectPayment[K] } & { [K in keyof ZonosCollectPayment & keyof ZonosCollectPaymentAttributes as `attr:${K}`]?: ZonosCollectPaymentAttributes[K] } & { [K in keyof ZonosCollectPayment & keyof ZonosCollectPaymentAttributes as `prop:${K}`]?: ZonosCollectPayment[K] };
+        "zonos-collect-review": Omit<ZonosCollectReview, keyof ZonosCollectReviewAttributes> & { [K in keyof ZonosCollectReview & keyof ZonosCollectReviewAttributes]?: ZonosCollectReview[K] } & { [K in keyof ZonosCollectReview & keyof ZonosCollectReviewAttributes as `attr:${K}`]?: ZonosCollectReviewAttributes[K] } & { [K in keyof ZonosCollectReview & keyof ZonosCollectReviewAttributes as `prop:${K}`]?: ZonosCollectReview[K] };
         "zonos-collect-subtotal": ZonosCollectSubtotal;
-        "zonos-component": ZonosComponent;
-        "zonos-confirm-dialog": ZonosConfirmDialog;
-        "zonos-controller": ZonosController;
-        "zonos-country-flag": ZonosCountryFlag;
+        "zonos-component": Omit<ZonosComponent, keyof ZonosComponentAttributes> & { [K in keyof ZonosComponent & keyof ZonosComponentAttributes]?: ZonosComponent[K] } & { [K in keyof ZonosComponent & keyof ZonosComponentAttributes as `attr:${K}`]?: ZonosComponentAttributes[K] } & { [K in keyof ZonosComponent & keyof ZonosComponentAttributes as `prop:${K}`]?: ZonosComponent[K] };
+        "zonos-confirm-dialog": Omit<ZonosConfirmDialog, keyof ZonosConfirmDialogAttributes> & { [K in keyof ZonosConfirmDialog & keyof ZonosConfirmDialogAttributes]?: ZonosConfirmDialog[K] } & { [K in keyof ZonosConfirmDialog & keyof ZonosConfirmDialogAttributes as `attr:${K}`]?: ZonosConfirmDialogAttributes[K] } & { [K in keyof ZonosConfirmDialog & keyof ZonosConfirmDialogAttributes as `prop:${K}`]?: ZonosConfirmDialog[K] } & OneOf<"dialogConfirmBtnText", ZonosConfirmDialog["dialogConfirmBtnText"], ZonosConfirmDialogAttributes["dialogConfirmBtnText"]> & OneOf<"dialogOpen", ZonosConfirmDialog["dialogOpen"], ZonosConfirmDialogAttributes["dialogOpen"]>;
+        "zonos-controller": Omit<ZonosController, keyof ZonosControllerAttributes> & { [K in keyof ZonosController & keyof ZonosControllerAttributes]?: ZonosController[K] } & { [K in keyof ZonosController & keyof ZonosControllerAttributes as `attr:${K}`]?: ZonosControllerAttributes[K] } & { [K in keyof ZonosController & keyof ZonosControllerAttributes as `prop:${K}`]?: ZonosController[K] } & OneOf<"zonosApiKey", ZonosController["zonosApiKey"], ZonosControllerAttributes["zonosApiKey"]>;
+        "zonos-country-flag": Omit<ZonosCountryFlag, keyof ZonosCountryFlagAttributes> & { [K in keyof ZonosCountryFlag & keyof ZonosCountryFlagAttributes]?: ZonosCountryFlag[K] } & { [K in keyof ZonosCountryFlag & keyof ZonosCountryFlagAttributes as `attr:${K}`]?: ZonosCountryFlagAttributes[K] } & { [K in keyof ZonosCountryFlag & keyof ZonosCountryFlagAttributes as `prop:${K}`]?: ZonosCountryFlag[K] };
         "zonos-country-select": ZonosCountrySelect;
         "zonos-currency-toggle": ZonosCurrencyToggle;
-        "zonos-custom-address": ZonosCustomAddress;
-        "zonos-custom-message": ZonosCustomMessage;
-        "zonos-customer-info": ZonosCustomerInfo;
-        "zonos-dialog": ZonosDialog;
-        "zonos-empty-state-payment": ZonosEmptyStatePayment;
-        "zonos-h-stack": ZonosHStack;
-        "zonos-hello": ZonosHello;
-        "zonos-hello-dialog": ZonosHelloDialog;
+        "zonos-custom-address": Omit<ZonosCustomAddress, keyof ZonosCustomAddressAttributes> & { [K in keyof ZonosCustomAddress & keyof ZonosCustomAddressAttributes]?: ZonosCustomAddress[K] } & { [K in keyof ZonosCustomAddress & keyof ZonosCustomAddressAttributes as `attr:${K}`]?: ZonosCustomAddressAttributes[K] } & { [K in keyof ZonosCustomAddress & keyof ZonosCustomAddressAttributes as `prop:${K}`]?: ZonosCustomAddress[K] } & OneOf<"type", ZonosCustomAddress["type"], ZonosCustomAddressAttributes["type"]> & OneOf<"titleText", ZonosCustomAddress["titleText"], ZonosCustomAddressAttributes["titleText"]>;
+        "zonos-custom-message": Omit<ZonosCustomMessage, keyof ZonosCustomMessageAttributes> & { [K in keyof ZonosCustomMessage & keyof ZonosCustomMessageAttributes]?: ZonosCustomMessage[K] } & { [K in keyof ZonosCustomMessage & keyof ZonosCustomMessageAttributes as `attr:${K}`]?: ZonosCustomMessageAttributes[K] } & { [K in keyof ZonosCustomMessage & keyof ZonosCustomMessageAttributes as `prop:${K}`]?: ZonosCustomMessage[K] };
+        "zonos-customer-info": Omit<ZonosCustomerInfo, keyof ZonosCustomerInfoAttributes> & { [K in keyof ZonosCustomerInfo & keyof ZonosCustomerInfoAttributes]?: ZonosCustomerInfo[K] } & { [K in keyof ZonosCustomerInfo & keyof ZonosCustomerInfoAttributes as `attr:${K}`]?: ZonosCustomerInfoAttributes[K] } & { [K in keyof ZonosCustomerInfo & keyof ZonosCustomerInfoAttributes as `prop:${K}`]?: ZonosCustomerInfo[K] };
+        "zonos-dialog": Omit<ZonosDialog, keyof ZonosDialogAttributes> & { [K in keyof ZonosDialog & keyof ZonosDialogAttributes]?: ZonosDialog[K] } & { [K in keyof ZonosDialog & keyof ZonosDialogAttributes as `attr:${K}`]?: ZonosDialogAttributes[K] } & { [K in keyof ZonosDialog & keyof ZonosDialogAttributes as `prop:${K}`]?: ZonosDialog[K] };
+        "zonos-empty-state-payment": Omit<ZonosEmptyStatePayment, keyof ZonosEmptyStatePaymentAttributes> & { [K in keyof ZonosEmptyStatePayment & keyof ZonosEmptyStatePaymentAttributes]?: ZonosEmptyStatePayment[K] } & { [K in keyof ZonosEmptyStatePayment & keyof ZonosEmptyStatePaymentAttributes as `attr:${K}`]?: ZonosEmptyStatePaymentAttributes[K] } & { [K in keyof ZonosEmptyStatePayment & keyof ZonosEmptyStatePaymentAttributes as `prop:${K}`]?: ZonosEmptyStatePayment[K] } & OneOf<"emptyStateText", ZonosEmptyStatePayment["emptyStateText"], ZonosEmptyStatePaymentAttributes["emptyStateText"]>;
+        "zonos-h-stack": Omit<ZonosHStack, keyof ZonosHStackAttributes> & { [K in keyof ZonosHStack & keyof ZonosHStackAttributes]?: ZonosHStack[K] } & { [K in keyof ZonosHStack & keyof ZonosHStackAttributes as `attr:${K}`]?: ZonosHStackAttributes[K] } & { [K in keyof ZonosHStack & keyof ZonosHStackAttributes as `prop:${K}`]?: ZonosHStack[K] };
+        "zonos-hello": Omit<ZonosHello, keyof ZonosHelloAttributes> & { [K in keyof ZonosHello & keyof ZonosHelloAttributes]?: ZonosHello[K] } & { [K in keyof ZonosHello & keyof ZonosHelloAttributes as `attr:${K}`]?: ZonosHelloAttributes[K] } & { [K in keyof ZonosHello & keyof ZonosHelloAttributes as `prop:${K}`]?: ZonosHello[K] };
+        "zonos-hello-dialog": Omit<ZonosHelloDialog, keyof ZonosHelloDialogAttributes> & { [K in keyof ZonosHelloDialog & keyof ZonosHelloDialogAttributes]?: ZonosHelloDialog[K] } & { [K in keyof ZonosHelloDialog & keyof ZonosHelloDialogAttributes as `attr:${K}`]?: ZonosHelloDialogAttributes[K] } & { [K in keyof ZonosHelloDialog & keyof ZonosHelloDialogAttributes as `prop:${K}`]?: ZonosHelloDialog[K] };
         "zonos-hello-dialog-footer": ZonosHelloDialogFooter;
-        "zonos-icon": ZonosIcon;
-        "zonos-input": ZonosInput;
-        "zonos-invoice": ZonosInvoice;
-        "zonos-invoice-cart-items": ZonosInvoiceCartItems;
-        "zonos-invoice-finish": ZonosInvoiceFinish;
-        "zonos-invoice-footer": ZonosInvoiceFooter;
-        "zonos-invoice-order-details": ZonosInvoiceOrderDetails;
-        "zonos-invoice-payment": ZonosInvoicePayment;
-        "zonos-invoice-review": ZonosInvoiceReview;
-        "zonos-invoice-subtotal": ZonosInvoiceSubtotal;
+        "zonos-icon": Omit<ZonosIcon, keyof ZonosIconAttributes> & { [K in keyof ZonosIcon & keyof ZonosIconAttributes]?: ZonosIcon[K] } & { [K in keyof ZonosIcon & keyof ZonosIconAttributes as `attr:${K}`]?: ZonosIconAttributes[K] } & { [K in keyof ZonosIcon & keyof ZonosIconAttributes as `prop:${K}`]?: ZonosIcon[K] } & OneOf<"content", ZonosIcon["content"], ZonosIconAttributes["content"]>;
+        "zonos-input": Omit<ZonosInput, keyof ZonosInputAttributes> & { [K in keyof ZonosInput & keyof ZonosInputAttributes]?: ZonosInput[K] } & { [K in keyof ZonosInput & keyof ZonosInputAttributes as `attr:${K}`]?: ZonosInputAttributes[K] } & { [K in keyof ZonosInput & keyof ZonosInputAttributes as `prop:${K}`]?: ZonosInput[K] } & OneOf<"inputLabel", ZonosInput["inputLabel"], ZonosInputAttributes["inputLabel"]>;
+        "zonos-invoice": Omit<ZonosInvoice, keyof ZonosInvoiceAttributes> & { [K in keyof ZonosInvoice & keyof ZonosInvoiceAttributes]?: ZonosInvoice[K] } & { [K in keyof ZonosInvoice & keyof ZonosInvoiceAttributes as `attr:${K}`]?: ZonosInvoiceAttributes[K] } & { [K in keyof ZonosInvoice & keyof ZonosInvoiceAttributes as `prop:${K}`]?: ZonosInvoice[K] };
+        "zonos-invoice-cart-items": Omit<ZonosInvoiceCartItems, keyof ZonosInvoiceCartItemsAttributes> & { [K in keyof ZonosInvoiceCartItems & keyof ZonosInvoiceCartItemsAttributes]?: ZonosInvoiceCartItems[K] } & { [K in keyof ZonosInvoiceCartItems & keyof ZonosInvoiceCartItemsAttributes as `attr:${K}`]?: ZonosInvoiceCartItemsAttributes[K] } & { [K in keyof ZonosInvoiceCartItems & keyof ZonosInvoiceCartItemsAttributes as `prop:${K}`]?: ZonosInvoiceCartItems[K] };
+        "zonos-invoice-finish": Omit<ZonosInvoiceFinish, keyof ZonosInvoiceFinishAttributes> & { [K in keyof ZonosInvoiceFinish & keyof ZonosInvoiceFinishAttributes]?: ZonosInvoiceFinish[K] } & { [K in keyof ZonosInvoiceFinish & keyof ZonosInvoiceFinishAttributes as `attr:${K}`]?: ZonosInvoiceFinishAttributes[K] } & { [K in keyof ZonosInvoiceFinish & keyof ZonosInvoiceFinishAttributes as `prop:${K}`]?: ZonosInvoiceFinish[K] };
+        "zonos-invoice-footer": Omit<ZonosInvoiceFooter, keyof ZonosInvoiceFooterAttributes> & { [K in keyof ZonosInvoiceFooter & keyof ZonosInvoiceFooterAttributes]?: ZonosInvoiceFooter[K] } & { [K in keyof ZonosInvoiceFooter & keyof ZonosInvoiceFooterAttributes as `attr:${K}`]?: ZonosInvoiceFooterAttributes[K] } & { [K in keyof ZonosInvoiceFooter & keyof ZonosInvoiceFooterAttributes as `prop:${K}`]?: ZonosInvoiceFooter[K] };
+        "zonos-invoice-order-details": Omit<ZonosInvoiceOrderDetails, keyof ZonosInvoiceOrderDetailsAttributes> & { [K in keyof ZonosInvoiceOrderDetails & keyof ZonosInvoiceOrderDetailsAttributes]?: ZonosInvoiceOrderDetails[K] } & { [K in keyof ZonosInvoiceOrderDetails & keyof ZonosInvoiceOrderDetailsAttributes as `attr:${K}`]?: ZonosInvoiceOrderDetailsAttributes[K] } & { [K in keyof ZonosInvoiceOrderDetails & keyof ZonosInvoiceOrderDetailsAttributes as `prop:${K}`]?: ZonosInvoiceOrderDetails[K] } & OneOf<"collapsed", ZonosInvoiceOrderDetails["collapsed"], ZonosInvoiceOrderDetailsAttributes["collapsed"]>;
+        "zonos-invoice-payment": Omit<ZonosInvoicePayment, keyof ZonosInvoicePaymentAttributes> & { [K in keyof ZonosInvoicePayment & keyof ZonosInvoicePaymentAttributes]?: ZonosInvoicePayment[K] } & { [K in keyof ZonosInvoicePayment & keyof ZonosInvoicePaymentAttributes as `attr:${K}`]?: ZonosInvoicePaymentAttributes[K] } & { [K in keyof ZonosInvoicePayment & keyof ZonosInvoicePaymentAttributes as `prop:${K}`]?: ZonosInvoicePayment[K] };
+        "zonos-invoice-review": Omit<ZonosInvoiceReview, keyof ZonosInvoiceReviewAttributes> & { [K in keyof ZonosInvoiceReview & keyof ZonosInvoiceReviewAttributes]?: ZonosInvoiceReview[K] } & { [K in keyof ZonosInvoiceReview & keyof ZonosInvoiceReviewAttributes as `attr:${K}`]?: ZonosInvoiceReviewAttributes[K] } & { [K in keyof ZonosInvoiceReview & keyof ZonosInvoiceReviewAttributes as `prop:${K}`]?: ZonosInvoiceReview[K] };
+        "zonos-invoice-subtotal": Omit<ZonosInvoiceSubtotal, keyof ZonosInvoiceSubtotalAttributes> & { [K in keyof ZonosInvoiceSubtotal & keyof ZonosInvoiceSubtotalAttributes]?: ZonosInvoiceSubtotal[K] } & { [K in keyof ZonosInvoiceSubtotal & keyof ZonosInvoiceSubtotalAttributes as `attr:${K}`]?: ZonosInvoiceSubtotalAttributes[K] } & { [K in keyof ZonosInvoiceSubtotal & keyof ZonosInvoiceSubtotalAttributes as `prop:${K}`]?: ZonosInvoiceSubtotal[K] };
         "zonos-language-select": ZonosLanguageSelect;
-        "zonos-link": ZonosLink;
-        "zonos-link-authentication": ZonosLinkAuthentication;
-        "zonos-loading-overlay": ZonosLoadingOverlay;
-        "zonos-logo": ZonosLogo;
+        "zonos-link": Omit<ZonosLink, keyof ZonosLinkAttributes> & { [K in keyof ZonosLink & keyof ZonosLinkAttributes]?: ZonosLink[K] } & { [K in keyof ZonosLink & keyof ZonosLinkAttributes as `attr:${K}`]?: ZonosLinkAttributes[K] } & { [K in keyof ZonosLink & keyof ZonosLinkAttributes as `prop:${K}`]?: ZonosLink[K] };
+        "zonos-link-authentication": Omit<ZonosLinkAuthentication, keyof ZonosLinkAuthenticationAttributes> & { [K in keyof ZonosLinkAuthentication & keyof ZonosLinkAuthenticationAttributes]?: ZonosLinkAuthentication[K] } & { [K in keyof ZonosLinkAuthentication & keyof ZonosLinkAuthenticationAttributes as `attr:${K}`]?: ZonosLinkAuthenticationAttributes[K] } & { [K in keyof ZonosLinkAuthentication & keyof ZonosLinkAuthenticationAttributes as `prop:${K}`]?: ZonosLinkAuthentication[K] } & OneOf<"titleText", ZonosLinkAuthentication["titleText"], ZonosLinkAuthenticationAttributes["titleText"]>;
+        "zonos-loading-overlay": Omit<ZonosLoadingOverlay, keyof ZonosLoadingOverlayAttributes> & { [K in keyof ZonosLoadingOverlay & keyof ZonosLoadingOverlayAttributes]?: ZonosLoadingOverlay[K] } & { [K in keyof ZonosLoadingOverlay & keyof ZonosLoadingOverlayAttributes as `attr:${K}`]?: ZonosLoadingOverlayAttributes[K] } & { [K in keyof ZonosLoadingOverlay & keyof ZonosLoadingOverlayAttributes as `prop:${K}`]?: ZonosLoadingOverlay[K] };
+        "zonos-logo": Omit<ZonosLogo, keyof ZonosLogoAttributes> & { [K in keyof ZonosLogo & keyof ZonosLogoAttributes]?: ZonosLogo[K] } & { [K in keyof ZonosLogo & keyof ZonosLogoAttributes as `attr:${K}`]?: ZonosLogoAttributes[K] } & { [K in keyof ZonosLogo & keyof ZonosLogoAttributes as `prop:${K}`]?: ZonosLogo[K] };
         "zonos-notification": ZonosNotification;
-        "zonos-payment": ZonosPayment;
+        "zonos-payment": Omit<ZonosPayment, keyof ZonosPaymentAttributes> & { [K in keyof ZonosPayment & keyof ZonosPaymentAttributes]?: ZonosPayment[K] } & { [K in keyof ZonosPayment & keyof ZonosPaymentAttributes as `attr:${K}`]?: ZonosPaymentAttributes[K] } & { [K in keyof ZonosPayment & keyof ZonosPaymentAttributes as `prop:${K}`]?: ZonosPayment[K] };
         "zonos-paypal-payment": ZonosPaypalPayment;
-        "zonos-rest-state": ZonosRestState;
-        "zonos-review": ZonosReview;
-        "zonos-select-dialog-header": ZonosSelectDialogHeader;
-        "zonos-shipping": ZonosShipping;
-        "zonos-shipping-rich-radio": ZonosShippingRichRadio;
-        "zonos-skeleton": ZonosSkeleton;
-        "zonos-spinner": ZonosSpinner;
-        "zonos-store-credit": ZonosStoreCredit;
-        "zonos-stripe-input": ZonosStripeInput;
-        "zonos-stripe-phone-input": ZonosStripePhoneInput;
-        "zonos-stripe-select": ZonosStripeSelect;
-        "zonos-text": ZonosText;
-        "zonos-toggle": ZonosToggle;
-        "zonos-tooltip": ZonosTooltip;
-        "zonos-v-stack": ZonosVStack;
-        "zonos-virtual-scroll": ZonosVirtualScroll;
+        "zonos-policy-consent": ZonosPolicyConsent;
+        "zonos-rest-state": Omit<ZonosRestState, keyof ZonosRestStateAttributes> & { [K in keyof ZonosRestState & keyof ZonosRestStateAttributes]?: ZonosRestState[K] } & { [K in keyof ZonosRestState & keyof ZonosRestStateAttributes as `attr:${K}`]?: ZonosRestStateAttributes[K] } & { [K in keyof ZonosRestState & keyof ZonosRestStateAttributes as `prop:${K}`]?: ZonosRestState[K] } & OneOf<"restStateSubtitle", ZonosRestState["restStateSubtitle"], ZonosRestStateAttributes["restStateSubtitle"]> & OneOf<"restStateTitle", ZonosRestState["restStateTitle"], ZonosRestStateAttributes["restStateTitle"]> & OneOf<"restStateType", ZonosRestState["restStateType"], ZonosRestStateAttributes["restStateType"]>;
+        "zonos-review": Omit<ZonosReview, keyof ZonosReviewAttributes> & { [K in keyof ZonosReview & keyof ZonosReviewAttributes]?: ZonosReview[K] } & { [K in keyof ZonosReview & keyof ZonosReviewAttributes as `attr:${K}`]?: ZonosReviewAttributes[K] } & { [K in keyof ZonosReview & keyof ZonosReviewAttributes as `prop:${K}`]?: ZonosReview[K] };
+        "zonos-select-dialog-header": Omit<ZonosSelectDialogHeader, keyof ZonosSelectDialogHeaderAttributes> & { [K in keyof ZonosSelectDialogHeader & keyof ZonosSelectDialogHeaderAttributes]?: ZonosSelectDialogHeader[K] } & { [K in keyof ZonosSelectDialogHeader & keyof ZonosSelectDialogHeaderAttributes as `attr:${K}`]?: ZonosSelectDialogHeaderAttributes[K] } & { [K in keyof ZonosSelectDialogHeader & keyof ZonosSelectDialogHeaderAttributes as `prop:${K}`]?: ZonosSelectDialogHeader[K] };
+        "zonos-shipping": Omit<ZonosShipping, keyof ZonosShippingAttributes> & { [K in keyof ZonosShipping & keyof ZonosShippingAttributes]?: ZonosShipping[K] } & { [K in keyof ZonosShipping & keyof ZonosShippingAttributes as `attr:${K}`]?: ZonosShippingAttributes[K] } & { [K in keyof ZonosShipping & keyof ZonosShippingAttributes as `prop:${K}`]?: ZonosShipping[K] } & OneOf<"isMobile", ZonosShipping["isMobile"], ZonosShippingAttributes["isMobile"]>;
+        "zonos-shipping-rich-radio": Omit<ZonosShippingRichRadio, keyof ZonosShippingRichRadioAttributes> & { [K in keyof ZonosShippingRichRadio & keyof ZonosShippingRichRadioAttributes]?: ZonosShippingRichRadio[K] } & { [K in keyof ZonosShippingRichRadio & keyof ZonosShippingRichRadioAttributes as `attr:${K}`]?: ZonosShippingRichRadioAttributes[K] } & { [K in keyof ZonosShippingRichRadio & keyof ZonosShippingRichRadioAttributes as `prop:${K}`]?: ZonosShippingRichRadio[K] } & OneOf<"isMobile", ZonosShippingRichRadio["isMobile"], ZonosShippingRichRadioAttributes["isMobile"]>;
+        "zonos-skeleton": Omit<ZonosSkeleton, keyof ZonosSkeletonAttributes> & { [K in keyof ZonosSkeleton & keyof ZonosSkeletonAttributes]?: ZonosSkeleton[K] } & { [K in keyof ZonosSkeleton & keyof ZonosSkeletonAttributes as `attr:${K}`]?: ZonosSkeletonAttributes[K] } & { [K in keyof ZonosSkeleton & keyof ZonosSkeletonAttributes as `prop:${K}`]?: ZonosSkeleton[K] };
+        "zonos-spinner": Omit<ZonosSpinner, keyof ZonosSpinnerAttributes> & { [K in keyof ZonosSpinner & keyof ZonosSpinnerAttributes]?: ZonosSpinner[K] } & { [K in keyof ZonosSpinner & keyof ZonosSpinnerAttributes as `attr:${K}`]?: ZonosSpinnerAttributes[K] } & { [K in keyof ZonosSpinner & keyof ZonosSpinnerAttributes as `prop:${K}`]?: ZonosSpinner[K] };
+        "zonos-store-credit": Omit<ZonosStoreCredit, keyof ZonosStoreCreditAttributes> & { [K in keyof ZonosStoreCredit & keyof ZonosStoreCreditAttributes]?: ZonosStoreCredit[K] } & { [K in keyof ZonosStoreCredit & keyof ZonosStoreCreditAttributes as `attr:${K}`]?: ZonosStoreCreditAttributes[K] } & { [K in keyof ZonosStoreCredit & keyof ZonosStoreCreditAttributes as `prop:${K}`]?: ZonosStoreCredit[K] };
+        "zonos-stripe-input": Omit<ZonosStripeInput, keyof ZonosStripeInputAttributes> & { [K in keyof ZonosStripeInput & keyof ZonosStripeInputAttributes]?: ZonosStripeInput[K] } & { [K in keyof ZonosStripeInput & keyof ZonosStripeInputAttributes as `attr:${K}`]?: ZonosStripeInputAttributes[K] } & { [K in keyof ZonosStripeInput & keyof ZonosStripeInputAttributes as `prop:${K}`]?: ZonosStripeInput[K] } & OneOf<"inputLabel", ZonosStripeInput["inputLabel"], ZonosStripeInputAttributes["inputLabel"]>;
+        "zonos-stripe-phone-input": Omit<ZonosStripePhoneInput, keyof ZonosStripePhoneInputAttributes> & { [K in keyof ZonosStripePhoneInput & keyof ZonosStripePhoneInputAttributes]?: ZonosStripePhoneInput[K] } & { [K in keyof ZonosStripePhoneInput & keyof ZonosStripePhoneInputAttributes as `attr:${K}`]?: ZonosStripePhoneInputAttributes[K] } & { [K in keyof ZonosStripePhoneInput & keyof ZonosStripePhoneInputAttributes as `prop:${K}`]?: ZonosStripePhoneInput[K] };
+        "zonos-stripe-select": Omit<ZonosStripeSelect, keyof ZonosStripeSelectAttributes> & { [K in keyof ZonosStripeSelect & keyof ZonosStripeSelectAttributes]?: ZonosStripeSelect[K] } & { [K in keyof ZonosStripeSelect & keyof ZonosStripeSelectAttributes as `attr:${K}`]?: ZonosStripeSelectAttributes[K] } & { [K in keyof ZonosStripeSelect & keyof ZonosStripeSelectAttributes as `prop:${K}`]?: ZonosStripeSelect[K] } & OneOf<"selectLabel", ZonosStripeSelect["selectLabel"], ZonosStripeSelectAttributes["selectLabel"]>;
+        "zonos-text": Omit<ZonosText, keyof ZonosTextAttributes> & { [K in keyof ZonosText & keyof ZonosTextAttributes]?: ZonosText[K] } & { [K in keyof ZonosText & keyof ZonosTextAttributes as `attr:${K}`]?: ZonosTextAttributes[K] } & { [K in keyof ZonosText & keyof ZonosTextAttributes as `prop:${K}`]?: ZonosText[K] };
+        "zonos-toggle": Omit<ZonosToggle, keyof ZonosToggleAttributes> & { [K in keyof ZonosToggle & keyof ZonosToggleAttributes]?: ZonosToggle[K] } & { [K in keyof ZonosToggle & keyof ZonosToggleAttributes as `attr:${K}`]?: ZonosToggleAttributes[K] } & { [K in keyof ZonosToggle & keyof ZonosToggleAttributes as `prop:${K}`]?: ZonosToggle[K] } & OneOf<"value", ZonosToggle["value"], ZonosToggleAttributes["value"]>;
+        "zonos-tooltip": Omit<ZonosTooltip, keyof ZonosTooltipAttributes> & { [K in keyof ZonosTooltip & keyof ZonosTooltipAttributes]?: ZonosTooltip[K] } & { [K in keyof ZonosTooltip & keyof ZonosTooltipAttributes as `attr:${K}`]?: ZonosTooltipAttributes[K] } & { [K in keyof ZonosTooltip & keyof ZonosTooltipAttributes as `prop:${K}`]?: ZonosTooltip[K] };
+        "zonos-v-stack": Omit<ZonosVStack, keyof ZonosVStackAttributes> & { [K in keyof ZonosVStack & keyof ZonosVStackAttributes]?: ZonosVStack[K] } & { [K in keyof ZonosVStack & keyof ZonosVStackAttributes as `attr:${K}`]?: ZonosVStackAttributes[K] } & { [K in keyof ZonosVStack & keyof ZonosVStackAttributes as `prop:${K}`]?: ZonosVStack[K] };
+        "zonos-virtual-scroll": Omit<ZonosVirtualScroll, keyof ZonosVirtualScrollAttributes> & { [K in keyof ZonosVirtualScroll & keyof ZonosVirtualScrollAttributes]?: ZonosVirtualScroll[K] } & { [K in keyof ZonosVirtualScroll & keyof ZonosVirtualScrollAttributes as `attr:${K}`]?: ZonosVirtualScrollAttributes[K] } & { [K in keyof ZonosVirtualScroll & keyof ZonosVirtualScrollAttributes as `prop:${K}`]?: ZonosVirtualScroll[K] } & OneOf<"fallbackItemHeight", ZonosVirtualScroll["fallbackItemHeight"], ZonosVirtualScrollAttributes["fallbackItemHeight"]>;
     }
 }
 export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "zonos-address": LocalJSX.ZonosAddress & JSXBase.HTMLAttributes<HTMLZonosAddressElement>;
-            "zonos-address-display": LocalJSX.ZonosAddressDisplay & JSXBase.HTMLAttributes<HTMLZonosAddressDisplayElement>;
-            "zonos-address-form": LocalJSX.ZonosAddressForm & JSXBase.HTMLAttributes<HTMLZonosAddressFormElement>;
-            "zonos-address-suggestions": LocalJSX.ZonosAddressSuggestions & JSXBase.HTMLAttributes<HTMLZonosAddressSuggestionsElement>;
-            "zonos-address-update-dialog": LocalJSX.ZonosAddressUpdateDialog & JSXBase.HTMLAttributes<HTMLZonosAddressUpdateDialogElement>;
-            "zonos-badge": LocalJSX.ZonosBadge & JSXBase.HTMLAttributes<HTMLZonosBadgeElement>;
-            "zonos-banner": LocalJSX.ZonosBanner & JSXBase.HTMLAttributes<HTMLZonosBannerElement>;
-            "zonos-button": LocalJSX.ZonosButton & JSXBase.HTMLAttributes<HTMLZonosButtonElement>;
-            "zonos-card": LocalJSX.ZonosCard & JSXBase.HTMLAttributes<HTMLZonosCardElement>;
-            "zonos-cart-items": LocalJSX.ZonosCartItems & JSXBase.HTMLAttributes<HTMLZonosCartItemsElement>;
-            "zonos-cart-restricted-items": LocalJSX.ZonosCartRestrictedItems & JSXBase.HTMLAttributes<HTMLZonosCartRestrictedItemsElement>;
-            "zonos-cart-subtotal": LocalJSX.ZonosCartSubtotal & JSXBase.HTMLAttributes<HTMLZonosCartSubtotalElement>;
-            "zonos-checkbox": LocalJSX.ZonosCheckbox & JSXBase.HTMLAttributes<HTMLZonosCheckboxElement>;
-            "zonos-checkout": LocalJSX.ZonosCheckout & JSXBase.HTMLAttributes<HTMLZonosCheckoutElement>;
-            "zonos-checkout-finish": LocalJSX.ZonosCheckoutFinish & JSXBase.HTMLAttributes<HTMLZonosCheckoutFinishElement>;
-            "zonos-checkout-footer": LocalJSX.ZonosCheckoutFooter & JSXBase.HTMLAttributes<HTMLZonosCheckoutFooterElement>;
-            "zonos-checkout-payment": LocalJSX.ZonosCheckoutPayment & JSXBase.HTMLAttributes<HTMLZonosCheckoutPaymentElement>;
-            "zonos-checkout-progress-tabs": LocalJSX.ZonosCheckoutProgressTabs & JSXBase.HTMLAttributes<HTMLZonosCheckoutProgressTabsElement>;
-            "zonos-collapse": LocalJSX.ZonosCollapse & JSXBase.HTMLAttributes<HTMLZonosCollapseElement>;
-            "zonos-collect": LocalJSX.ZonosCollect & JSXBase.HTMLAttributes<HTMLZonosCollectElement>;
-            "zonos-collect-cart-items": LocalJSX.ZonosCollectCartItems & JSXBase.HTMLAttributes<HTMLZonosCollectCartItemsElement>;
-            "zonos-collect-finish": LocalJSX.ZonosCollectFinish & JSXBase.HTMLAttributes<HTMLZonosCollectFinishElement>;
-            "zonos-collect-footer": LocalJSX.ZonosCollectFooter & JSXBase.HTMLAttributes<HTMLZonosCollectFooterElement>;
-            "zonos-collect-order-details": LocalJSX.ZonosCollectOrderDetails & JSXBase.HTMLAttributes<HTMLZonosCollectOrderDetailsElement>;
-            "zonos-collect-payment": LocalJSX.ZonosCollectPayment & JSXBase.HTMLAttributes<HTMLZonosCollectPaymentElement>;
-            "zonos-collect-review": LocalJSX.ZonosCollectReview & JSXBase.HTMLAttributes<HTMLZonosCollectReviewElement>;
-            "zonos-collect-subtotal": LocalJSX.ZonosCollectSubtotal & JSXBase.HTMLAttributes<HTMLZonosCollectSubtotalElement>;
-            "zonos-component": LocalJSX.ZonosComponent & JSXBase.HTMLAttributes<HTMLZonosComponentElement>;
-            "zonos-confirm-dialog": LocalJSX.ZonosConfirmDialog & JSXBase.HTMLAttributes<HTMLZonosConfirmDialogElement>;
-            "zonos-controller": LocalJSX.ZonosController & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
-            "zonos-country-flag": LocalJSX.ZonosCountryFlag & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
-            "zonos-country-select": LocalJSX.ZonosCountrySelect & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
-            "zonos-currency-toggle": LocalJSX.ZonosCurrencyToggle & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
-            "zonos-custom-address": LocalJSX.ZonosCustomAddress & JSXBase.HTMLAttributes<HTMLZonosCustomAddressElement>;
-            "zonos-custom-message": LocalJSX.ZonosCustomMessage & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
-            "zonos-customer-info": LocalJSX.ZonosCustomerInfo & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
-            "zonos-dialog": LocalJSX.ZonosDialog & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
-            "zonos-empty-state-payment": LocalJSX.ZonosEmptyStatePayment & JSXBase.HTMLAttributes<HTMLZonosEmptyStatePaymentElement>;
-            "zonos-h-stack": LocalJSX.ZonosHStack & JSXBase.HTMLAttributes<HTMLZonosHStackElement>;
-            "zonos-hello": LocalJSX.ZonosHello & JSXBase.HTMLAttributes<HTMLZonosHelloElement>;
-            "zonos-hello-dialog": LocalJSX.ZonosHelloDialog & JSXBase.HTMLAttributes<HTMLZonosHelloDialogElement>;
-            "zonos-hello-dialog-footer": LocalJSX.ZonosHelloDialogFooter & JSXBase.HTMLAttributes<HTMLZonosHelloDialogFooterElement>;
-            "zonos-icon": LocalJSX.ZonosIcon & JSXBase.HTMLAttributes<HTMLZonosIconElement>;
-            "zonos-input": LocalJSX.ZonosInput & JSXBase.HTMLAttributes<HTMLZonosInputElement>;
-            "zonos-invoice": LocalJSX.ZonosInvoice & JSXBase.HTMLAttributes<HTMLZonosInvoiceElement>;
-            "zonos-invoice-cart-items": LocalJSX.ZonosInvoiceCartItems & JSXBase.HTMLAttributes<HTMLZonosInvoiceCartItemsElement>;
-            "zonos-invoice-finish": LocalJSX.ZonosInvoiceFinish & JSXBase.HTMLAttributes<HTMLZonosInvoiceFinishElement>;
-            "zonos-invoice-footer": LocalJSX.ZonosInvoiceFooter & JSXBase.HTMLAttributes<HTMLZonosInvoiceFooterElement>;
-            "zonos-invoice-order-details": LocalJSX.ZonosInvoiceOrderDetails & JSXBase.HTMLAttributes<HTMLZonosInvoiceOrderDetailsElement>;
-            "zonos-invoice-payment": LocalJSX.ZonosInvoicePayment & JSXBase.HTMLAttributes<HTMLZonosInvoicePaymentElement>;
-            "zonos-invoice-review": LocalJSX.ZonosInvoiceReview & JSXBase.HTMLAttributes<HTMLZonosInvoiceReviewElement>;
-            "zonos-invoice-subtotal": LocalJSX.ZonosInvoiceSubtotal & JSXBase.HTMLAttributes<HTMLZonosInvoiceSubtotalElement>;
-            "zonos-language-select": LocalJSX.ZonosLanguageSelect & JSXBase.HTMLAttributes<HTMLZonosLanguageSelectElement>;
-            "zonos-link": LocalJSX.ZonosLink & JSXBase.HTMLAttributes<HTMLZonosLinkElement>;
-            "zonos-link-authentication": LocalJSX.ZonosLinkAuthentication & JSXBase.HTMLAttributes<HTMLZonosLinkAuthenticationElement>;
-            "zonos-loading-overlay": LocalJSX.ZonosLoadingOverlay & JSXBase.HTMLAttributes<HTMLZonosLoadingOverlayElement>;
-            "zonos-logo": LocalJSX.ZonosLogo & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
-            "zonos-notification": LocalJSX.ZonosNotification & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
-            "zonos-payment": LocalJSX.ZonosPayment & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
-            "zonos-paypal-payment": LocalJSX.ZonosPaypalPayment & JSXBase.HTMLAttributes<HTMLZonosPaypalPaymentElement>;
-            "zonos-rest-state": LocalJSX.ZonosRestState & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
-            "zonos-review": LocalJSX.ZonosReview & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
-            "zonos-select-dialog-header": LocalJSX.ZonosSelectDialogHeader & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
-            "zonos-shipping": LocalJSX.ZonosShipping & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
-            "zonos-shipping-rich-radio": LocalJSX.ZonosShippingRichRadio & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
-            "zonos-skeleton": LocalJSX.ZonosSkeleton & JSXBase.HTMLAttributes<HTMLZonosSkeletonElement>;
-            "zonos-spinner": LocalJSX.ZonosSpinner & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
-            "zonos-store-credit": LocalJSX.ZonosStoreCredit & JSXBase.HTMLAttributes<HTMLZonosStoreCreditElement>;
+            "zonos-address": LocalJSX.IntrinsicElements["zonos-address"] & JSXBase.HTMLAttributes<HTMLZonosAddressElement>;
+            "zonos-address-completion-dialog": LocalJSX.IntrinsicElements["zonos-address-completion-dialog"] & JSXBase.HTMLAttributes<HTMLZonosAddressCompletionDialogElement>;
+            "zonos-address-display": LocalJSX.IntrinsicElements["zonos-address-display"] & JSXBase.HTMLAttributes<HTMLZonosAddressDisplayElement>;
+            "zonos-address-form": LocalJSX.IntrinsicElements["zonos-address-form"] & JSXBase.HTMLAttributes<HTMLZonosAddressFormElement>;
+            "zonos-address-suggestions": LocalJSX.IntrinsicElements["zonos-address-suggestions"] & JSXBase.HTMLAttributes<HTMLZonosAddressSuggestionsElement>;
+            "zonos-address-update-dialog": LocalJSX.IntrinsicElements["zonos-address-update-dialog"] & JSXBase.HTMLAttributes<HTMLZonosAddressUpdateDialogElement>;
+            "zonos-airwallex-payment": LocalJSX.IntrinsicElements["zonos-airwallex-payment"] & JSXBase.HTMLAttributes<HTMLZonosAirwallexPaymentElement>;
+            "zonos-badge": LocalJSX.IntrinsicElements["zonos-badge"] & JSXBase.HTMLAttributes<HTMLZonosBadgeElement>;
+            "zonos-banner": LocalJSX.IntrinsicElements["zonos-banner"] & JSXBase.HTMLAttributes<HTMLZonosBannerElement>;
+            "zonos-button": LocalJSX.IntrinsicElements["zonos-button"] & JSXBase.HTMLAttributes<HTMLZonosButtonElement>;
+            "zonos-card": LocalJSX.IntrinsicElements["zonos-card"] & JSXBase.HTMLAttributes<HTMLZonosCardElement>;
+            "zonos-cart-items": LocalJSX.IntrinsicElements["zonos-cart-items"] & JSXBase.HTMLAttributes<HTMLZonosCartItemsElement>;
+            "zonos-cart-restricted-items": LocalJSX.IntrinsicElements["zonos-cart-restricted-items"] & JSXBase.HTMLAttributes<HTMLZonosCartRestrictedItemsElement>;
+            "zonos-cart-subtotal": LocalJSX.IntrinsicElements["zonos-cart-subtotal"] & JSXBase.HTMLAttributes<HTMLZonosCartSubtotalElement>;
+            "zonos-checkbox": LocalJSX.IntrinsicElements["zonos-checkbox"] & JSXBase.HTMLAttributes<HTMLZonosCheckboxElement>;
+            "zonos-checkout": LocalJSX.IntrinsicElements["zonos-checkout"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutElement>;
+            "zonos-checkout-finish": LocalJSX.IntrinsicElements["zonos-checkout-finish"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutFinishElement>;
+            "zonos-checkout-footer": LocalJSX.IntrinsicElements["zonos-checkout-footer"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutFooterElement>;
+            "zonos-checkout-payment": LocalJSX.IntrinsicElements["zonos-checkout-payment"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutPaymentElement>;
+            "zonos-checkout-progress-tabs": LocalJSX.IntrinsicElements["zonos-checkout-progress-tabs"] & JSXBase.HTMLAttributes<HTMLZonosCheckoutProgressTabsElement>;
+            "zonos-collapse": LocalJSX.IntrinsicElements["zonos-collapse"] & JSXBase.HTMLAttributes<HTMLZonosCollapseElement>;
+            "zonos-collect": LocalJSX.IntrinsicElements["zonos-collect"] & JSXBase.HTMLAttributes<HTMLZonosCollectElement>;
+            "zonos-collect-cart-items": LocalJSX.IntrinsicElements["zonos-collect-cart-items"] & JSXBase.HTMLAttributes<HTMLZonosCollectCartItemsElement>;
+            "zonos-collect-finish": LocalJSX.IntrinsicElements["zonos-collect-finish"] & JSXBase.HTMLAttributes<HTMLZonosCollectFinishElement>;
+            "zonos-collect-footer": LocalJSX.IntrinsicElements["zonos-collect-footer"] & JSXBase.HTMLAttributes<HTMLZonosCollectFooterElement>;
+            "zonos-collect-order-details": LocalJSX.IntrinsicElements["zonos-collect-order-details"] & JSXBase.HTMLAttributes<HTMLZonosCollectOrderDetailsElement>;
+            "zonos-collect-payment": LocalJSX.IntrinsicElements["zonos-collect-payment"] & JSXBase.HTMLAttributes<HTMLZonosCollectPaymentElement>;
+            "zonos-collect-review": LocalJSX.IntrinsicElements["zonos-collect-review"] & JSXBase.HTMLAttributes<HTMLZonosCollectReviewElement>;
+            "zonos-collect-subtotal": LocalJSX.IntrinsicElements["zonos-collect-subtotal"] & JSXBase.HTMLAttributes<HTMLZonosCollectSubtotalElement>;
+            "zonos-component": LocalJSX.IntrinsicElements["zonos-component"] & JSXBase.HTMLAttributes<HTMLZonosComponentElement>;
+            "zonos-confirm-dialog": LocalJSX.IntrinsicElements["zonos-confirm-dialog"] & JSXBase.HTMLAttributes<HTMLZonosConfirmDialogElement>;
+            "zonos-controller": LocalJSX.IntrinsicElements["zonos-controller"] & JSXBase.HTMLAttributes<HTMLZonosControllerElement>;
+            "zonos-country-flag": LocalJSX.IntrinsicElements["zonos-country-flag"] & JSXBase.HTMLAttributes<HTMLZonosCountryFlagElement>;
+            "zonos-country-select": LocalJSX.IntrinsicElements["zonos-country-select"] & JSXBase.HTMLAttributes<HTMLZonosCountrySelectElement>;
+            "zonos-currency-toggle": LocalJSX.IntrinsicElements["zonos-currency-toggle"] & JSXBase.HTMLAttributes<HTMLZonosCurrencyToggleElement>;
+            "zonos-custom-address": LocalJSX.IntrinsicElements["zonos-custom-address"] & JSXBase.HTMLAttributes<HTMLZonosCustomAddressElement>;
+            "zonos-custom-message": LocalJSX.IntrinsicElements["zonos-custom-message"] & JSXBase.HTMLAttributes<HTMLZonosCustomMessageElement>;
+            "zonos-customer-info": LocalJSX.IntrinsicElements["zonos-customer-info"] & JSXBase.HTMLAttributes<HTMLZonosCustomerInfoElement>;
+            "zonos-dialog": LocalJSX.IntrinsicElements["zonos-dialog"] & JSXBase.HTMLAttributes<HTMLZonosDialogElement>;
+            "zonos-empty-state-payment": LocalJSX.IntrinsicElements["zonos-empty-state-payment"] & JSXBase.HTMLAttributes<HTMLZonosEmptyStatePaymentElement>;
+            "zonos-h-stack": LocalJSX.IntrinsicElements["zonos-h-stack"] & JSXBase.HTMLAttributes<HTMLZonosHStackElement>;
+            "zonos-hello": LocalJSX.IntrinsicElements["zonos-hello"] & JSXBase.HTMLAttributes<HTMLZonosHelloElement>;
+            "zonos-hello-dialog": LocalJSX.IntrinsicElements["zonos-hello-dialog"] & JSXBase.HTMLAttributes<HTMLZonosHelloDialogElement>;
+            "zonos-hello-dialog-footer": LocalJSX.IntrinsicElements["zonos-hello-dialog-footer"] & JSXBase.HTMLAttributes<HTMLZonosHelloDialogFooterElement>;
+            "zonos-icon": LocalJSX.IntrinsicElements["zonos-icon"] & JSXBase.HTMLAttributes<HTMLZonosIconElement>;
+            "zonos-input": LocalJSX.IntrinsicElements["zonos-input"] & JSXBase.HTMLAttributes<HTMLZonosInputElement>;
+            "zonos-invoice": LocalJSX.IntrinsicElements["zonos-invoice"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceElement>;
+            "zonos-invoice-cart-items": LocalJSX.IntrinsicElements["zonos-invoice-cart-items"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceCartItemsElement>;
+            "zonos-invoice-finish": LocalJSX.IntrinsicElements["zonos-invoice-finish"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceFinishElement>;
+            "zonos-invoice-footer": LocalJSX.IntrinsicElements["zonos-invoice-footer"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceFooterElement>;
+            "zonos-invoice-order-details": LocalJSX.IntrinsicElements["zonos-invoice-order-details"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceOrderDetailsElement>;
+            "zonos-invoice-payment": LocalJSX.IntrinsicElements["zonos-invoice-payment"] & JSXBase.HTMLAttributes<HTMLZonosInvoicePaymentElement>;
+            "zonos-invoice-review": LocalJSX.IntrinsicElements["zonos-invoice-review"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceReviewElement>;
+            "zonos-invoice-subtotal": LocalJSX.IntrinsicElements["zonos-invoice-subtotal"] & JSXBase.HTMLAttributes<HTMLZonosInvoiceSubtotalElement>;
+            "zonos-language-select": LocalJSX.IntrinsicElements["zonos-language-select"] & JSXBase.HTMLAttributes<HTMLZonosLanguageSelectElement>;
+            "zonos-link": LocalJSX.IntrinsicElements["zonos-link"] & JSXBase.HTMLAttributes<HTMLZonosLinkElement>;
+            "zonos-link-authentication": LocalJSX.IntrinsicElements["zonos-link-authentication"] & JSXBase.HTMLAttributes<HTMLZonosLinkAuthenticationElement>;
+            "zonos-loading-overlay": LocalJSX.IntrinsicElements["zonos-loading-overlay"] & JSXBase.HTMLAttributes<HTMLZonosLoadingOverlayElement>;
+            "zonos-logo": LocalJSX.IntrinsicElements["zonos-logo"] & JSXBase.HTMLAttributes<HTMLZonosLogoElement>;
+            "zonos-notification": LocalJSX.IntrinsicElements["zonos-notification"] & JSXBase.HTMLAttributes<HTMLZonosNotificationElement>;
+            "zonos-payment": LocalJSX.IntrinsicElements["zonos-payment"] & JSXBase.HTMLAttributes<HTMLZonosPaymentElement>;
+            "zonos-paypal-payment": LocalJSX.IntrinsicElements["zonos-paypal-payment"] & JSXBase.HTMLAttributes<HTMLZonosPaypalPaymentElement>;
+            "zonos-policy-consent": LocalJSX.IntrinsicElements["zonos-policy-consent"] & JSXBase.HTMLAttributes<HTMLZonosPolicyConsentElement>;
+            "zonos-rest-state": LocalJSX.IntrinsicElements["zonos-rest-state"] & JSXBase.HTMLAttributes<HTMLZonosRestStateElement>;
+            "zonos-review": LocalJSX.IntrinsicElements["zonos-review"] & JSXBase.HTMLAttributes<HTMLZonosReviewElement>;
+            "zonos-select-dialog-header": LocalJSX.IntrinsicElements["zonos-select-dialog-header"] & JSXBase.HTMLAttributes<HTMLZonosSelectDialogHeaderElement>;
+            "zonos-shipping": LocalJSX.IntrinsicElements["zonos-shipping"] & JSXBase.HTMLAttributes<HTMLZonosShippingElement>;
+            "zonos-shipping-rich-radio": LocalJSX.IntrinsicElements["zonos-shipping-rich-radio"] & JSXBase.HTMLAttributes<HTMLZonosShippingRichRadioElement>;
+            "zonos-skeleton": LocalJSX.IntrinsicElements["zonos-skeleton"] & JSXBase.HTMLAttributes<HTMLZonosSkeletonElement>;
+            "zonos-spinner": LocalJSX.IntrinsicElements["zonos-spinner"] & JSXBase.HTMLAttributes<HTMLZonosSpinnerElement>;
+            "zonos-store-credit": LocalJSX.IntrinsicElements["zonos-store-credit"] & JSXBase.HTMLAttributes<HTMLZonosStoreCreditElement>;
             /**
              * This component is input that has similar style to Stripe since we will use it with other Stripe elements when we don't want to use Link authentication element
              */
-            "zonos-stripe-input": LocalJSX.ZonosStripeInput & JSXBase.HTMLAttributes<HTMLZonosStripeInputElement>;
-            "zonos-stripe-phone-input": LocalJSX.ZonosStripePhoneInput & JSXBase.HTMLAttributes<HTMLZonosStripePhoneInputElement>;
-            "zonos-stripe-select": LocalJSX.ZonosStripeSelect & JSXBase.HTMLAttributes<HTMLZonosStripeSelectElement>;
-            "zonos-text": LocalJSX.ZonosText & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
-            "zonos-toggle": LocalJSX.ZonosToggle & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
-            "zonos-tooltip": LocalJSX.ZonosTooltip & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
-            "zonos-v-stack": LocalJSX.ZonosVStack & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
+            "zonos-stripe-input": LocalJSX.IntrinsicElements["zonos-stripe-input"] & JSXBase.HTMLAttributes<HTMLZonosStripeInputElement>;
+            "zonos-stripe-phone-input": LocalJSX.IntrinsicElements["zonos-stripe-phone-input"] & JSXBase.HTMLAttributes<HTMLZonosStripePhoneInputElement>;
+            "zonos-stripe-select": LocalJSX.IntrinsicElements["zonos-stripe-select"] & JSXBase.HTMLAttributes<HTMLZonosStripeSelectElement>;
+            "zonos-text": LocalJSX.IntrinsicElements["zonos-text"] & JSXBase.HTMLAttributes<HTMLZonosTextElement>;
+            "zonos-toggle": LocalJSX.IntrinsicElements["zonos-toggle"] & JSXBase.HTMLAttributes<HTMLZonosToggleElement>;
+            "zonos-tooltip": LocalJSX.IntrinsicElements["zonos-tooltip"] & JSXBase.HTMLAttributes<HTMLZonosTooltipElement>;
+            "zonos-v-stack": LocalJSX.IntrinsicElements["zonos-v-stack"] & JSXBase.HTMLAttributes<HTMLZonosVStackElement>;
             /**
              * Virtual scroll component for efficiently rendering large lists
              * The idea is from:
              * @ref https://github.com/beenotung/stencil-virtual-scroll/blob/master/src/components/virtual-scroll-list/virtual-scroll-list.scss
              * @ref https://github.dev/ionic-team/ionic-framework/blob/v6.7.5/core/src/components/virtual-scroll/virtual-scroll.tsx
              */
-            "zonos-virtual-scroll": LocalJSX.ZonosVirtualScroll & JSXBase.HTMLAttributes<HTMLZonosVirtualScrollElement>;
+            "zonos-virtual-scroll": LocalJSX.IntrinsicElements["zonos-virtual-scroll"] & JSXBase.HTMLAttributes<HTMLZonosVirtualScrollElement>;
         }
     }
 }

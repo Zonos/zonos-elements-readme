@@ -1,3 +1,4 @@
+import type { CheckoutTaxIdTypeValue } from "../TaxId";
 import type { CountryCode } from "../../generated/graphql.internal.types";
 export type CreatePartyRequest = {
     address: {
@@ -28,6 +29,7 @@ export type CreatePartyRequest = {
     rootId: string;
     shortAddressCode?: string;
     taxId?: string;
+    taxIdType?: CheckoutTaxIdTypeValue;
 };
 export type CreatePartyResponse = {
     billToPartyId: string;
